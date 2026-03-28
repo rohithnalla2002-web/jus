@@ -2,9 +2,10 @@ import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import PageHeader from "@/components/shared/PageHeader";
-import { Plus, Filter, Grid3X3, List, Star, Shield, QrCode, X } from "lucide-react";
+import { Plus, Filter, Grid3X3, List, Star, Shield, QrCode, X, Loader2 } from "lucide-react";
 import { useAppDemo } from "@/context/AppDemoContext";
 import { toast } from "@/hooks/use-toast";
+import { useSubmitLock } from "@/hooks/useSubmitLock";
 import { ProductQrDialog } from "@/components/shared/ProductQrDialog";
 import { InventoryItemDetailDialog } from "@/components/inventory/InventoryItemDetailDialog";
 import type { InventoryItem } from "@/lib/api";
@@ -29,6 +30,7 @@ const initialForm = {
 };
 
 const Inventory = () => {
+  const { pending: addingItem, runExclusive } = useSubmitLock();
   const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, globalSearch } = useAppDemo();
   const [category, setCategory] = useState("All");
   const [purity, setPurity] = useState("All");
@@ -88,19 +90,22 @@ const Inventory = () => {
       return;
     }
 
-    try {
-      const created = await addInventoryItem(form);
-      setForm(initialForm);
-      setShowModal(false);
-      setQrCelebrate(true);
-      setQrItem(created);
-      toast({
-        title: "Inventory updated",
-        description: `${form.name} has been added to inventory.`,
-      });
-    } catch {
-      toast({ title: "Could not save", description: "Check that the API server is running and try again." });
-    }
+    const nameForToast = form.name.trim();
+    await runExclusive(async () => {
+      try {
+        const created = await addInventoryItem(form);
+        setForm(initialForm);
+        setShowModal(false);
+        setQrCelebrate(true);
+        setQrItem(created);
+        toast({
+          title: "Inventory updated",
+          description: `${nameForToast} has been added to inventory.`,
+        });
+      } catch {
+        toast({ title: "Could not save", description: "Check that the API server is running and try again." });
+      }
+    });
   };
 
   return (
@@ -113,7 +118,8 @@ const Inventory = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg gold-gradient text-primary-foreground font-medium text-sm btn-ripple"
+            disabled={addingItem}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg gold-gradient text-primary-foreground font-medium text-sm btn-ripple disabled:opacity-60"
           >
             <Plus className="w-4 h-4" /> Add Item
           </motion.button>
@@ -262,11 +268,25 @@ const Inventory = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass rounded-2xl p-6 w-full max-w-lg max-h-[min(90dvh,calc(100dvh-2rem))] overflow-y-auto overscroll-contain gold-glow my-auto"
+              className="relative glass rounded-2xl p-6 w-full max-w-lg max-h-[min(90dvh,calc(100dvh-2rem))] overflow-y-auto overscroll-contain gold-glow my-auto"
             >
+              {addingItem && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-background/55 backdrop-blur-[1px]">
+                  <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+                    <Loader2 className="w-5 h-5 animate-spin" /> Adding…
+                  </span>
+                </div>
+              )}
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-serif font-bold gold-text">Add New Item</h2>
-                <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-secondary text-muted-foreground"><X className="w-5 h-5" /></button>
+                <button
+                  type="button"
+                  disabled={addingItem}
+                  onClick={() => setShowModal(false)}
+                  className="p-1 rounded-lg hover:bg-secondary text-muted-foreground disabled:opacity-40"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
               <div className="space-y-4">
                 <div>
@@ -418,13 +438,20 @@ const Inventory = () => {
                   )}
                 </div>
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: addingItem ? 1 : 1.02 }}
+                  whileTap={{ scale: addingItem ? 1 : 0.98 }}
                   type="button"
-                  onClick={handleSubmit}
-                  className="w-full py-3 rounded-lg gold-gradient text-primary-foreground font-semibold text-sm btn-ripple"
+                  disabled={addingItem}
+                  onClick={() => void handleSubmit()}
+                  className="w-full py-3 rounded-lg gold-gradient text-primary-foreground font-semibold text-sm btn-ripple inline-flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  Add to Inventory
+                  {addingItem ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Adding…
+                    </>
+                  ) : (
+                    "Add to Inventory"
+                  )}
                 </motion.button>
               </div>
             </motion.div>

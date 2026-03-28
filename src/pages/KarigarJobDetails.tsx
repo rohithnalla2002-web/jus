@@ -13,9 +13,10 @@ import {
 } from "@/lib/api";
 import { normCustomerKey, normalizePhoneDigits, phonesMatch } from "@/lib/customerPhoneLookup";
 import { toast } from "@/hooks/use-toast";
+import { useSubmitLock } from "@/hooks/useSubmitLock";
 import { formatCurrency, parseCurrency } from "@/lib/demo";
 import { downloadKarigarJobReceiptHtml } from "@/lib/invoiceHtml";
-import { ArrowLeft, ArrowRight, FileText, Hammer, Mail, MapPin, Phone, User } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileText, Hammer, Loader2, Mail, MapPin, Phone, User } from "lucide-react";
 
 function displayStr(value: string | undefined | null) {
   const t = String(value ?? "").trim();
@@ -50,6 +51,7 @@ function workflowLabel(stage: KarigarColumnKey | undefined) {
 export default function KarigarJobDetails() {
   const navigate = useNavigate();
   const { jobId } = useParams<{ jobId: string }>();
+  const { pending: advancingJob, runExclusive } = useSubmitLock();
   const { karigarBoard, customerList, moveKarigarJob, dataLoading } = useAppDemo();
 
   const numericId = jobId ? Number(jobId) : NaN;
@@ -124,22 +126,25 @@ export default function KarigarJobDetails() {
 
   const handleAdvance = async () => {
     if (!baseJob) return;
-    try {
-      const next = await moveKarigarJob(baseJob.id);
-      if (!next) {
-        toast({ title: "Already completed", description: "This job is already in the final stage." });
-        return;
-      }
-      toast({ title: "Job updated", description: `Moved to ${workflowLabel(next as KarigarColumnKey)}.` });
+    const id = baseJob.id;
+    await runExclusive(async () => {
       try {
-        const fresh = await fetchKarigarJobById(baseJob.id);
-        setRemoteJob(fresh);
+        const next = await moveKarigarJob(id);
+        if (!next) {
+          toast({ title: "Already completed", description: "This job is already in the final stage." });
+          return;
+        }
+        toast({ title: "Job updated", description: `Moved to ${workflowLabel(next as KarigarColumnKey)}.` });
+        try {
+          const fresh = await fetchKarigarJobById(id);
+          setRemoteJob(fresh);
+        } catch {
+          /* context refresh updated board */
+        }
       } catch {
-        /* context refresh updated board */
+        toast({ title: "Update failed", description: "Could not advance the job. Is the API running?" });
       }
-    } catch {
-      toast({ title: "Update failed", description: "Could not advance the job. Is the API running?" });
-    }
+    });
   };
 
   if (dataLoading) {
@@ -336,10 +341,18 @@ export default function KarigarJobDetails() {
           <button
             type="button"
             onClick={() => void handleAdvance()}
-            disabled={columnKey === "completed"}
+            disabled={columnKey === "completed" || advancingJob}
             className="flex-1 rounded-xl gold-gradient px-4 py-3 text-sm font-medium text-primary-foreground inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Advance job <ArrowRight className="w-4 h-4" />
+            {advancingJob ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Updating…
+              </>
+            ) : (
+              <>
+                Advance job <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </button>
         </div>
       </motion.div>

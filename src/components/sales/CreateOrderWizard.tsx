@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Camera, ChevronLeft, ChevronRight, Download, Trash2 } from "lucide-react";
+import { Camera, ChevronLeft, ChevronRight, Download, Loader2, Trash2 } from "lucide-react";
 import type { Customer, InventoryItem, Order } from "@/lib/api";
 import { lookupContactByPhone, normalizePhoneDigits } from "@/lib/customerPhoneLookup";
 import { formatCurrency, parseCurrency } from "@/lib/demo";
 import { parseProductIdInput, formatProductId } from "@/lib/productQr";
 import { QrScanDialog } from "@/components/shared/QrScanDialog";
 import { toast } from "@/hooks/use-toast";
+import { useSubmitLock } from "@/hooks/useSubmitLock";
 import { downloadSalesReceiptHtml, receiptLineTotals, type ReceiptLine } from "@/lib/salesReceiptHtml";
 import {
   DEFAULT_PAYMENT_MODE,
@@ -104,7 +105,7 @@ export function CreateOrderWizard({
   const [scanOpen, setScanOpen] = useState(false);
   const [orderDate, setOrderDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [paymentMode, setPaymentMode] = useState<OrderPaymentModeValue>(DEFAULT_PAYMENT_MODE);
-  const [submitting, setSubmitting] = useState(false);
+  const { pending: submitting, runExclusive } = useSubmitLock();
   const [savedOrderId, setSavedOrderId] = useState<string | null>(null);
 
   const reset = useCallback(() => {
@@ -116,7 +117,6 @@ export function CreateOrderWizard({
     setScanOpen(false);
     setOrderDate(new Date().toISOString().slice(0, 10));
     setPaymentMode(DEFAULT_PAYMENT_MODE);
-    setSubmitting(false);
     setSavedOrderId(null);
   }, []);
 
@@ -233,41 +233,40 @@ export function CreateOrderWizard({
 
   const handleCreateOrder = async () => {
     if (!canStep1Next || !canStep2Next) return;
-    setSubmitting(true);
-    try {
-      const created = await onCreateOrder({
-        customer: customer.name.trim(),
-        customerPhone: customer.phone.trim(),
-        customerEmail: customer.email.trim(),
-        customerAddress: customer.address.trim(),
-        paymentMode,
-        items: itemsSummaryForApi,
-        total: grandTotalFormatted,
-        status: DEFAULT_NEW_ORDER_STATUS,
-        date: orderDate,
-      });
-      setSavedOrderId(created.id);
-      downloadSalesReceiptHtml({
-        filename: `receipt-${created.id}`.toLowerCase(),
-        orderId: created.id,
-        date: orderDate,
-        customer: {
-          name: customer.name,
-          phone: customer.phone,
-          email: customer.email,
-          address: customer.address,
-        },
-        lines: toReceiptLines(),
-        grandTotal: grandTotalFormatted,
-        subtitle: "JewelCraft — Sales receipt (saved)",
-        paymentModeLabel: labelForPaymentMode(paymentMode),
-      });
-      toast({ title: "Order saved", description: `${created.id} — receipt downloaded.` });
-    } catch {
-      toast({ title: "Failed", description: "Could not save order." });
-    } finally {
-      setSubmitting(false);
-    }
+    await runExclusive(async () => {
+      try {
+        const created = await onCreateOrder({
+          customer: customer.name.trim(),
+          customerPhone: customer.phone.trim(),
+          customerEmail: customer.email.trim(),
+          customerAddress: customer.address.trim(),
+          paymentMode,
+          items: itemsSummaryForApi,
+          total: grandTotalFormatted,
+          status: DEFAULT_NEW_ORDER_STATUS,
+          date: orderDate,
+        });
+        setSavedOrderId(created.id);
+        downloadSalesReceiptHtml({
+          filename: `receipt-${created.id}`.toLowerCase(),
+          orderId: created.id,
+          date: orderDate,
+          customer: {
+            name: customer.name,
+            phone: customer.phone,
+            email: customer.email,
+            address: customer.address,
+          },
+          lines: toReceiptLines(),
+          grandTotal: grandTotalFormatted,
+          subtitle: "JewelCraft — Sales receipt (saved)",
+          paymentModeLabel: labelForPaymentMode(paymentMode),
+        });
+        toast({ title: "Order saved", description: `${created.id} — receipt downloaded.` });
+      } catch {
+        toast({ title: "Failed", description: "Could not save order." });
+      }
+    });
   };
 
   if (!open) return null;
@@ -276,7 +275,14 @@ export function CreateOrderWizard({
     <>
       <div className="fixed inset-0 z-50 overflow-y-auto overscroll-y-contain bg-background/80 backdrop-blur-sm">
         <div className="flex min-h-full items-center justify-center p-4 py-8 sm:py-10">
-        <div className="glass rounded-2xl p-6 w-full max-w-4xl max-h-[min(92dvh,calc(100dvh-2rem))] overflow-y-auto overscroll-contain gold-glow my-auto">
+        <div className="relative glass rounded-2xl p-6 w-full max-w-4xl max-h-[min(92dvh,calc(100dvh-2rem))] overflow-y-auto overscroll-contain gold-glow my-auto">
+          {submitting && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-background/55 backdrop-blur-[1px]">
+              <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Loader2 className="w-5 h-5 animate-spin" /> Saving…
+              </span>
+            </div>
+          )}
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
               <h2 className="text-xl font-serif font-bold gold-text">Create New Order</h2>
@@ -284,7 +290,12 @@ export function CreateOrderWizard({
                 Step {step} of 3 — {step === 1 ? "Customer" : step === 2 ? "Items" : "Review & receipt"}
               </p>
             </div>
-            <button type="button" onClick={() => onOpenChange(false)} className="text-sm text-muted-foreground hover:text-foreground shrink-0">
+            <button
+              type="button"
+              disabled={submitting}
+              onClick={() => onOpenChange(false)}
+              className="text-sm text-muted-foreground hover:text-foreground shrink-0 disabled:opacity-40"
+            >
               Close
             </button>
           </div>
@@ -374,7 +385,7 @@ export function CreateOrderWizard({
               <div className="flex justify-end pt-2">
                 <button
                   type="button"
-                  disabled={!canStep1Next}
+                  disabled={!canStep1Next || submitting}
                   onClick={() => setStep(2)}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg gold-gradient text-primary-foreground text-sm font-medium disabled:opacity-50"
                 >
@@ -536,12 +547,17 @@ export function CreateOrderWizard({
               <div className="flex items-center justify-between border-t border-border pt-4">
                 <p className="text-lg font-serif font-bold gold-text">Total: {grandTotalFormatted}</p>
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => setStep(1)} className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-secondary text-sm">
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    onClick={() => setStep(1)}
+                    className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-secondary text-sm disabled:opacity-50"
+                  >
                     <ChevronLeft className="h-4 w-4" /> Back
                   </button>
                   <button
                     type="button"
-                    disabled={!canStep2Next}
+                    disabled={!canStep2Next || submitting}
                     onClick={() => setStep(3)}
                     className="inline-flex items-center gap-1 px-5 py-2 rounded-lg gold-gradient text-primary-foreground text-sm font-medium disabled:opacity-50"
                   >
@@ -616,24 +632,38 @@ export function CreateOrderWizard({
               </div>
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-2 justify-between items-stretch sm:items-center">
-                <button type="button" onClick={() => setStep(2)} className="inline-flex items-center justify-center gap-1 px-4 py-2 rounded-lg bg-secondary text-sm">
+                <button
+                  type="button"
+                  disabled={submitting}
+                  onClick={() => setStep(2)}
+                  className="inline-flex items-center justify-center gap-1 px-4 py-2 rounded-lg bg-secondary text-sm disabled:opacity-50"
+                >
                   <ChevronLeft className="h-4 w-4" /> Back to items
                 </button>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <button
                     type="button"
+                    disabled={submitting}
                     onClick={() => downloadReceipt(`QUOTE-${Date.now()}`, "JewelCraft — Provisional receipt")}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-sm font-medium"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-sm font-medium disabled:opacity-50"
                   >
                     <Download className="h-4 w-4" /> Download receipt
                   </button>
                   <button
                     type="button"
                     disabled={submitting || savedOrderId !== null}
-                    onClick={handleCreateOrder}
+                    onClick={() => void handleCreateOrder()}
                     className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg gold-gradient text-primary-foreground text-sm font-medium disabled:opacity-60"
                   >
-                    {submitting ? "Saving…" : savedOrderId ? "Saved" : "Save order & receipt"}
+                    {submitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" /> Saving…
+                      </>
+                    ) : savedOrderId ? (
+                      "Saved"
+                    ) : (
+                      "Save order & receipt"
+                    )}
                   </button>
                 </div>
               </div>

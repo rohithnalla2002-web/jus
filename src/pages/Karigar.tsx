@@ -6,6 +6,7 @@ import PageHeader from "@/components/shared/PageHeader";
 import { Clock, Loader2, CheckCircle2, AlertCircle, Plus, X, ChevronLeft, ChevronRight, Wrench } from "lucide-react";
 import { useAppDemo } from "@/context/AppDemoContext";
 import { toast } from "@/hooks/use-toast";
+import { useSubmitLock } from "@/hooks/useSubmitLock";
 import { parseCurrency } from "@/lib/demo";
 import { lookupContactForKarigarAssign, normalizePhoneDigits } from "@/lib/customerPhoneLookup";
 
@@ -42,6 +43,7 @@ const initialAssignForm = {
 const Karigar = () => {
   const navigate = useNavigate();
   const suppressJobCardClickUntil = useRef(0);
+  const { pending: karigarBusy, runExclusive } = useSubmitLock();
   const { karigarBoard, employeeList, customerList, salesOrders, moveKarigarJob, moveKarigarJobToColumn, addKarigarJob } =
     useAppDemo();
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -129,35 +131,40 @@ const Karigar = () => {
     form.customerName.trim().length > 0;
 
   const handleMove = async (jobId: number) => {
-    try {
-      const nextColumn = await moveKarigarJob(jobId);
+    await runExclusive(async () => {
+      try {
+        const nextColumn = await moveKarigarJob(jobId);
 
-      if (!nextColumn) {
-        toast({ title: "Job already completed", description: "This karigar job is already in the final stage." });
-        return;
+        if (!nextColumn) {
+          toast({ title: "Job already completed", description: "This karigar job is already in the final stage." });
+          return;
+        }
+
+        toast({ title: "Job moved", description: `The job has been moved to ${nextColumn}.` });
+      } catch {
+        toast({ title: "Move failed", description: "Check that the API server is running and try again." });
       }
-
-      toast({ title: "Job moved", description: `The job has been moved to ${nextColumn}.` });
-    } catch {
-      toast({ title: "Move failed", description: "Check that the API server is running and try again." });
-    }
+    });
   };
 
   const handleDropToColumn = async (targetColumn: (typeof columns)[number]["key"]) => {
-    if (!draggedJobId) return;
-    try {
-      const moved = await moveKarigarJobToColumn(draggedJobId, targetColumn);
-      setDraggedJobId(null);
-      setDragOverColumn(null);
+    const id = draggedJobId;
+    if (!id) return;
+    await runExclusive(async () => {
+      try {
+        const moved = await moveKarigarJobToColumn(id, targetColumn);
+        setDraggedJobId(null);
+        setDragOverColumn(null);
 
-      if (moved) {
-        toast({ title: "Job moved", description: `The job has been moved to ${targetColumn}.` });
+        if (moved) {
+          toast({ title: "Job moved", description: `The job has been moved to ${targetColumn}.` });
+        }
+      } catch {
+        setDraggedJobId(null);
+        setDragOverColumn(null);
+        toast({ title: "Move failed", description: "Check that the API server is running and try again." });
       }
-    } catch {
-      setDraggedJobId(null);
-      setDragOverColumn(null);
-      toast({ title: "Move failed", description: "Check that the API server is running and try again." });
-    }
+    });
   };
 
   const handleAssign = async () => {
@@ -184,33 +191,36 @@ const Karigar = () => {
       return;
     }
 
-    try {
-      const rawTitle = form.title.trim();
-      const jobTitle =
-        assignItemMode === "repair" && rawTitle && !/^repair\b/i.test(rawTitle) ? `Repair — ${rawTitle}` : rawTitle;
-      const karigarName = form.karigar.trim();
-      await addKarigarJob({
-        title: jobTitle,
-        karigar: karigarName,
-        deadline: form.deadline.trim(),
-        material: form.material.trim(),
-        instructions: form.instructions.trim(),
-        customerName: form.customerName.trim(),
-        customerMobile: form.customerPhone.trim(),
-        customerEmail: form.customerEmail.trim(),
-        customerAddress: form.customerAddress.trim(),
-        size: form.size.trim(),
-        price: form.price.trim(),
-        referenceImage: form.referenceImage,
-      });
-      closeAssignModal();
-      toast({
-        title: "Item assigned",
-        description: `${jobTitle} → ${karigarName}. Customer profile updated in CRM.`,
-      });
-    } catch {
-      toast({ title: "Could not assign", description: "Check that the API server is running and try again." });
-    }
+    const rawTitle = form.title.trim();
+    const jobTitle =
+      assignItemMode === "repair" && rawTitle && !/^repair\b/i.test(rawTitle) ? `Repair — ${rawTitle}` : rawTitle;
+    const karigarName = form.karigar.trim();
+
+    await runExclusive(async () => {
+      try {
+        await addKarigarJob({
+          title: jobTitle,
+          karigar: karigarName,
+          deadline: form.deadline.trim(),
+          material: form.material.trim(),
+          instructions: form.instructions.trim(),
+          customerName: form.customerName.trim(),
+          customerMobile: form.customerPhone.trim(),
+          customerEmail: form.customerEmail.trim(),
+          customerAddress: form.customerAddress.trim(),
+          size: form.size.trim(),
+          price: form.price.trim(),
+          referenceImage: form.referenceImage,
+        });
+        closeAssignModal();
+        toast({
+          title: "Item assigned",
+          description: `${jobTitle} → ${karigarName}. Customer profile updated in CRM.`,
+        });
+      } catch {
+        toast({ title: "Could not assign", description: "Check that the API server is running and try again." });
+      }
+    });
   };
 
   const handleReferenceImageUpload = (file: File | null) => {
@@ -238,7 +248,8 @@ const Karigar = () => {
             whileTap={{ scale: 0.97 }}
             type="button"
             onClick={openAssignModal}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg gold-gradient text-primary-foreground font-medium text-sm btn-ripple"
+            disabled={karigarBusy}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg gold-gradient text-primary-foreground font-medium text-sm btn-ripple disabled:opacity-60"
           >
             <Plus className="w-4 h-4" /> Assign Item
           </motion.button>
@@ -285,9 +296,11 @@ const Karigar = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: ci * 0.15 + i * 0.1 }}
                     whileHover={{ scale: 1.02 }}
-                    className="glass rounded-lg p-3 cursor-grab active:cursor-grabbing card-shine hover:ring-1 hover:ring-primary/25 outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    className={`glass rounded-lg p-3 card-shine hover:ring-1 hover:ring-primary/25 outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
+                      karigarBusy ? "cursor-not-allowed opacity-80" : "cursor-grab active:cursor-grabbing"
+                    }`}
                     title="Open job details — or drag to another column"
-                    draggable
+                    draggable={!karigarBusy}
                     onDragStart={(e) => {
                       setDraggedJobId(job.id);
                       e.dataTransfer.effectAllowed = "move";
@@ -382,7 +395,7 @@ const Karigar = () => {
                            e.stopPropagation();
                            void handleMove(job.id);
                          }}
-                         disabled={col.key === "completed"}
+                         disabled={col.key === "completed" || karigarBusy}
                          className="rounded-lg bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary transition-opacity disabled:bg-secondary disabled:text-muted-foreground disabled:cursor-not-allowed"
                        >
                          {col.key === "assigned" ? "Start" : col.key === "inProgress" ? "Complete" : "Done"}
@@ -399,7 +412,14 @@ const Karigar = () => {
       {showAssignModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto overscroll-y-contain bg-background/80 backdrop-blur-sm">
           <div className="flex min-h-full items-center justify-center p-4 py-8 sm:py-10">
-          <div className="glass rounded-2xl p-6 w-full max-w-2xl max-h-[min(90dvh,calc(100dvh-2rem))] overflow-y-auto overscroll-contain my-auto">
+          <div className="relative glass rounded-2xl p-6 w-full max-w-2xl max-h-[min(90dvh,calc(100dvh-2rem))] overflow-y-auto overscroll-contain my-auto">
+            {karigarBusy && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-background/55 backdrop-blur-[1px]">
+                <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Loader2 className="w-5 h-5 animate-spin" /> Please wait…
+                </span>
+              </div>
+            )}
             <div className="flex items-center justify-between mb-2">
               <div>
                 <h2 className="text-xl font-serif font-bold gold-text">Assign Item</h2>
@@ -418,8 +438,9 @@ const Karigar = () => {
               </div>
               <button
                 type="button"
+                disabled={karigarBusy}
                 onClick={closeAssignModal}
-                className="p-1 rounded-lg hover:bg-secondary text-muted-foreground"
+                className="p-1 rounded-lg hover:bg-secondary text-muted-foreground disabled:opacity-40"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -553,14 +574,15 @@ const Karigar = () => {
                 <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
                   <button
                     type="button"
+                    disabled={karigarBusy}
                     onClick={closeAssignModal}
-                    className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium"
+                    className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
-                    disabled={!canAssignStep1Next}
+                    disabled={!canAssignStep1Next || karigarBusy}
                     onClick={() => setAssignStep(2)}
                     className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-lg gold-gradient text-primary-foreground text-sm font-medium disabled:opacity-50"
                   >
@@ -695,25 +717,34 @@ const Karigar = () => {
                 <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 pt-2">
                   <button
                     type="button"
+                    disabled={karigarBusy}
                     onClick={() => setAssignStep(1)}
-                    className="inline-flex items-center justify-center gap-1 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium"
+                    className="inline-flex items-center justify-center gap-1 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium disabled:opacity-50"
                   >
                     <ChevronLeft className="w-4 h-4" /> Back
                   </button>
                   <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
                     <button
                       type="button"
+                      disabled={karigarBusy}
                       onClick={closeAssignModal}
-                      className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium"
+                      className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium disabled:opacity-50"
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
-                      onClick={handleAssign}
-                      className="px-4 py-2 rounded-lg gold-gradient text-primary-foreground text-sm font-medium btn-ripple"
+                      disabled={karigarBusy}
+                      onClick={() => void handleAssign()}
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg gold-gradient text-primary-foreground text-sm font-medium btn-ripple disabled:opacity-60"
                     >
-                      Assign Item
+                      {karigarBusy ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" /> Assigning…
+                        </>
+                      ) : (
+                        "Assign Item"
+                      )}
                     </button>
                   </div>
                 </div>

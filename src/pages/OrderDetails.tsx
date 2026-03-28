@@ -7,7 +7,8 @@ import { useAppDemo } from "@/context/AppDemoContext";
 import { formatCurrency, formatShortDate, parseCurrency } from "@/lib/demo";
 import { downloadInvoiceHtml } from "@/lib/invoiceHtml";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, ArrowRight, FileText, User, Phone, Mail, MapPin, Package, History } from "lucide-react";
+import { useSubmitLock } from "@/hooks/useSubmitLock";
+import { ArrowLeft, ArrowRight, FileText, Loader2, User, Phone, Mail, MapPin, Package, History } from "lucide-react";
 import { fetchOrderById, normalizeOrderFromApi, type Customer, type Order } from "@/lib/api";
 import { labelForPaymentMode } from "@/lib/paymentMode";
 import { normCustomerKey, normalizePhoneDigits, orderBelongsToCustomer, phonesMatch } from "@/lib/customerPhoneLookup";
@@ -61,6 +62,7 @@ function resolveOrderCustomer(order: Order, customerList: Customer[]): BillToCus
 export default function OrderDetails() {
   const navigate = useNavigate();
   const { orderId } = useParams<{ orderId: string }>();
+  const { pending: advancingOrder, runExclusive } = useSubmitLock();
 
   const { salesOrders, advanceOrder, customerList, inventory, dataLoading } = useAppDemo();
 
@@ -205,24 +207,27 @@ export default function OrderDetails() {
 
   const handleAdvanceStatus = async () => {
     if (!order) return;
-    try {
-      const next = await advanceOrder(order.id);
-
-      if (!next) {
-        toast({ title: "Order already completed", description: "This order is already in the delivered stage." });
-        return;
-      }
-
-      toast({ title: "Order advanced", description: `${order.id} moved to ${orderStatusLabels[next] ?? next}.` });
+    const id = order.id;
+    await runExclusive(async () => {
       try {
-        const fresh = await fetchOrderById(order.id);
-        setRemoteOrder(normalizeOrderFromApi(fresh as Order & Record<string, unknown>));
+        const next = await advanceOrder(id);
+
+        if (!next) {
+          toast({ title: "Order already completed", description: "This order is already in the delivered stage." });
+          return;
+        }
+
+        toast({ title: "Order advanced", description: `${id} moved to ${orderStatusLabels[next] ?? next}.` });
+        try {
+          const fresh = await fetchOrderById(id);
+          setRemoteOrder(normalizeOrderFromApi(fresh as Order & Record<string, unknown>));
+        } catch {
+          /* list refresh already updated context */
+        }
       } catch {
-        /* list refresh already updated context */
+        toast({ title: "Update failed", description: "Could not advance order. Is the API server running?" });
       }
-    } catch {
-      toast({ title: "Update failed", description: "Could not advance order. Is the API server running?" });
-    }
+    });
   };
 
   if (dataLoading) {
@@ -435,11 +440,19 @@ export default function OrderDetails() {
               </button>
               <button
                 type="button"
-                onClick={handleAdvanceStatus}
-                disabled={order.status === "delivered"}
+                onClick={() => void handleAdvanceStatus()}
+                disabled={order.status === "delivered" || advancingOrder}
                 className="flex-1 rounded-xl gold-gradient px-4 py-3 text-sm font-medium text-primary-foreground inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Advance order <ArrowRight className="w-4 h-4" />
+                {advancingOrder ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Updating…
+                  </>
+                ) : (
+                  <>
+                    Advance order <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </div>
           </div>

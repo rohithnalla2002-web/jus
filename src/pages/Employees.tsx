@@ -2,9 +2,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import PageHeader from "@/components/shared/PageHeader";
-import { User, Shield, ShoppingCart, Wrench, Plus, X, Pencil } from "lucide-react";
+import { User, Shield, ShoppingCart, Wrench, Plus, X, Pencil, Loader2 } from "lucide-react";
 import { useAppDemo } from "@/context/AppDemoContext";
 import { toast } from "@/hooks/use-toast";
+import { useSubmitLock } from "@/hooks/useSubmitLock";
 import { useNavigate } from "react-router-dom";
 
 const roleConfig: Record<string, { color: string; icon: typeof Shield }> = {
@@ -37,6 +38,7 @@ const initialEmployeeForm: EmployeeForm = {
 
 const Employees = () => {
   const navigate = useNavigate();
+  const { pending: empBusy, runExclusive } = useSubmitLock();
   const { employeeList, addEmployee, updateEmployee, toggleEmployeeStatus } = useAppDemo();
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(initialEmployeeForm);
@@ -51,25 +53,27 @@ const Employees = () => {
       return;
     }
 
-    try {
-      if (editingEmployeeId) {
-        const updated = await updateEmployee(editingEmployeeId, form);
-        if (!updated) {
-          toast({ title: "Update failed", description: "Could not update employee details." });
-          return;
+    await runExclusive(async () => {
+      try {
+        if (editingEmployeeId) {
+          const updated = await updateEmployee(editingEmployeeId, form);
+          if (!updated) {
+            toast({ title: "Update failed", description: "Could not update employee details." });
+            return;
+          }
+          toast({ title: "Employee updated", description: `${form.name} details have been updated.` });
+        } else {
+          await addEmployee(form);
+          toast({ title: "Employee added", description: `${form.name} has been added to your team.` });
         }
-        toast({ title: "Employee updated", description: `${form.name} details have been updated.` });
-      } else {
-        await addEmployee(form);
-        toast({ title: "Employee added", description: `${form.name} has been added to your team.` });
-      }
 
-      setForm(initialEmployeeForm);
-      setEditingEmployeeId(null);
-      setShowModal(false);
-    } catch {
-      toast({ title: "Request failed", description: "Check that the API server is running and try again." });
-    }
+        setForm(initialEmployeeForm);
+        setEditingEmployeeId(null);
+        setShowModal(false);
+      } catch {
+        toast({ title: "Request failed", description: "Check that the API server is running and try again." });
+      }
+    });
   };
 
   return (
@@ -83,7 +87,8 @@ const Employees = () => {
             whileTap={{ scale: 0.97 }}
             type="button"
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg gold-gradient text-primary-foreground font-medium text-sm btn-ripple"
+            disabled={empBusy}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg gold-gradient text-primary-foreground font-medium text-sm btn-ripple disabled:opacity-60"
           >
             <Plus className="w-4 h-4" /> Add Employee
           </motion.button>
@@ -119,6 +124,7 @@ const Employees = () => {
               <div className="mb-3">
                 <button
                   type="button"
+                  disabled={empBusy}
                   onClick={(e) => {
                     e.stopPropagation();
                     setEditingEmployeeId(emp.id);
@@ -134,7 +140,7 @@ const Employees = () => {
                     });
                     setShowModal(true);
                   }}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-secondary text-secondary-foreground text-xs"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-secondary text-secondary-foreground text-xs disabled:opacity-50"
                 >
                   <Pencil className="w-3 h-3" /> Edit
                 </button>
@@ -146,15 +152,18 @@ const Employees = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={async (e) => {
+                  disabled={empBusy}
+                  onClick={(e) => {
                     e.stopPropagation();
-                    try {
-                      await toggleEmployeeStatus(emp.id);
-                    } catch {
-                      toast({ title: "Update failed", description: "Could not change status." });
-                    }
+                    void runExclusive(async () => {
+                      try {
+                        await toggleEmployeeStatus(emp.id);
+                      } catch {
+                        toast({ title: "Update failed", description: "Could not change status." });
+                      }
+                    });
                   }}
-                  className={`text-xs px-2 py-0.5 rounded-full ${
+                  className={`text-xs px-2 py-0.5 rounded-full disabled:opacity-50 ${
                     emp.status === "active" ? "bg-green-500/10 text-green-400" : "bg-warning/10 text-warning"
                   }`}
                 >
@@ -169,17 +178,25 @@ const Employees = () => {
       {showModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto overscroll-y-contain bg-background/80 backdrop-blur-sm">
           <div className="flex min-h-full items-center justify-center p-4 py-8 sm:py-10">
-          <div className="glass rounded-2xl p-6 w-full max-w-2xl max-h-[min(90dvh,calc(100dvh-2rem))] overflow-y-auto overscroll-contain my-auto">
+          <div className="relative glass rounded-2xl p-6 w-full max-w-2xl max-h-[min(90dvh,calc(100dvh-2rem))] overflow-y-auto overscroll-contain my-auto">
+            {empBusy && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-background/55 backdrop-blur-[1px]">
+                <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Loader2 className="w-5 h-5 animate-spin" /> Saving…
+                </span>
+              </div>
+            )}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-serif font-bold gold-text">{editingEmployeeId ? "Edit Employee" : "Add Employee"}</h2>
               <button
                 type="button"
+                disabled={empBusy}
                 onClick={() => {
                   setShowModal(false);
                   setEditingEmployeeId(null);
                   setForm(initialEmployeeForm);
                 }}
-                className="p-1 rounded-lg hover:bg-secondary text-muted-foreground"
+                className="p-1 rounded-lg hover:bg-secondary text-muted-foreground disabled:opacity-40"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -203,17 +220,31 @@ const Employees = () => {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 type="button"
+                disabled={empBusy}
                 onClick={() => {
                   setShowModal(false);
                   setEditingEmployeeId(null);
                   setForm(initialEmployeeForm);
                 }}
-                className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium"
+                className="px-4 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium disabled:opacity-50"
               >
                 Cancel
               </button>
-              <button type="button" onClick={handleSaveEmployee} className="px-4 py-2 rounded-lg gold-gradient text-primary-foreground text-sm font-medium btn-ripple">
-                {editingEmployeeId ? "Save Changes" : "Add Employee"}
+              <button
+                type="button"
+                disabled={empBusy}
+                onClick={() => void handleSaveEmployee()}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg gold-gradient text-primary-foreground text-sm font-medium btn-ripple disabled:opacity-60"
+              >
+                {empBusy ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Saving…
+                  </>
+                ) : editingEmployeeId ? (
+                  "Save Changes"
+                ) : (
+                  "Add Employee"
+                )}
               </button>
             </div>
           </div>
