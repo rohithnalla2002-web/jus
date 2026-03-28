@@ -8,8 +8,9 @@ services:
     runtime: node
     rootDir: server
     buildCommand: npm install
-    # Use node directly — avoids shell/quote issues if dashboard had typos like `npm start`
-    startCommand: node src/index.js
+    # Shell script — dashboard "Start Command" often gets corrupted ('npm start`').
+    # Manual override: type exactly →  sh start.sh
+    startCommand: sh start.sh
     envVars:
       - key: NODE_VERSION
         value: "20"

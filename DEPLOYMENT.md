@@ -90,17 +90,28 @@ Create a **Web Service** connected to this Git repo, then:
 | **Root directory** | `server` |
 | **Runtime** | **Node** (not Bun) |
 | **Build command** | `npm install` |
-| **Start command** | `node src/index.js` *(recommended — avoids quote typos)* or `npm start` |
+| **Start command** | `sh start.sh` *(use this — see below)* |
 
 Add the environment variables from section 2.
 
-**If deploy fails with** `unexpected EOF while looking for matching` **quotes:** your **Start Command** in the dashboard has a **wrong character** (often a backtick `` ` `` instead of a quote). Delete the field and re-type **exactly**:
+### Render still shows `Running 'npm start`'` and crashes?
 
-```text
-node src/index.js
-```
+Your **Start Command** in the Render dashboard is **saved with a broken character** (a backtick `` ` ``). **Blueprint / `render.yaml` does not always overwrite** an existing service’s start command — you must fix it once in the UI.
 
-(no smart quotes, no backticks).
+1. Render Dashboard → your **Web Service** → **Settings**.
+2. Find **Start Command**.
+3. **Select all text in that box and delete it** (Cmd+A / Ctrl+A, Delete).
+4. Type **only** this (plain ASCII, no smart quotes):
+
+   ```text
+   sh start.sh
+   ```
+
+5. **Save** → **Manual Deploy** → **Clear build cache & deploy** (or normal deploy).
+
+The repo includes **`server/start.sh`**, which runs `node src/index.js`. Using `sh start.sh` avoids `npm` and stray quote bugs.
+
+**If deploy fails with** `unexpected EOF while looking for matching` **quotes:** that is always a **corrupted Start Command** — repeat steps 2–5.
 
 Optional: use the repo’s **`render.yaml`** (Blueprint) so Render picks **Node 20**, `rootDir: server`, and the start command from Git — no manual typing.
 
