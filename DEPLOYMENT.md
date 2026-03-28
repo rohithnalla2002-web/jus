@@ -88,11 +88,23 @@ Create a **Web Service** connected to this Git repo, then:
 | Setting | Value |
 |---------|--------|
 | **Root directory** | `server` |
-| **Runtime** | Node |
+| **Runtime** | **Node** (not Bun) |
 | **Build command** | `npm install` |
-| **Start command** | `npm start` |
+| **Start command** | `node src/index.js` *(recommended — avoids quote typos)* or `npm start` |
 
 Add the environment variables from section 2.
+
+**If deploy fails with** `unexpected EOF while looking for matching` **quotes:** your **Start Command** in the dashboard has a **wrong character** (often a backtick `` ` `` instead of a quote). Delete the field and re-type **exactly**:
+
+```text
+node src/index.js
+```
+
+(no smart quotes, no backticks).
+
+Optional: use the repo’s **`render.yaml`** (Blueprint) so Render picks **Node 20**, `rootDir: server`, and the start command from Git — no manual typing.
+
+**Bun vs Node:** If logs say “Using Bun”, the service runtime is wrong — switch the service to **Node** in Settings, or redeploy from the Blueprint.
 
 **CLI (optional)**
 
