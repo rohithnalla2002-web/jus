@@ -1,0 +1,16 @@
+# Netlify — static frontend (Vite + React).
+# Deploy the Express/Postgres API separately (Render, Railway, Fly.io, etc.) and set
+# VITE_API_URL in Netlify: Site settings → Environment variables (build-time).
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Fix "Page not found" on refresh for /sales, /orders/xyz, /karigar/jobs/1, etc.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
