@@ -1,0 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 20% 96%;
+    --foreground: 40 10% 10%;
+
+    --card: 40 15% 100%;
+    --card-foreground: 40 10% 10%;
+
+    --popover: 40 15% 98%;
+    --popover-foreground: 40 10% 10%;
+
+    --primary: 43 72% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 15% 92%;
+    --secondary-foreground: 40 10% 20%;
+
+    --muted: 40 10% 90%;
+    --muted-foreground: 40 10% 40%;
+
+    --accent: 43 60% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 40 15% 85%;
+    --input: 40 15% 85%;
+    --ring: 43 72% 42%;
+
+    --radius: 0.75rem;
+
+    --gold: 43 72% 42%;
+    --gold-light: 43 80% 55%;
+    --gold-dark: 43 60% 30%;
+    --gold-muted: 43 20% 80%;
+
+    --sidebar-background: 40 15% 98%;
+    --sidebar-foreground: 40 10% 30%;
+    --sidebar-primary: 43 72% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 15% 93%;
+    --sidebar-accent-foreground: 40 10% 15%;
+    --sidebar-border: 40 15% 88%;
+    --sidebar-ring: 43 72% 42%;
+
+    --success: 142 72% 35%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+    --info: 217 91% 50%;
+    --info-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--gold-dark));
+    border-radius: 3px;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-card/80 backdrop-blur-xl border border-border/60 shadow-sm;
+  }
+
+  .glass-hover {
+    @apply hover:bg-card/80 hover:border-primary/30 transition-all duration-500;
+  }
+
+  .gold-gradient {
+    background: linear-gradient(135deg, hsl(var(--gold-dark)), hsl(var(--gold)), hsl(var(--gold-light)));
+  }
+
+  .gold-text {
+    background: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-light)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gold-text-shop {
+    background: linear-gradient(135deg, #fde68a, #f59e0b, #b45309);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gold-glow {
+    box-shadow: 0 0 20px hsl(var(--gold) / 0.15), 0 0 60px hsl(var(--gold) / 0.05);
+  }
+
+  .card-shine {
+    position: relative;
+    overflow: hidden;
+  }
+  .card-shine::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent 40%,
+      hsl(var(--gold) / 0.03) 45%,
+      hsl(var(--gold) / 0.06) 50%,
+      hsl(var(--gold) / 0.03) 55%,
+      transparent 60%
+    );
+    transform: translateX(-100%) translateY(-100%);
+    transition: transform 0.8s ease;
+  }
+  .card-shine:hover::before {
+    transform: translateX(20%) translateY(20%);
+  }
+
+  .btn-ripple {
+    @apply relative overflow-hidden;
+  }
+  .btn-ripple::after {
+    content: '';
+    @apply absolute inset-0 opacity-0;
+    background: radial-gradient(circle at center, hsl(var(--gold-light) / 0.3) 0%, transparent 70%);
+    transition: opacity 0.4s ease;
+  }
+  .btn-ripple:hover::after {
+    @apply opacity-100;
+  }
+}
