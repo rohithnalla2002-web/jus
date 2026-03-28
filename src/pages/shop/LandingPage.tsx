@@ -22,7 +22,7 @@ export default function LandingPage() {
           className="absolute inset-0 bg-cover bg-center opacity-25"
           style={{
             backgroundImage:
-              "url(https://images.unsplash.com/photo-1617038260897-41a1f2a66c8a?w=1920&q=80)",
+              "url(https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1920&q=80)",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#fefdfb] via-[#fefdfb]/95 to-[#fefdfb]/70" />

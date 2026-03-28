@@ -35,7 +35,7 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.12),transparent_55%)]" />
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617038260897-41a1f2a66c8a?w=1600&q=60')] bg-cover bg-center opacity-20" />
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1600&q=60')] bg-cover bg-center opacity-20" />
 
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
