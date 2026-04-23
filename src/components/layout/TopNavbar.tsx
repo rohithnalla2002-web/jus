@@ -138,7 +138,7 @@ export default function TopNavbar({ onOpenMobileNav }: { onOpenMobileNav: () => 
             </div>
             <div className="hidden md:block text-left">
               <p className="text-sm font-medium text-foreground">{username ?? "Admin"}</p>
-              <p className="text-xs text-muted-foreground">JewelCraft</p>
+              <p className="text-xs text-muted-foreground">RatnaERP</p>
             </div>
           </button>
 
