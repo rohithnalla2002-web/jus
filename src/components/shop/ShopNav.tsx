@@ -26,8 +26,8 @@ export default function ShopNav() {
             <Gem className="h-5 w-5 text-black" />
           </div>
           <div>
-            <p className="font-serif text-lg font-bold tracking-tight text-zinc-900">Gilded Gem</p>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700">Fine Jewelry</p>
+            <p className="font-serif text-lg font-bold tracking-tight text-zinc-900">RatnaERP</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700">Jewelry Platform</p>
           </div>
         </Link>
 
