@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { adminLogin, adminSession } from "@/lib/api";
 
-const TOKEN_KEY = "jewelcraft-admin-token";
+const TOKEN_KEY = "goldmind-erp-admin-token";
 
 type AdminAuthContextValue = {
   /** True after initial session check (or no token). */

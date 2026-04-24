@@ -46,7 +46,7 @@ export default function AdminLogin() {
           <Gem className="h-7 w-7 text-black" />
         </div>
         <h1 className="mt-6 text-center font-serif text-2xl font-bold text-white">Admin Login</h1>
-        <p className="mt-2 text-center text-xs text-zinc-500">JewelCraft management console</p>
+        <p className="mt-2 text-center text-xs text-zinc-500">GoldMind ERP management console</p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div>

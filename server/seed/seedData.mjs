@@ -1,11 +1,11 @@
 /** Initial rows — rupees are integer INR amounts (same as frontend parseCurrency). */
 
 export const inventorySeed = [
-  { name: "Royal Gold Necklace", category: "Gold", weight: "45.2g", purity: "22K (916)", priceRupees: 327200, hallmark: true, hallmarkNumber: "HC-1029", size: "45cm", providerName: "JewelCraft Suppliers", storageBoxNumber: "SB-07", image: "necklace", stock: 5, highSelling: true },
+  { name: "Royal Gold Necklace", category: "Gold", weight: "45.2g", purity: "22K (916)", priceRupees: 327200, hallmark: true, hallmarkNumber: "HC-1029", size: "45cm", providerName: "GoldMind ERP Suppliers", storageBoxNumber: "SB-07", image: "necklace", stock: 5, highSelling: true },
   { name: "Diamond Solitaire Ring", category: "Diamond", weight: "8.5g", purity: "18K (750)", priceRupees: 185000, hallmark: true, hallmarkNumber: "HC-1440", size: "Ring Size 8", providerName: "DiamondWorks Imports", storageBoxNumber: "SB-12", image: "ring", stock: 12, highSelling: true },
   { name: "Bridal Choker Set", category: "Bridal", weight: "120g", purity: "22K (916)", priceRupees: 869600, hallmark: true, hallmarkNumber: "HC-1763", size: "Premium Choker", providerName: "BridalGold Co.", storageBoxNumber: "SB-03", image: "choker", stock: 3, highSelling: false },
   { name: "Silver Anklet Pair", category: "Silver", weight: "32g", purity: "925 Sterling", priceRupees: 4800, hallmark: true, hallmarkNumber: "HC-0901", size: "9 Inch", providerName: "SilverLine Distributors", storageBoxNumber: "SB-22", image: "anklet", stock: 25, highSelling: false },
-  { name: "Gold Bangles (Set of 4)", category: "Gold", weight: "62g", purity: "22K (916)", priceRupees: 449300, hallmark: true, hallmarkNumber: "HC-2112", size: "Bangles Set (4)", providerName: "JewelCraft Suppliers", storageBoxNumber: "SB-14", image: "bangles", stock: 8, highSelling: true },
+  { name: "Gold Bangles (Set of 4)", category: "Gold", weight: "62g", purity: "22K (916)", priceRupees: 449300, hallmark: true, hallmarkNumber: "HC-2112", size: "Bangles Set (4)", providerName: "GoldMind ERP Suppliers", storageBoxNumber: "SB-14", image: "bangles", stock: 8, highSelling: true },
   { name: "Pearl Earrings", category: "Gold", weight: "12g", purity: "18K (750)", priceRupees: 98400, hallmark: true, hallmarkNumber: "HC-1337", size: "Small Drop", providerName: "Pearl & Co.", storageBoxNumber: "SB-19", image: "earrings", stock: 15, highSelling: false },
   { name: "Platinum Wedding Band", category: "Platinum", weight: "6.8g", purity: "950 Pt", priceRupees: 62000, hallmark: true, hallmarkNumber: "HC-3050", size: "Ring Size 6.5", providerName: "Platinum Prime", storageBoxNumber: "SB-05", image: "band", stock: 20, highSelling: false },
   { name: "Temple Jewellery Set", category: "Bridal", weight: "85g", purity: "22K (916)", priceRupees: 615800, hallmark: true, hallmarkNumber: "HC-1984", size: "Temple Set (Full)", providerName: "BridalGold Co.", storageBoxNumber: "SB-01", image: "temple", stock: 4, highSelling: true },
@@ -20,11 +20,11 @@ export const customerSeed = [
 ];
 
 export const employeeSeed = [
-  { name: "Anita Desai", role: "Admin", department: "Management", salaryRupees: 85000, status: "active", joinDate: "Jan 2020", phone: "+91 98450 12001", email: "anita.desai@jewelcraft.in", address: "22 Residency Road, Hyderabad, 500082" },
-  { name: "Vikram Singh", role: "Salesman", department: "Retail", salaryRupees: 45000, status: "active", joinDate: "Mar 2021", phone: "+91 98450 12002", email: "vikram.singh@jewelcraft.in", address: "14 Market Street, Secunderabad, 500003" },
-  { name: "Pooja Mehta", role: "Salesman", department: "Retail", salaryRupees: 42000, status: "active", joinDate: "Jun 2021", phone: "+91 98450 12003", email: "pooja.mehta@jewelcraft.in", address: "9 Green Park, Banjara Hills, 500034" },
-  { name: "Rahul Sharma", role: "Karigar", department: "Inventory", salaryRupees: 35000, status: "active", joinDate: "Sep 2022", phone: "+91 98450 12004", email: "rahul.sharma@jewelcraft.in", address: "31 Warehouse Lane, Kukatpally, 500072" },
-  { name: "Kavita Nair", role: "Karigar", department: "Accounts", salaryRupees: 40000, status: "on-leave", joinDate: "Feb 2023", phone: "+91 98450 12005", email: "kavita.nair@jewelcraft.in", address: "44 Finance Colony, Kondapur, 500084" },
+  { name: "Anita Desai", role: "Admin", department: "Management", salaryRupees: 85000, status: "active", joinDate: "Jan 2020", phone: "+91 98450 12001", email: "anita.desai@goldminderp.in", address: "22 Residency Road, Hyderabad, 500082" },
+  { name: "Vikram Singh", role: "Salesman", department: "Retail", salaryRupees: 45000, status: "active", joinDate: "Mar 2021", phone: "+91 98450 12002", email: "vikram.singh@goldminderp.in", address: "14 Market Street, Secunderabad, 500003" },
+  { name: "Pooja Mehta", role: "Salesman", department: "Retail", salaryRupees: 42000, status: "active", joinDate: "Jun 2021", phone: "+91 98450 12003", email: "pooja.mehta@goldminderp.in", address: "9 Green Park, Banjara Hills, 500034" },
+  { name: "Rahul Sharma", role: "Karigar", department: "Inventory", salaryRupees: 35000, status: "active", joinDate: "Sep 2022", phone: "+91 98450 12004", email: "rahul.sharma@goldminderp.in", address: "31 Warehouse Lane, Kukatpally, 500072" },
+  { name: "Kavita Nair", role: "Karigar", department: "Accounts", salaryRupees: 40000, status: "on-leave", joinDate: "Feb 2023", phone: "+91 98450 12005", email: "kavita.nair@goldminderp.in", address: "44 Finance Colony, Kondapur, 500084" },
 ];
 
 /** daysAgo from seed moment */

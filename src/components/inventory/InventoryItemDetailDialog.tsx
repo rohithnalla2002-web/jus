@@ -137,7 +137,7 @@ export function InventoryItemDetailDialog({ item, onClose, onUpdate, onDelete }:
   const downloadQr = () => {
     if (!dataUrl) return;
     const safeName = item.name.replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").slice(0, 40) || "product";
-    downloadDataUrlPng(dataUrl, `jewelcraft-${publicId}-${safeName}`);
+    downloadDataUrlPng(dataUrl, `goldmind-erp-${publicId}-${safeName}`);
     toast({ title: "Download started", description: "QR code PNG saved." });
   };
 

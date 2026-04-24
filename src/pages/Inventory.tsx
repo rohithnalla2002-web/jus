@@ -378,7 +378,7 @@ const Inventory = () => {
                       value={form.providerName}
                       onChange={(event) => updateForm("providerName", event.target.value)}
                       className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
-                      placeholder="e.g. JewelCraft Suppliers"
+                      placeholder="e.g. GoldMind ERP Suppliers"
                     />
                   </div>
                 </div>

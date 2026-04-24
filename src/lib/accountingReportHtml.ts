@@ -149,7 +149,7 @@ export const downloadAccountingReportHtml = (args: {
     <div class="page">
       <div class="head">
         <div>
-          <div class="brand">JewelCraft Finance</div>
+          <div class="brand">GoldMind ERP Finance</div>
           <div class="subtitle">${escapeHtml(subtitle)} | Filters: ${escapeHtml(filtersLabel)}</div>
         </div>
         <div class="meta">

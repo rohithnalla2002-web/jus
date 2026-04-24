@@ -47,7 +47,7 @@ export function buildSalesReceiptHtml(args: {
     customer,
     lines,
     grandTotal,
-    subtitle = "JewelCraft — Sales receipt",
+    subtitle = "GoldMind ERP — Sales receipt",
     paymentModeLabel = "—",
   } = args;
   const formattedDate = date
@@ -119,7 +119,7 @@ export function buildSalesReceiptHtml(args: {
       </div>
       <div class="box">
         <h3>Store</h3>
-        <div class="row">JewelCraft Jewellers</div>
+        <div class="row">GoldMind ERP</div>
         <div class="row" style="color:var(--muted);font-size:13px;">Thank you for your purchase.</div>
       </div>
     </div>

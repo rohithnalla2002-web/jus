@@ -51,7 +51,7 @@ export function ProductQrDialog({ item, open, onOpenChange, celebrate }: Props) 
   const download = () => {
     if (!dataUrl || !item) return;
     const safeName = item.name.replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").slice(0, 40) || "product";
-    downloadDataUrlPng(dataUrl, `jewelcraft-${publicId}-${safeName}`);
+    downloadDataUrlPng(dataUrl, `goldmind-erp-${publicId}-${safeName}`);
     toast({ title: "Download started", description: "QR code PNG saved." });
   };
 

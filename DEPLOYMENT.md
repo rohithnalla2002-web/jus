@@ -15,7 +15,7 @@ The browser must know where your API lives. That value is **`VITE_API_URL`**.
 
 **Rules**
 
-- Use your **Render web service URL**, e.g. `https://jewelcraft-api.onrender.com`
+- Use your **Render web service URL**, e.g. `https://goldmind-erp-api.onrender.com`
 - **No trailing slash**
 - **Redeploy** the Netlify site after changing it (Vite bakes this in at **build** time)
 

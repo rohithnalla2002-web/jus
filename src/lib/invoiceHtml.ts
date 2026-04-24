@@ -344,7 +344,7 @@ export const buildInvoiceHtml = (args: {
       </div>
 
       <div class="footer">
-        Generated from JewelCraft Admin Dashboard · Thanks for your business.
+        Generated from GoldMind ERP Admin Dashboard · Thanks for your business.
       </div>
     </div>
   </body>
@@ -503,7 +503,7 @@ export const buildKarigarJobReceiptHtml = (args: {
       }
       ${refBlock}
 
-      <div class="footer">Generated from JewelCraft Admin Dashboard · Karigar workshop record.</div>
+      <div class="footer">Generated from GoldMind ERP Admin Dashboard · Karigar workshop record.</div>
     </div>
   </body>
 </html>`;

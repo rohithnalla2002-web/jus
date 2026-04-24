@@ -14,7 +14,7 @@ type ShopCartContextValue = {
   getSubtotal: (resolvePrice: (id: number) => number) => number;
 };
 
-const STORAGE_KEY = "jewelcraft-shop-cart";
+const STORAGE_KEY = "goldmind-erp-shop-cart";
 const ShopCartContext = createContext<ShopCartContextValue | undefined>(undefined);
 
 export function ShopCartProvider({ children }: { children: ReactNode }) {

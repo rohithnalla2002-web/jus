@@ -222,7 +222,7 @@ export function CreateOrderWizard({
       },
       lines: toReceiptLines(),
       grandTotal: grandTotalFormatted,
-      subtitle: subtitle ?? "JewelCraft — Sales receipt",
+      subtitle: subtitle ?? "GoldMind ERP — Sales receipt",
       paymentModeLabel: labelForPaymentMode(paymentMode),
     });
     toast({ title: "Receipt downloaded", description: "Open the HTML file or print to PDF." });
@@ -259,7 +259,7 @@ export function CreateOrderWizard({
           },
           lines: toReceiptLines(),
           grandTotal: grandTotalFormatted,
-          subtitle: "JewelCraft — Sales receipt (saved)",
+          subtitle: "GoldMind ERP — Sales receipt (saved)",
           paymentModeLabel: labelForPaymentMode(paymentMode),
         });
         toast({ title: "Order saved", description: `${created.id} — receipt downloaded.` });
@@ -644,7 +644,7 @@ export function CreateOrderWizard({
                   <button
                     type="button"
                     disabled={submitting}
-                    onClick={() => downloadReceipt(`QUOTE-${Date.now()}`, "JewelCraft — Provisional receipt")}
+                    onClick={() => downloadReceipt(`QUOTE-${Date.now()}`, "GoldMind ERP — Provisional receipt")}
                     className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-sm font-medium disabled:opacity-50"
                   >
                     <Download className="h-4 w-4" /> Download receipt
