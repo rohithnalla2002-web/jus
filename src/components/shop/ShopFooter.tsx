@@ -14,7 +14,7 @@ export default function ShopFooter() {
   return (
     <footer className="border-t border-amber-200/70 bg-white/90 text-zinc-600 shadow-[0_-4px_24px_-8px_rgba(180,83,9,0.08)]">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           <div>
             <div className="flex items-center gap-2 text-zinc-900">
               <GoldMindLogoMark size="sm" />
@@ -38,33 +38,37 @@ export default function ShopFooter() {
           </div>
           <div>
             <p className="font-semibold text-zinc-900">Quick links</p>
-            <ul className="mt-4 space-y-2 text-sm">
-              {[
-                ["/", "Home"],
-                ["/products", "Products"],
-                ["/about", "About Us"],
-                ["/contact", "Contact"],
-                ["/cart", "Your Cart"],
-              ].map(([to, label]) => (
-                <li key={to}>
-                  <Link to={to} className="text-zinc-600 hover:text-amber-800 transition-colors">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <p className="font-semibold text-zinc-900">Collections</p>
-            <ul className="mt-4 space-y-2 text-sm">
-              {["Rings", "Necklaces", "Earrings", "Bridal"].map((c) => (
-                <li key={c}>
-                  <Link to={`/products?category=${encodeURIComponent(c)}`} className="text-zinc-600 hover:text-amber-800 transition-colors">
-                    {c}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <ul className="space-y-2 text-sm">
+                {[
+                  ["/#home", "Home"],
+                  ["/#visual-analytics", "Visual Analytics"],
+                  ["/#ai-integration", "AI Integration"],
+                  ["/#why-us", "Why Us"],
+                  ["/#core-features", "Core Features"],
+                ].map(([to, label]) => (
+                  <li key={to}>
+                    <Link to={to} className="text-zinc-600 hover:text-amber-800 transition-colors">
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <ul className="space-y-2 text-sm">
+                {[
+                  ["/#testimonials", "Testimonials"],
+                  ["/#pricing", "Pricing"],
+                  ["/#faqs", "FAQs"],
+                  ["/#contact", "Contact"],
+                ].map(([to, label]) => (
+                  <li key={to}>
+                    <Link to={to} className="text-zinc-600 hover:text-amber-800 transition-colors">
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
           <div>
             <p className="font-semibold text-zinc-900">Visit</p>

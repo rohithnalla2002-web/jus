@@ -5,8 +5,7 @@ import {
   Wallet, BarChart3, ChevronLeft, ChevronRight, Hammer, LogOut,
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
-import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
-import { GOLDMIND_APP_NAME } from "@/lib/company";
+import { GOLDMIND_APP_NAME, GOLDMIND_BRAND_NAME_IMAGE_SRC } from "@/lib/company";
 
 const navItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -49,35 +48,25 @@ export default function AppSidebar({
       {/* Logo */}
       <NavLink
         to="/dashboard"
-        className={`flex h-16 items-center gap-3 border-b border-border px-4 transition-colors hover:bg-sidebar-accent/60 ${collapsed ? "justify-center" : ""}`}
+        className={`flex h-14 items-center border-b border-border bg-white px-0 transition-colors hover:bg-white`}
       >
         <AnimatePresence mode="wait">
-          {collapsed ? (
-            <motion.div
-              key="collapsed-logo"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-            >
-              <GoldMindLogoMark size="sm" />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="expanded-brand"
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: "auto" }}
-              exit={{ opacity: 0, width: 0 }}
-              className="flex min-w-0 items-center gap-2 overflow-hidden"
-            >
-              <GoldMindLogoMark size="sm" />
-              <motion.span
-                layout
-                className="truncate font-serif text-lg font-bold tracking-tight gold-text"
-              >
-                {GOLDMIND_APP_NAME}
-              </motion.span>
-            </motion.div>
-          )}
+          <motion.div
+            key={collapsed ? "collapsed-brand-image" : "expanded-brand-image"}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            className="h-full w-full"
+          >
+            <img
+              src={GOLDMIND_BRAND_NAME_IMAGE_SRC}
+              alt={GOLDMIND_APP_NAME}
+              className="h-full w-full object-contain"
+              width={800}
+              height={250}
+              decoding="async"
+            />
+          </motion.div>
         </AnimatePresence>
       </NavLink>
 

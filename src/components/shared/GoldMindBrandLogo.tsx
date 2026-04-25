@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { GOLDMIND_AI_LOGO_SRC, GOLDMIND_APP_NAME } from "@/lib/company";
+import { GOLDMIND_AI_LOGO_SRC, GOLDMIND_APP_NAME, GOLDMIND_BRAND_NAME_IMAGE_SRC } from "@/lib/company";
 import { cn } from "@/lib/utils";
 
 const logoSizes = {
@@ -38,23 +38,23 @@ export function GoldMindBrandLockup({
   className?: string;
   nameClassName?: string;
 }) {
-  const nameSize =
-    size === "xs" || size === "sm" ? "text-base sm:text-lg" : size === "md" ? "text-lg sm:text-xl" : "text-xl sm:text-2xl";
-
   return (
     <div className={cn("flex min-w-0 items-center gap-2.5", className)}>
       <GoldMindLogoMark size={size} />
       {showName && (
         <div className="min-w-0">
-          <p
+          <img
+            src={GOLDMIND_BRAND_NAME_IMAGE_SRC}
+            alt={GOLDMIND_APP_NAME}
             className={cn(
-              "font-sans font-bold tracking-tight",
-              nameSize,
-              nameClassName ?? "ai-text-gradient",
+              "h-12 w-auto max-w-full object-contain",
+              size === "xs" ? "h-8" : size === "sm" ? "h-9" : size === "md" ? "h-10" : size === "lg" ? "h-12" : "h-14",
+              nameClassName,
             )}
-          >
-            {GOLDMIND_APP_NAME}
-          </p>
+            width={800}
+            height={250}
+            decoding="async"
+          />
           {subtitle ? <div className="mt-0.5">{subtitle}</div> : null}
         </div>
       )}

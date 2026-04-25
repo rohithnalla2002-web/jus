@@ -5,6 +5,9 @@ export const GOLDMIND_APP_NAME = "GoldMind ERP";
 /** GoldMind AI mark (PNG in `/public`). */
 export const GOLDMIND_AI_LOGO_SRC = "/ChatGPT_Image_Apr_25__2026__05_53_47_AM-removebg-preview.png";
 
+/** Brand lockup image (JPEG in `/public`). */
+export const GOLDMIND_BRAND_NAME_IMAGE_SRC = "/GoldMind%20ERP.jpg%20(1).jpeg";
+
 export const COMPANY_LEGAL_NAME = "Appera Private Limited";
 
 export const COMPANY_CIN = "U70200TS2026PTC212789";

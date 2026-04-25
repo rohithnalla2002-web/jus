@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { downloadInvoiceHtml } from "@/lib/invoiceHtml";
 import { labelForPaymentMode } from "@/lib/paymentMode";
 import { CreateOrderWizard } from "@/components/sales/CreateOrderWizard";
+import { whatsappHref } from "@/lib/aiReachOutUtils";
+import { GmailLogoMark, WhatsAppLogoMark } from "@/components/layout/AiReachOutBrandIcons";
 
 const Sales = () => {
   const { salesOrders, addOrder, globalSearch, customerList, inventory } = useAppDemo();
@@ -54,6 +56,36 @@ const Sales = () => {
     toast({ title: "Invoice downloaded", description: `${order.id} invoice has been downloaded (HTML).` });
   };
 
+  const openOrderWhatsApp = (orderId: string) => {
+    const order = salesOrders.find((item) => item.id === orderId);
+    if (!order) return;
+
+    const customer = customerList.find((c) => c.name === order.customer);
+    const href = whatsappHref(
+      customer?.phone ?? "",
+      `Hi ${order.customer}, gentle reminder for order ${order.id} from GoldMind ERP.`,
+    );
+
+    if (!href) {
+      toast({
+        title: "WhatsApp unavailable",
+        description: `Add a valid mobile number for ${order.customer} to send WhatsApp reminders.`,
+      });
+      return;
+    }
+
+    window.open(href, "_blank", "noopener,noreferrer");
+  };
+
+  const sendReminder = (orderId: string) => {
+    const order = salesOrders.find((item) => item.id === orderId);
+    if (!order) return;
+    toast({
+      title: "Reminder sent",
+      description: `Payment reminder sent for ${order.id} (${order.customer}).`,
+    });
+  };
+
   return (
     <AppLayout>
       <PageHeader
@@ -79,7 +111,12 @@ const Sales = () => {
             <thead>
               <tr className="border-b border-border">
                 {["Order ID", "Customer", "Items", "Total", "Date", "Actions"].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{h}</th>
+                  <th
+                    key={h}
+                    className={`px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider ${h === "Actions" ? "text-center" : "text-left"}`}
+                  >
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -99,16 +136,17 @@ const Sales = () => {
                     <td className="px-4 py-3 text-sm text-muted-foreground">{order.items}</td>
                     <td className="px-4 py-3 text-sm font-semibold text-foreground">{order.total}</td>
                     <td className="px-4 py-3 text-sm text-muted-foreground">{formatShortDate(order.date)}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
+                    <td className="px-4 py-3 align-middle">
+                      <div className="flex w-full items-center justify-center gap-2">
                          <button
                            type="button"
                            onClick={(e) => {
                              e.stopPropagation();
                              navigate(`/orders/${order.id}`);
                            }}
-                           className="p-1.5 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                           className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
                            aria-label="View order"
+                           title="View order"
                          >
                            <FileText className="w-4 h-4" />
                          </button>
@@ -118,10 +156,35 @@ const Sales = () => {
                              e.stopPropagation();
                              downloadInvoice(order.id);
                            }}
-                           className="p-1.5 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                           className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
                            aria-label="Download invoice"
+                           title="Download invoice"
                          >
                            <Download className="w-4 h-4" />
+                         </button>
+                         <button
+                           type="button"
+                           onClick={(e) => {
+                             e.stopPropagation();
+                             openOrderWhatsApp(order.id);
+                           }}
+                           className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20 transition-colors"
+                           aria-label="WhatsApp customer"
+                           title="WhatsApp customer"
+                         >
+                           <WhatsAppLogoMark className="h-4 w-4" />
+                         </button>
+                         <button
+                           type="button"
+                           onClick={(e) => {
+                             e.stopPropagation();
+                             sendReminder(order.id);
+                           }}
+                           className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 transition-colors"
+                           aria-label="Send reminder"
+                           title="Send reminder"
+                         >
+                           <GmailLogoMark className="h-4 w-4" />
                          </button>
                       </div>
                     </td>

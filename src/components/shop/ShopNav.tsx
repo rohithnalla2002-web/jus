@@ -1,85 +1,100 @@
-import { useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, ShoppingBag, X } from "lucide-react";
-import { useShopCart } from "@/context/ShopCartContext";
-import { GOLDMIND_APP_NAME } from "@/lib/company";
-import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
+import { Menu, Sparkles, X } from "lucide-react";
+import { GoldMindBrandLockup } from "@/components/shared/GoldMindBrandLogo";
 
 const links = [
-  { to: "/", label: "Home" },
-  { to: "/products", label: "Products" },
-  { to: "/products#categories", label: "Categories" },
-  { to: "/about", label: "About Us" },
-  { to: "/contact", label: "Contact" },
+  { to: "/#home", label: "Home" },
+  { to: "/#visual-analytics", label: "Analytics" },
+  { to: "/#ai-integration", label: "AI" },
+  { to: "/#why-us", label: "Why Us" },
+  { to: "/#core-features", label: "Features" },
+  { to: "/#testimonials", label: "Reviews" },
+  { to: "/#pricing", label: "Pricing" },
+  { to: "/#faqs", label: "FAQs" },
+  { to: "/#contact", label: "Contact" },
 ];
 
 export default function ShopNav() {
   const [open, setOpen] = useState(false);
-  const { getLineCount } = useShopCart();
+  const location = useLocation();
   const navigate = useNavigate();
-  const count = getLineCount();
+  const [activeHash, setActiveHash] = useState(location.hash || "#home");
+  const sectionIds = links.map((link) => link.to.split("#")[1]).filter(Boolean);
+
+  useEffect(() => {
+    setActiveHash(location.hash || "#home");
+  }, [location.hash, location.pathname]);
+
+  useEffect(() => {
+    if (location.pathname !== "/") return;
+
+    const updateActiveSection = () => {
+      const scrollMarker = window.scrollY + 130;
+      let current = "#home";
+
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        if (scrollMarker >= el.offsetTop) current = `#${id}`;
+      }
+
+      setActiveHash((prev) => (prev === current ? prev : current));
+      if (window.location.hash !== current) {
+        window.history.replaceState(null, "", `${location.pathname}${current}`);
+      }
+    };
+
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    return () => window.removeEventListener("scroll", updateActiveSection);
+  }, [location.pathname, sectionIds]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-amber-200/60 bg-white/85 backdrop-blur-xl shadow-sm shadow-amber-900/5">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link to="/" className="group flex min-w-0 items-center gap-2 transition-opacity hover:opacity-95">
-          <GoldMindLogoMark size="md" />
-          <div>
-            <p className="font-serif text-lg font-bold tracking-tight text-zinc-900">{GOLDMIND_APP_NAME}</p>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700">Jewellery · Retail & workshop</p>
-          </div>
+    <header className="sticky top-0 z-50 border-b border-amber-200/60 bg-white/80 backdrop-blur-2xl shadow-[0_8px_28px_-16px_rgba(146,64,14,0.45)]">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
+        <Link to="/#home" className="group flex min-w-0 items-center transition-all hover:opacity-95">
+          <GoldMindBrandLockup size="xl" className="gap-0" />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-1 rounded-2xl border border-amber-200/70 bg-white/85 p-1.5 shadow-sm">
           {links.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                  isActive
-                    ? "text-amber-900 bg-amber-100/80"
-                    : "text-zinc-600 hover:text-amber-800 hover:bg-amber-50"
-                }`
-              }
-            >
-              {link.label}
-            </NavLink>
+            <motion.div key={link.to} className="relative">
+              {activeHash === link.to.replace("/", "") ? (
+                <motion.span
+                  layoutId="shop-nav-active-pill"
+                  className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-100 to-yellow-100"
+                  transition={{ type: "spring", stiffness: 330, damping: 30 }}
+                />
+              ) : null}
+              <Link
+                to={link.to}
+                className={`relative z-10 block rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
+                  activeHash === link.to.replace("/", "")
+                    ? "text-amber-900"
+                    : "text-zinc-600 hover:text-amber-800"
+                }`}
+              >
+                {link.label}
+              </Link>
+            </motion.div>
           ))}
           <button
             type="button"
             onClick={() => navigate("/admin/login")}
-            className="ml-2 rounded-full border border-amber-600/40 px-4 py-2 text-sm font-semibold text-amber-900 transition-all hover:bg-amber-100 hover:border-amber-500 hover:shadow-md hover:shadow-amber-200/50"
+            className="ml-2 inline-flex items-center gap-1 rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-100 to-yellow-100 px-4 py-2 text-xs font-semibold text-amber-900 transition-all hover:shadow-md hover:shadow-amber-200/60"
           >
+            <Sparkles className="h-3.5 w-3.5" />
             Login (Admin)
           </button>
-          <Link
-            to="/cart"
-            className="relative ml-2 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-700 text-black shadow-md shadow-amber-300/60 transition-transform hover:scale-105"
-          >
-            <ShoppingBag className="h-5 w-5" />
-            {count > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-zinc-900 px-1 text-[10px] font-bold text-amber-300 ring-2 ring-amber-400">
-                {count > 99 ? "99+" : count}
-              </span>
-            )}
-          </Link>
         </nav>
 
         <div className="flex items-center gap-2 md:hidden">
-          <Link to="/cart" className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-yellow-700 text-black">
-            <ShoppingBag className="h-5 w-5" />
-            {count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 h-4 min-w-4 rounded-full bg-zinc-900 px-1 text-[9px] font-bold text-amber-300">
-                {count}
-              </span>
-            )}
-          </Link>
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            className="rounded-lg p-2 text-zinc-700 hover:bg-amber-50"
+            className="rounded-xl border border-amber-200/80 bg-white p-2 text-zinc-700 shadow-sm hover:bg-amber-50"
             aria-label="Menu"
           >
             {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -93,18 +108,19 @@ export default function ShopNav() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden border-t border-amber-200/60 bg-white md:hidden"
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="overflow-hidden border-t border-amber-200/60 bg-white/95 backdrop-blur md:hidden"
           >
             <div className="flex flex-col gap-1 p-4">
               {links.map((link) => (
-                <NavLink
+                <Link
                   key={link.to}
                   to={link.to}
                   onClick={() => setOpen(false)}
-                  className="rounded-lg px-3 py-3 text-zinc-700 hover:bg-amber-50 hover:text-amber-900"
+                  className="rounded-xl px-3 py-3 text-zinc-700 hover:bg-amber-50 hover:text-amber-900"
                 >
                   {link.label}
-                </NavLink>
+                </Link>
               ))}
               <button
                 type="button"
@@ -112,8 +128,9 @@ export default function ShopNav() {
                   setOpen(false);
                   navigate("/admin/login");
                 }}
-                className="mt-2 rounded-xl border border-amber-300 py-3 text-center font-semibold text-amber-900"
+                className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 py-3 text-center font-semibold text-amber-900"
               >
+                <Sparkles className="h-4 w-4" />
                 Login (Admin)
               </button>
             </div>
