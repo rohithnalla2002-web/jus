@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Gem, Lock, User } from "lucide-react";
+import { Lock, User } from "lucide-react";
+import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { COMPANY_CIN, COMPANY_LEGAL_NAME } from "@/lib/company";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -42,11 +44,13 @@ export default function AdminLogin() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         className="relative w-full max-w-md rounded-3xl border border-white/10 bg-black/70 p-8 shadow-2xl shadow-amber-900/20 backdrop-blur-xl"
       >
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-700">
-          <Gem className="h-7 w-7 text-black" />
+        <div className="mx-auto flex justify-center">
+          <GoldMindLogoMark size="xl" />
         </div>
         <h1 className="mt-6 text-center font-serif text-2xl font-bold text-white">Admin Login</h1>
-        <p className="mt-2 text-center text-xs text-zinc-500">GoldMind ERP management console</p>
+        <p className="mt-2 text-center text-xs text-zinc-500">
+          GoldMind ERP · {COMPANY_LEGAL_NAME} · CIN {COMPANY_CIN}
+        </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div>

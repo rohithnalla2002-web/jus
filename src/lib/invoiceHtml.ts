@@ -1,4 +1,14 @@
 import { formatCurrency, parseCurrency } from "@/lib/demo";
+import {
+  COMPANY_ADDRESS_FULL,
+  COMPANY_CIN,
+  COMPANY_LEGAL_NAME,
+  COMPANY_PHONE_DISPLAY,
+  GOLDMIND_AI_LOGO_SRC,
+  GOLDMIND_APP_NAME,
+  INVOICE_FOOTER_NOTE,
+  KARIGAR_RECEIPT_FOOTER_NOTE,
+} from "@/lib/company";
 
 type CustomerLike = {
   name: string;
@@ -122,6 +132,35 @@ export const buildInvoiceHtml = (args: {
         margin: 18px auto;
         padding: 24px 30px;
       }
+      .letterhead{
+        text-align: center;
+        margin-bottom: 18px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .letterhead-title{
+        font-size: 22px;
+        font-weight: 900;
+        color: var(--gold-2);
+        letter-spacing: .02em;
+      }
+      .letterhead-sub{
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 5px;
+        line-height: 1.45;
+      }
+      .letterhead-brand{
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:10px;
+        margin-bottom:2px;
+      }
+      .letterhead-logo{
+        width:52px;height:52px;border-radius:10px;object-fit:contain;
+        border:1px solid rgba(167,139,250,0.25);
+      }
       .header{
         display:flex;
         justify-content:space-between;
@@ -235,6 +274,15 @@ export const buildInvoiceHtml = (args: {
   </head>
   <body>
     <div class="page">
+      <div class="letterhead">
+        <div class="letterhead-brand">
+          <img class="letterhead-logo" src="${GOLDMIND_AI_LOGO_SRC}" alt="" width="52" height="52" />
+          <div class="letterhead-title">${escapeHtml(GOLDMIND_APP_NAME)}</div>
+        </div>
+        <div class="letterhead-sub">${escapeHtml(COMPANY_LEGAL_NAME)}</div>
+        <div class="letterhead-sub">CIN ${escapeHtml(COMPANY_CIN)} · ${escapeHtml(COMPANY_ADDRESS_FULL)}</div>
+        <div class="letterhead-sub">Phone ${escapeHtml(COMPANY_PHONE_DISPLAY)}</div>
+      </div>
       <div class="header">
         <div class="bill">
           <div class="box-title">Bill To</div>
@@ -344,7 +392,7 @@ export const buildInvoiceHtml = (args: {
       </div>
 
       <div class="footer">
-        Generated from GoldMind ERP Admin Dashboard · Thanks for your business.
+        ${escapeHtml(INVOICE_FOOTER_NOTE)}
       </div>
     </div>
   </body>
@@ -434,6 +482,35 @@ export const buildKarigarJobReceiptHtml = (args: {
         color: var(--text);
       }
       .page{ width: 860px; margin: 18px auto; padding: 24px 30px; }
+      .letterhead{
+        text-align: center;
+        margin-bottom: 18px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .letterhead-title{
+        font-size: 22px;
+        font-weight: 900;
+        color: var(--gold-2);
+        letter-spacing: .02em;
+      }
+      .letterhead-sub{
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 5px;
+        line-height: 1.45;
+      }
+      .letterhead-brand{
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:10px;
+        margin-bottom:2px;
+      }
+      .letterhead-logo{
+        width:52px;height:52px;border-radius:10px;object-fit:contain;
+        border:1px solid rgba(167,139,250,0.25);
+      }
       .titlebar{
         height:2px;
         background: linear-gradient(90deg, var(--gold) 0%, var(--gold-2) 50%, var(--gold) 100%);
@@ -464,6 +541,15 @@ export const buildKarigarJobReceiptHtml = (args: {
   </head>
   <body>
     <div class="page">
+      <div class="letterhead">
+        <div class="letterhead-brand">
+          <img class="letterhead-logo" src="${GOLDMIND_AI_LOGO_SRC}" alt="" width="52" height="52" />
+          <div class="letterhead-title">${escapeHtml(GOLDMIND_APP_NAME)}</div>
+        </div>
+        <div class="letterhead-sub">${escapeHtml(COMPANY_LEGAL_NAME)}</div>
+        <div class="letterhead-sub">CIN ${escapeHtml(COMPANY_CIN)} · ${escapeHtml(COMPANY_ADDRESS_FULL)}</div>
+        <div class="letterhead-sub">Phone ${escapeHtml(COMPANY_PHONE_DISPLAY)}</div>
+      </div>
       <h1>Workshop job receipt</h1>
       <div class="sub">Job #${escapeHtml(job.id)} · ${escapeHtml(workflowStage)}</div>
       <div class="titlebar"></div>
@@ -503,7 +589,7 @@ export const buildKarigarJobReceiptHtml = (args: {
       }
       ${refBlock}
 
-      <div class="footer">Generated from GoldMind ERP Admin Dashboard · Karigar workshop record.</div>
+      <div class="footer">${escapeHtml(KARIGAR_RECEIPT_FOOTER_NOTE)}</div>
     </div>
   </body>
 </html>`;

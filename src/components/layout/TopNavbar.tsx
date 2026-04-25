@@ -4,6 +4,7 @@ import { Bell, CheckCheck, Menu, Search, TrendingUp, User, X } from "lucide-reac
 import { AnimatePresence, motion } from "framer-motion";
 import { useAppDemo } from "@/context/AppDemoContext";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { GOLDMIND_APP_NAME } from "@/lib/company";
 
 export default function TopNavbar({ onOpenMobileNav }: { onOpenMobileNav: () => void }) {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export default function TopNavbar({ onOpenMobileNav }: { onOpenMobileNav: () => 
 
   return (
     <header className="h-16 border-b border-border glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6">
-      <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
         <button
           type="button"
           onClick={onOpenMobileNav}
@@ -31,7 +32,7 @@ export default function TopNavbar({ onOpenMobileNav }: { onOpenMobileNav: () => 
           <Menu className="w-5 h-5 text-muted-foreground" />
         </button>
 
-        <div className="relative w-full">
+        <div className="relative min-w-0 flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
@@ -138,7 +139,7 @@ export default function TopNavbar({ onOpenMobileNav }: { onOpenMobileNav: () => 
             </div>
             <div className="hidden md:block text-left">
               <p className="text-sm font-medium text-foreground">{username ?? "Admin"}</p>
-              <p className="text-xs text-muted-foreground">RatnaERP</p>
+              <p className="text-xs text-muted-foreground">{GOLDMIND_APP_NAME}</p>
             </div>
           </button>
 
@@ -150,7 +151,7 @@ export default function TopNavbar({ onOpenMobileNav }: { onOpenMobileNav: () => 
                 exit={{ opacity: 0, y: 12 }}
                 className="absolute right-0 mt-3 w-[calc(100vw-2rem)] sm:w-64 glass rounded-2xl p-4 max-h-[80vh] overflow-hidden"
               >
-                <p className="text-sm font-semibold text-foreground">Luxury Admin Workspace</p>
+                <p className="text-sm font-semibold text-foreground">{GOLDMIND_APP_NAME}</p>
                 <p className="text-xs text-muted-foreground mt-1">All demo controls are now live across the dashboard.</p>
 
                 <div className="mt-4 rounded-xl bg-secondary/70 p-3 overflow-y-auto max-h-[42vh] pr-1">

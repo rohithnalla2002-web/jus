@@ -1,4 +1,13 @@
 import { formatCurrency, parseCurrency } from "@/lib/demo";
+import {
+  COMPANY_ADDRESS_FULL,
+  COMPANY_CIN,
+  COMPANY_LEGAL_NAME,
+  COMPANY_PHONE_DISPLAY,
+  GOLDMIND_AI_LOGO_SRC,
+  GOLDMIND_APP_NAME,
+  SALES_RECEIPT_SUBTITLE,
+} from "@/lib/company";
 
 export type ReceiptCustomer = {
   name: string;
@@ -47,7 +56,7 @@ export function buildSalesReceiptHtml(args: {
     customer,
     lines,
     grandTotal,
-    subtitle = "GoldMind ERP — Sales receipt",
+    subtitle = SALES_RECEIPT_SUBTITLE,
     paymentModeLabel = "—",
   } = args;
   const formattedDate = date
@@ -119,8 +128,15 @@ export function buildSalesReceiptHtml(args: {
       </div>
       <div class="box">
         <h3>Store</h3>
-        <div class="row">GoldMind ERP</div>
-        <div class="row" style="color:var(--muted);font-size:13px;">Thank you for your purchase.</div>
+        <div class="row" style="display:flex;align-items:center;gap:10px;">
+          <img src="${GOLDMIND_AI_LOGO_SRC}" alt="" width="44" height="44" style="border-radius:8px;object-fit:contain;border:1px solid rgba(167,139,250,0.25);flex-shrink:0;" />
+          <span style="font-weight:700">${escapeHtml(GOLDMIND_APP_NAME)}</span>
+        </div>
+        <div class="row" style="color:var(--muted);font-size:13px;">${escapeHtml(COMPANY_LEGAL_NAME)}</div>
+        <div class="row" style="color:var(--muted);font-size:12px;">CIN ${escapeHtml(COMPANY_CIN)}</div>
+        <div class="row" style="color:var(--muted);font-size:12px;">${escapeHtml(COMPANY_ADDRESS_FULL)}</div>
+        <div class="row" style="color:var(--muted);font-size:12px;">${escapeHtml(COMPANY_PHONE_DISPLAY)}</div>
+        <div class="row" style="color:var(--muted);font-size:13px;margin-top:8px;">Thank you for your purchase.</div>
       </div>
     </div>
     <h3 style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;">Line items</h3>

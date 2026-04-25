@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Gem, Menu, ShoppingBag, X } from "lucide-react";
+import { Menu, ShoppingBag, X } from "lucide-react";
 import { useShopCart } from "@/context/ShopCartContext";
+import { GOLDMIND_APP_NAME } from "@/lib/company";
+import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
 
 const links = [
   { to: "/", label: "Home" },
@@ -21,13 +23,11 @@ export default function ShopNav() {
   return (
     <header className="sticky top-0 z-50 border-b border-amber-200/60 bg-white/85 backdrop-blur-xl shadow-sm shadow-amber-900/5">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 via-yellow-600 to-amber-800 shadow-lg shadow-amber-500/30 transition-transform group-hover:scale-105">
-            <Gem className="h-5 w-5 text-black" />
-          </div>
+        <Link to="/" className="group flex min-w-0 items-center gap-2 transition-opacity hover:opacity-95">
+          <GoldMindLogoMark size="md" />
           <div>
-            <p className="font-serif text-lg font-bold tracking-tight text-zinc-900">RatnaERP</p>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700">Jewelry Platform</p>
+            <p className="font-serif text-lg font-bold tracking-tight text-zinc-900">{GOLDMIND_APP_NAME}</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-amber-700">Jewellery · Retail & workshop</p>
           </div>
         </Link>
 

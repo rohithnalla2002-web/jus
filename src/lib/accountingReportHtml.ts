@@ -1,4 +1,11 @@
 import { formatCurrency } from "@/lib/demo";
+import {
+  COMPANY_CIN,
+  COMPANY_LEGAL_NAME,
+  COMPANY_PHONE_DISPLAY,
+  GOLDMIND_AI_LOGO_SRC,
+  GOLDMIND_APP_NAME,
+} from "@/lib/company";
 
 type RevenueRow = {
   month: string;
@@ -135,6 +142,8 @@ export const downloadAccountingReportHtml = (args: {
       body{margin:0;background:#fff;color:#111827;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
       .page{width:920px;margin:20px auto;padding:26px 30px}
       .head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+      .brand-row{display:flex;align-items:center;gap:12px}
+      .brand-logo{width:48px;height:48px;border-radius:10px;object-fit:contain;border:1px solid rgba(167,139,250,0.25)}
       .brand{font-size:26px;font-weight:900;letter-spacing:.03em;color:#b8860b}
       .subtitle{margin-top:6px;color:#6b7280;font-size:13px}
       .meta{font-size:12px;color:#6b7280;text-align:right}
@@ -149,7 +158,11 @@ export const downloadAccountingReportHtml = (args: {
     <div class="page">
       <div class="head">
         <div>
-          <div class="brand">GoldMind ERP Finance</div>
+          <div class="brand-row">
+            <img class="brand-logo" src="${GOLDMIND_AI_LOGO_SRC}" alt="" width="48" height="48" />
+            <div class="brand">${escapeHtml(GOLDMIND_APP_NAME)} Finance</div>
+          </div>
+          <div class="subtitle">${escapeHtml(COMPANY_LEGAL_NAME)} · CIN ${escapeHtml(COMPANY_CIN)} · ${escapeHtml(COMPANY_PHONE_DISPLAY)}</div>
           <div class="subtitle">${escapeHtml(subtitle)} | Filters: ${escapeHtml(filtersLabel)}</div>
         </div>
         <div class="meta">

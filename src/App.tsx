@@ -28,6 +28,7 @@ import CartPage from "./pages/shop/CartPage";
 import AboutPage from "./pages/shop/AboutPage";
 import ContactPage from "./pages/shop/ContactPage";
 import AdminLogin from "./pages/admin/AdminLogin";
+import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
 
 const queryClient = new QueryClient();
 
@@ -35,8 +36,9 @@ function ProtectedAdmin({ children }: { children: ReactElement }) {
   const { authReady, isAuthenticated } = useAdminAuth();
   if (!authReady) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground text-sm">
-        Checking session…
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-4 text-center text-muted-foreground text-sm">
+        <GoldMindLogoMark size="lg" />
+        <span>Checking session…</span>
       </div>
     );
   }

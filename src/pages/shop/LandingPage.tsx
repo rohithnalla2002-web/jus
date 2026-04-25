@@ -4,6 +4,8 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { useAppDemo } from "@/context/AppDemoContext";
 import { getProductImageUrl, getShopCategory, shortDescription } from "@/lib/shopUtils";
 import { useShopCart } from "@/context/ShopCartContext";
+import { GOLDMIND_APP_NAME } from "@/lib/company";
+import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
 
 const fadeUp = { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 } };
 
@@ -30,8 +32,10 @@ export default function LandingPage() {
 
         <div className="relative mx-auto flex min-h-[78vh] max-w-7xl flex-col justify-center px-4 py-16 sm:px-6 sm:py-20">
           <motion.div {...fadeUp} transition={{ duration: 0.6 }} className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/80 bg-amber-100/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-amber-900">
-              <Sparkles className="h-3.5 w-3.5 text-amber-600" /> Since 1987
+            <span className="inline-flex items-center gap-2 rounded-full border border-amber-200/80 bg-white/90 px-4 py-1.5 text-sm font-medium text-amber-900 shadow-sm">
+              <Sparkles className="h-4 w-4 shrink-0 text-amber-600" />
+              <GoldMindLogoMark size="xs" />
+              {GOLDMIND_APP_NAME}
             </span>
             <h1 className="mt-6 font-serif text-4xl font-bold leading-tight text-zinc-900 sm:text-5xl md:text-6xl">
               Timeless <span className="gold-text-shop">Gold</span> for Every Moment

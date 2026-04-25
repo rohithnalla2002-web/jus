@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, MapPin, Phone, Send } from "lucide-react";
+import { Building2, MapPin, Phone, Send } from "lucide-react";
+import {
+  COMPANY_ADDRESS_FULL,
+  COMPANY_CIN,
+  COMPANY_LEGAL_NAME,
+  COMPANY_PHONE_DISPLAY,
+  COMPANY_PHONE_E164,
+} from "@/lib/company";
 
 export default function ContactPage() {
   const [name, setName] = useState("");
@@ -31,15 +38,21 @@ export default function ContactPage() {
           <ul className="mt-10 space-y-6 text-sm text-zinc-700">
             <li className="flex gap-4">
               <MapPin className="h-5 w-5 shrink-0 text-amber-600" />
-              <span>12 Jubilee Hills Road, Hyderabad, Telangana 500033</span>
+              <span>
+                {COMPANY_LEGAL_NAME}
+                <br />
+                {COMPANY_ADDRESS_FULL}
+              </span>
             </li>
             <li className="flex gap-4">
               <Phone className="h-5 w-5 shrink-0 text-amber-600" />
-              <span>+91 40 1234 5678</span>
+              <a href={`tel:${COMPANY_PHONE_E164}`} className="hover:text-amber-800 hover:underline">
+                {COMPANY_PHONE_DISPLAY}
+              </a>
             </li>
             <li className="flex gap-4">
-              <Mail className="h-5 w-5 shrink-0 text-amber-600" />
-              <span>care@gildedgem.in</span>
+              <Building2 className="h-5 w-5 shrink-0 text-amber-600" />
+              <span>CIN {COMPANY_CIN}</span>
             </li>
           </ul>
         </motion.div>

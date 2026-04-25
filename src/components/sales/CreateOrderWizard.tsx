@@ -14,6 +14,7 @@ import {
   labelForPaymentMode,
   type OrderPaymentModeValue,
 } from "@/lib/paymentMode";
+import { PROVISIONAL_RECEIPT_SUBTITLE, SALES_RECEIPT_SAVED_SUBTITLE, SALES_RECEIPT_SUBTITLE } from "@/lib/company";
 
 type OrderStatus = "ordered" | "in-production" | "ready" | "delivered";
 
@@ -222,7 +223,7 @@ export function CreateOrderWizard({
       },
       lines: toReceiptLines(),
       grandTotal: grandTotalFormatted,
-      subtitle: subtitle ?? "GoldMind ERP — Sales receipt",
+      subtitle: subtitle ?? SALES_RECEIPT_SUBTITLE,
       paymentModeLabel: labelForPaymentMode(paymentMode),
     });
     toast({ title: "Receipt downloaded", description: "Open the HTML file or print to PDF." });
@@ -259,7 +260,7 @@ export function CreateOrderWizard({
           },
           lines: toReceiptLines(),
           grandTotal: grandTotalFormatted,
-          subtitle: "GoldMind ERP — Sales receipt (saved)",
+          subtitle: SALES_RECEIPT_SAVED_SUBTITLE,
           paymentModeLabel: labelForPaymentMode(paymentMode),
         });
         toast({ title: "Order saved", description: `${created.id} — receipt downloaded.` });
@@ -644,7 +645,7 @@ export function CreateOrderWizard({
                   <button
                     type="button"
                     disabled={submitting}
-                    onClick={() => downloadReceipt(`QUOTE-${Date.now()}`, "GoldMind ERP — Provisional receipt")}
+                    onClick={() => downloadReceipt(`QUOTE-${Date.now()}`, PROVISIONAL_RECEIPT_SUBTITLE)}
                     className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card text-sm font-medium disabled:opacity-50"
                   >
                     <Download className="h-4 w-4" /> Download receipt

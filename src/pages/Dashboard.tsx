@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 import AppLayout from "@/components/layout/AppLayout";
+import AiInsightsSection from "@/components/layout/AiInsightsSection";
 import StatCard from "@/components/shared/StatCard";
 import PageHeader from "@/components/shared/PageHeader";
 import { formatCurrency, formatShortDate, parseCurrency } from "@/lib/demo";
@@ -397,6 +398,8 @@ const Dashboard = () => {
           <StatCard key={stat.label} {...stat} index={i} />
         ))}
       </div>
+
+      <AiInsightsSection />
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">

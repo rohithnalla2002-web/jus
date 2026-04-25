@@ -2,9 +2,11 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, UserCog,
-  Wallet, BarChart3, Gem, ChevronLeft, ChevronRight, Hammer, LogOut,
+  Wallet, BarChart3, ChevronLeft, ChevronRight, Hammer, LogOut,
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
+import { GOLDMIND_APP_NAME } from "@/lib/company";
 
 const navItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -45,23 +47,39 @@ export default function AppSidebar({
       className={`flex flex-col border-r border-border bg-sidebar ${variant === "desktop" ? "fixed left-0 top-0 h-screen z-40" : "relative h-screen"}`}
     >
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 h-16 border-b border-border">
-        <div className="w-9 h-9 rounded-lg gold-gradient flex items-center justify-center flex-shrink-0">
-          <Gem className="w-5 h-5 text-primary-foreground" />
-        </div>
-        <AnimatePresence>
-          {!collapsed && (
-            <motion.span
+      <NavLink
+        to="/dashboard"
+        className={`flex h-16 items-center gap-3 border-b border-border px-4 transition-colors hover:bg-sidebar-accent/60 ${collapsed ? "justify-center" : ""}`}
+      >
+        <AnimatePresence mode="wait">
+          {collapsed ? (
+            <motion.div
+              key="collapsed-logo"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+            >
+              <GoldMindLogoMark size="sm" />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="expanded-brand"
               initial={{ opacity: 0, width: 0 }}
               animate={{ opacity: 1, width: "auto" }}
               exit={{ opacity: 0, width: 0 }}
-              className="font-serif text-lg font-bold gold-text whitespace-nowrap overflow-hidden"
+              className="flex min-w-0 items-center gap-2 overflow-hidden"
             >
-              RatnaERP
-            </motion.span>
+              <GoldMindLogoMark size="sm" />
+              <motion.span
+                layout
+                className="truncate font-serif text-lg font-bold tracking-tight gold-text"
+              >
+                {GOLDMIND_APP_NAME}
+              </motion.span>
+            </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </NavLink>
 
       {/* Nav */}
       <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
