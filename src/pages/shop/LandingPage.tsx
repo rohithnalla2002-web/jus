@@ -101,15 +101,15 @@ const faqs = [
 const analyticsShots = [
   {
     title: "Live Sales Dashboard",
-    img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1400&q=80",
+    img: "/1.jpg",
   },
   {
     title: "Inventory Intelligence",
-    img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1400&q=80",
+    img: "/2.jpg",
   },
   {
     title: "Mobile Business Insights",
-    img: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1400&q=80",
+    img: "/3.jpg",
   },
 ];
 
@@ -122,12 +122,12 @@ const heroStats = [
 const aiShots = [
   {
     title: "AI Demand Forecasting",
-    img: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1400&q=80",
+    img: "/4.jpg",
     desc: "Predict fast-moving designs and optimize replenishment before stock-outs.",
   },
   {
     title: "AI Sales Co-Pilot",
-    img: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1400&q=80",
+    img: "/5.jpg",
     desc: "Suggest upsell bundles, follow-ups, and next best actions for staff.",
   },
 ];
@@ -139,8 +139,7 @@ export default function LandingPage() {
         <div
           className="absolute inset-0 bg-cover bg-center opacity-25"
           style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1920&q=80)",
+            backgroundImage: "url(/4.jpg)",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#fefdfb] via-[#fefdfb]/95 to-[#fefdfb]/70" />
@@ -213,7 +212,7 @@ export default function LandingPage() {
             <div className="absolute -bottom-8 right-0 h-28 w-28 rounded-full bg-violet-300/30 blur-2xl" />
             <div className="relative overflow-hidden rounded-3xl border border-amber-200/70 bg-white/90 p-4 shadow-2xl backdrop-blur">
               <img
-                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1400&q=80"
+                src="/1.jpg"
                 alt="GoldMind analytics dashboard"
                 className="h-64 w-full rounded-2xl object-cover sm:h-72"
               />
