@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, Sparkles, X } from "lucide-react";
-import { GoldMindBrandLockup } from "@/components/shared/GoldMindBrandLogo";
+import { Menu, X } from "lucide-react";
+import { GOLDMIND_APP_NAME, GOLDMIND_BRAND_NAME_IMAGE_SRC } from "@/lib/company";
 
 const links = [
   { to: "/#home", label: "Home" },
   { to: "/#visual-analytics", label: "Analytics" },
-  { to: "/#ai-integration", label: "AI" },
   { to: "/#why-us", label: "Why Us" },
   { to: "/#core-features", label: "Features" },
   { to: "/#testimonials", label: "Reviews" },
@@ -55,7 +54,14 @@ export default function ShopNav() {
     <header className="sticky top-0 z-50 border-b border-amber-200/60 bg-white/80 backdrop-blur-2xl shadow-[0_8px_28px_-16px_rgba(146,64,14,0.45)]">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/#home" className="group flex min-w-0 items-center transition-all hover:opacity-95">
-          <GoldMindBrandLockup size="xl" className="gap-0" />
+          <img
+            src={GOLDMIND_BRAND_NAME_IMAGE_SRC}
+            alt={GOLDMIND_APP_NAME}
+            className="h-11 w-auto max-w-full object-contain sm:h-12"
+            width={800}
+            height={250}
+            decoding="async"
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-1 rounded-2xl border border-amber-200/70 bg-white/85 p-1.5 shadow-sm">
@@ -83,9 +89,8 @@ export default function ShopNav() {
           <button
             type="button"
             onClick={() => navigate("/admin/login")}
-            className="ml-2 inline-flex items-center gap-1 rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-100 to-yellow-100 px-4 py-2 text-xs font-semibold text-amber-900 transition-all hover:shadow-md hover:shadow-amber-200/60"
+            className="ml-2 inline-flex items-center rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-100 to-yellow-100 px-4 py-2 text-xs font-semibold text-amber-900 transition-all hover:shadow-md hover:shadow-amber-200/60"
           >
-            <Sparkles className="h-3.5 w-3.5" />
             Login (Admin)
           </button>
         </nav>
@@ -128,9 +133,8 @@ export default function ShopNav() {
                   setOpen(false);
                   navigate("/admin/login");
                 }}
-                className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 py-3 text-center font-semibold text-amber-900"
+                className="mt-2 inline-flex items-center justify-center rounded-xl border border-amber-300 bg-amber-50 py-3 text-center font-semibold text-amber-900"
               >
-                <Sparkles className="h-4 w-4" />
                 Login (Admin)
               </button>
             </div>

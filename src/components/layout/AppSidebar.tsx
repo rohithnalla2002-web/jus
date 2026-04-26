@@ -5,7 +5,7 @@ import {
   Wallet, BarChart3, ChevronLeft, ChevronRight, Hammer, LogOut,
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
-import { GOLDMIND_APP_NAME, GOLDMIND_BRAND_NAME_IMAGE_SRC } from "@/lib/company";
+import { GOLDMIND_AI_LOGO_SRC, GOLDMIND_APP_NAME } from "@/lib/company";
 
 const navItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -48,24 +48,44 @@ export default function AppSidebar({
       {/* Logo */}
       <NavLink
         to="/dashboard"
-        className={`flex h-14 items-center border-b border-border bg-white px-0 transition-colors hover:bg-white`}
+        className={`flex h-16 items-center border-b border-border bg-sidebar px-0 transition-colors hover:bg-sidebar`}
       >
         <AnimatePresence mode="wait">
           <motion.div
-            key={collapsed ? "collapsed-brand-image" : "expanded-brand-image"}
+            key={collapsed ? "collapsed-brand-text" : "expanded-brand-text"}
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
-            className="h-full w-full"
+            className="flex h-full w-full items-center justify-center px-2"
           >
-            <img
-              src={GOLDMIND_BRAND_NAME_IMAGE_SRC}
-              alt={GOLDMIND_APP_NAME}
-              className="h-full w-full object-contain"
-              width={800}
-              height={250}
-              decoding="async"
-            />
+            {collapsed ? (
+              <img
+                src={GOLDMIND_AI_LOGO_SRC}
+                alt={`${GOLDMIND_APP_NAME} logo`}
+                className="h-10 w-10 object-contain"
+                width={512}
+                height={512}
+                decoding="async"
+              />
+            ) : (
+              <div className="flex items-center gap-2.5">
+                <img
+                  src={GOLDMIND_AI_LOGO_SRC}
+                  alt={`${GOLDMIND_APP_NAME} logo`}
+                  className="h-10 w-10 object-contain"
+                  width={512}
+                  height={512}
+                  decoding="async"
+                />
+                <div className="text-center leading-none">
+                <div className="text-[22px] font-bold">
+                  <span className="text-[#D4AF37]">Gold</span>
+                  <span className="text-[#4B1D7A]">Mind</span>
+                </div>
+                <p className="mt-1 text-[11px] text-zinc-600">AI Driven ERP for Jewellery RTL/WS</p>
+                </div>
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
       </NavLink>
