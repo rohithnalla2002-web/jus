@@ -35,12 +35,12 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-amber-50 via-white to-yellow-50 p-4">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 p-4">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.16),transparent_55%)]" />
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1600&q=60')] bg-cover bg-center opacity-10" />
       <motion.div
         aria-hidden
-        className="absolute -left-20 top-20 h-56 w-56 rounded-full bg-amber-400/20 blur-3xl"
+        className="absolute -left-20 top-20 h-56 w-56 rounded-full bg-violet-400/20 blur-3xl"
         animate={{ y: [0, -18, 0], x: [0, 12, 0] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -54,10 +54,10 @@ export default function AdminLogin() {
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        className="relative w-full max-w-md overflow-hidden rounded-3xl border border-amber-200/70 bg-white/90 p-8 shadow-2xl shadow-amber-200/60 backdrop-blur-xl"
+        className="relative w-full max-w-md overflow-hidden rounded-3xl border border-violet-200/70 bg-white/90 p-8 shadow-2xl shadow-violet-200/60 backdrop-blur-xl"
       >
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500" />
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-300/60 bg-amber-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-800">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-violet-400 via-fuchsia-300 to-violet-500" />
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-300/60 bg-violet-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-800">
           <ShieldCheck className="h-3.5 w-3.5" />
           Secure Admin Access
         </div>
@@ -79,7 +79,7 @@ export default function AdminLogin() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
-                className="w-full rounded-xl border border-amber-200 bg-white py-3 pl-10 pr-4 text-sm text-zinc-900 placeholder:text-zinc-400 shadow-sm transition focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500/30"
+                className="w-full rounded-xl border border-violet-200 bg-white py-3 pl-10 pr-4 text-sm text-zinc-900 placeholder:text-zinc-400 shadow-sm transition focus:border-violet-500/50 focus:outline-none focus:ring-1 focus:ring-violet-500/30"
                 placeholder="admin"
               />
             </div>
@@ -93,7 +93,7 @@ export default function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
-                className="w-full rounded-xl border border-amber-200 bg-white py-3 pl-10 pr-4 text-sm text-zinc-900 placeholder:text-zinc-400 shadow-sm transition focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500/30"
+                className="w-full rounded-xl border border-violet-200 bg-white py-3 pl-10 pr-4 text-sm text-zinc-900 placeholder:text-zinc-400 shadow-sm transition focus:border-violet-500/50 focus:outline-none focus:ring-1 focus:ring-violet-500/30"
                 placeholder="••••••••"
               />
             </div>
@@ -106,7 +106,7 @@ export default function AdminLogin() {
             whileTap={{ scale: submitting ? 1 : 0.99 }}
             type="submit"
             disabled={submitting}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 py-3.5 text-sm font-bold text-black shadow-lg shadow-amber-600/25 disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-purple-700 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-600/30 disabled:opacity-60"
           >
             <Sparkles className="h-4 w-4" />
             {submitting ? "Signing in…" : "Sign in"}
@@ -116,7 +116,7 @@ export default function AdminLogin() {
           Credentials are set in <span className="text-zinc-700">.env</span> as{" "}
           <span className="text-zinc-700">ADMIN_USERNAME</span> / <span className="text-zinc-700">ADMIN_PASSWORD</span>
         </p>
-        <button type="button" onClick={() => navigate("/")} className="mt-4 w-full text-center text-xs text-zinc-600 hover:text-amber-700">
+        <button type="button" onClick={() => navigate("/")} className="mt-4 w-full text-center text-xs text-zinc-600 hover:text-violet-700">
           ← Back to shop
         </button>
       </motion.div>

@@ -595,8 +595,8 @@ const Karigar = () => {
             {assignStep === 2 && (
               <div className="space-y-4">
                 {assignItemMode === "repair" && (
-                  <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-foreground flex gap-2 items-start">
-                    <Wrench className="w-4 h-4 shrink-0 mt-0.5 text-amber-700 dark:text-amber-400" />
+                  <div className="rounded-lg border border-violet-500/30 bg-violet-500/10 px-3 py-2 text-xs text-foreground flex gap-2 items-start">
+                    <Wrench className="w-4 h-4 shrink-0 mt-0.5 text-violet-700 dark:text-violet-400" />
                     <span>
                       <span className="font-semibold">Repair job.</span> Upload a clear photo of the customer&apos;s item.
                       Describe what needs fixing in Instructions.
@@ -686,7 +686,7 @@ const Karigar = () => {
                       onChange={(e) => handleReferenceImageUpload(e.target.files?.[0] ?? null)}
                       className={`w-full px-2.5 py-2 rounded-lg bg-secondary border text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors ${
                         assignItemMode === "repair" && !form.referenceImage
-                          ? "border-amber-500/50"
+                          ? "border-violet-500/50"
                           : "border-border"
                       }`}
                     />

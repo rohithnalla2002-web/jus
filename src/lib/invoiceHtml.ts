@@ -117,8 +117,8 @@ export const buildInvoiceHtml = (args: {
         --text:#111827;
         --muted:#6b7280;
         --border:#e5e7eb;
-        --gold:#b8860b;
-        --gold-2:#eab308;
+        --gold:#5b21b6;
+        --gold-2:#a855f7;
       }
       *{ box-sizing:border-box; }
       body{
@@ -471,8 +471,8 @@ export const buildKarigarJobReceiptHtml = (args: {
         --text:#111827;
         --muted:#6b7280;
         --border:#e5e7eb;
-        --gold:#b8860b;
-        --gold-2:#eab308;
+        --gold:#5b21b6;
+        --gold-2:#a855f7;
       }
       *{ box-sizing:border-box; }
       body{

@@ -65,17 +65,17 @@ const testimonials = [
   {
     quote: "Very user-friendly and quick accounting app for jewellers.",
     name: "Mihir Soni",
-    rating: "★★★★☆",
+    rating: "â˜…â˜…â˜…â˜…â˜†",
   },
   {
     quote: "Best cross-platform ERP so far, data sync is very fast.",
     name: "Manish Dholakia",
-    rating: "★★★★★",
+    rating: "â˜…â˜…â˜…â˜…â˜…",
   },
   {
     quote: "Great for sales, purchase, and inventory management.",
     name: "Himanshu Tomar",
-    rating: "★★★★★",
+    rating: "â˜…â˜…â˜…â˜…â˜…",
   },
 ];
 
@@ -142,11 +142,11 @@ export default function LandingPage() {
             backgroundImage: "url(/4.jpg)",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#fefdfb] via-[#fefdfb]/95 to-[#fefdfb]/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#faf8ff] via-[#faf8ff]/95 to-[#faf8ff]/70" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(251,191,36,0.2),transparent_55%)]" />
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute -left-16 top-16 h-48 w-48 rounded-full bg-amber-300/30 blur-3xl"
+          className="pointer-events-none absolute -left-16 top-16 h-48 w-48 rounded-full bg-violet-300/30 blur-3xl"
           animate={{ y: [0, -16, 0], x: [0, 10, 0] }}
           transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -159,8 +159,8 @@ export default function LandingPage() {
 
         <div className="relative mx-auto grid min-h-[78vh] max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2">
           <motion.div {...fadeUp} transition={{ duration: 0.6 }} className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-amber-200/80 bg-white/90 px-4 py-1.5 text-sm font-medium text-amber-900 shadow-sm">
-              <Sparkles className="h-4 w-4 shrink-0 text-amber-600" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-violet-200/80 bg-white/90 px-4 py-1.5 text-sm font-medium text-violet-900 shadow-sm">
+              <Sparkles className="h-4 w-4 shrink-0 text-violet-600" />
               <GoldMindLogoMark size="xs" />
               {GOLDMIND_APP_NAME}
             </span>
@@ -173,14 +173,14 @@ export default function LandingPage() {
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
                 to="/#visual-analytics"
-                className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 px-8 py-4 text-sm font-bold text-black shadow-lg shadow-amber-300/50 transition-all hover:scale-[1.02] hover:shadow-amber-400/40"
+                className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 via-fuchsia-500 to-purple-700 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-violet-400/40 transition-all hover:scale-[1.02] hover:shadow-fuchsia-500/35"
               >
                 Explore Platform
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
                 to="/contact"
-                className="inline-flex items-center rounded-full border border-zinc-300 bg-white/90 px-6 py-4 text-sm font-semibold text-zinc-800 transition hover:border-amber-400 hover:bg-amber-50"
+                className="inline-flex items-center rounded-full border border-zinc-300 bg-white/90 px-6 py-4 text-sm font-semibold text-zinc-800 transition hover:border-violet-400 hover:bg-violet-50"
               >
                 Book Demo
               </Link>
@@ -193,7 +193,7 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.08 }}
-                  className="rounded-xl border border-amber-200/80 bg-white/85 px-4 py-3 text-left shadow-sm backdrop-blur"
+                  className="rounded-xl border border-violet-200/80 bg-white/85 px-4 py-3 text-left shadow-sm backdrop-blur"
                 >
                   <p className="text-lg font-bold text-zinc-900">{stat.value}</p>
                   <p className="text-[11px] uppercase tracking-wide text-zinc-500">{stat.label}</p>
@@ -208,9 +208,9 @@ export default function LandingPage() {
             transition={{ delay: 0.2, duration: 0.7 }}
             className="relative mx-auto w-full max-w-xl"
           >
-            <div className="absolute -left-6 -top-6 h-24 w-24 rounded-2xl bg-amber-300/40 blur-2xl" />
+            <div className="absolute -left-6 -top-6 h-24 w-24 rounded-2xl bg-violet-300/40 blur-2xl" />
             <div className="absolute -bottom-8 right-0 h-28 w-28 rounded-full bg-violet-300/30 blur-2xl" />
-            <div className="relative overflow-hidden rounded-3xl border border-amber-200/70 bg-white/90 p-4 shadow-2xl backdrop-blur">
+            <div className="relative overflow-hidden rounded-3xl border border-violet-200/70 bg-white/90 p-4 shadow-2xl backdrop-blur">
               <img
                 src="/1.jpg"
                 alt="GoldMind analytics dashboard"
@@ -218,7 +218,7 @@ export default function LandingPage() {
               />
               <div className="mt-4 grid grid-cols-3 gap-2">
                 {[
-                  { k: "Today Sales", v: "₹4.8L" },
+                  { k: "Today Sales", v: "â‚¹4.8L" },
                   { k: "Orders", v: "126" },
                   { k: "AI Alerts", v: "18" },
                 ].map((m) => (
@@ -234,11 +234,11 @@ export default function LandingPage() {
       </section>
 
       <section id="visual-analytics" className="relative overflow-hidden py-16">
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-50/70 to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-violet-50/70 to-white" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">Visual Analytics</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Visual Analytics</p>
               <h2 className="mt-2 font-serif text-3xl font-bold text-zinc-900 sm:text-4xl">
                 Beautiful dashboards with actionable insights
               </h2>
@@ -246,7 +246,7 @@ export default function LandingPage() {
             <motion.div
               animate={{ y: [0, -4, 0] }}
               transition={{ duration: 3, repeat: Infinity }}
-              className="inline-flex items-center gap-2 rounded-full border border-amber-300/70 bg-white px-4 py-2 text-xs font-medium text-zinc-700 shadow-sm"
+              className="inline-flex items-center gap-2 rounded-full border border-violet-300/70 bg-white px-4 py-2 text-xs font-medium text-zinc-700 shadow-sm"
             >
               <TrendingUp className="h-4 w-4 text-emerald-600" />
               Real-time growth tracking
@@ -257,7 +257,7 @@ export default function LandingPage() {
             <motion.article
               whileHover={{ y: -4, scale: 1.005 }}
               transition={{ type: "spring", stiffness: 180, damping: 16 }}
-              className="group relative overflow-hidden rounded-3xl border border-amber-200/70 bg-white shadow-lg md:col-span-7"
+              className="group relative overflow-hidden rounded-3xl border border-violet-200/70 bg-white shadow-lg md:col-span-7"
             >
               <img src={analyticsShots[0].img} alt={analyticsShots[0].title} className="h-64 w-full object-cover md:h-80" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
@@ -273,7 +273,7 @@ export default function LandingPage() {
                   key={shot.title}
                   whileHover={{ y: -4 }}
                   transition={{ type: "spring", stiffness: 180, damping: 16 }}
-                  className="group relative overflow-hidden rounded-3xl border border-amber-200/70 bg-white shadow-md"
+                  className="group relative overflow-hidden rounded-3xl border border-violet-200/70 bg-white shadow-md"
                 >
                   <img src={shot.img} alt={shot.title} className="h-36 w-full object-cover sm:h-44" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
@@ -292,9 +292,9 @@ export default function LandingPage() {
               <motion.div
                 key={item.title}
                 whileHover={{ y: -3 }}
-                className="rounded-2xl border border-amber-200/70 bg-white/90 p-4 shadow-sm"
+                className="rounded-2xl border border-violet-200/70 bg-white/90 p-4 shadow-sm"
               >
-                <item.icon className="h-5 w-5 text-amber-700" />
+                <item.icon className="h-5 w-5 text-violet-700" />
                 <p className="mt-2 text-sm font-semibold text-zinc-900">{item.title}</p>
                 <p className="text-xs text-zinc-600">{item.note}</p>
               </motion.div>
@@ -356,7 +356,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="why-us" className="border-y border-amber-200/60 bg-white/80 py-16">
+      <section id="why-us" className="border-y border-violet-200/60 bg-white/80 py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="font-serif text-3xl font-bold text-zinc-900 sm:text-4xl">Why {GOLDMIND_APP_NAME}?</h2>
@@ -373,9 +373,9 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.06 }}
                 whileHover={{ y: -4, boxShadow: "0 20px 36px rgba(180, 130, 20, 0.12)" }}
-                className="rounded-2xl border border-amber-200/70 bg-white p-5 shadow-sm"
+                className="rounded-2xl border border-violet-200/70 bg-white p-5 shadow-sm"
               >
-                <feature.icon className="h-5 w-5 text-amber-700" />
+                <feature.icon className="h-5 w-5 text-violet-700" />
                 <h3 className="mt-3 text-base font-semibold text-zinc-900">{feature.title}</h3>
                 <p className="mt-1 text-sm text-zinc-600">{feature.desc}</p>
               </motion.div>
@@ -386,7 +386,7 @@ export default function LandingPage() {
 
       <section id="core-features" className="py-16">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 md:grid-cols-2">
-          <div className="rounded-2xl border border-amber-200/80 bg-gradient-to-br from-white to-amber-50 p-6">
+          <div className="rounded-2xl border border-violet-200/80 bg-gradient-to-br from-white to-violet-50 p-6">
             <h3 className="font-serif text-2xl font-bold text-zinc-900">Business analytics at your fingertips</h3>
             <p className="mt-2 text-sm text-zinc-600">
               Live dashboard cards and trend indicators help you monitor sales, stock, and collections at a glance.
@@ -400,7 +400,7 @@ export default function LandingPage() {
               ))}
             </ul>
           </div>
-          <div className="rounded-2xl border border-amber-200/80 bg-gradient-to-br from-white to-amber-50 p-6">
+          <div className="rounded-2xl border border-violet-200/80 bg-gradient-to-br from-white to-violet-50 p-6">
             <h3 className="font-serif text-2xl font-bold text-zinc-900">GST compliant invoices</h3>
             <p className="mt-2 text-sm text-zinc-600">
               Generate, share, and print GST-ready invoices quickly from both desktop and mobile workflows.
@@ -418,16 +418,16 @@ export default function LandingPage() {
       </section>
 
       <section id="testimonials" className="relative overflow-hidden py-16">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-50/70 via-white to-violet-50/50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-50/70 via-white to-violet-50/50" />
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute -left-12 top-10 h-44 w-44 rounded-full bg-amber-300/30 blur-3xl"
+          className="pointer-events-none absolute -left-12 top-10 h-44 w-44 rounded-full bg-violet-300/30 blur-3xl"
           animate={{ y: [0, 16, 0] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">Testimonials</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Testimonials</p>
             <h2 className="mt-2 font-serif text-3xl font-bold text-zinc-900 sm:text-4xl">What our users say</h2>
             <p className="mx-auto mt-2 max-w-2xl text-sm text-zinc-600">
               Real feedback from jewellers using the platform daily for billing, stock, and operations.
@@ -442,15 +442,15 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ y: -6, scale: 1.01 }}
-                className="group relative overflow-hidden rounded-3xl border border-amber-200/80 bg-white p-6 shadow-md"
+                className="group relative overflow-hidden rounded-3xl border border-violet-200/80 bg-white p-6 shadow-md"
               >
-                <div className="absolute right-4 top-4 rounded-full bg-amber-100 p-2 text-amber-700">
+                <div className="absolute right-4 top-4 rounded-full bg-violet-100 p-2 text-violet-700">
                   <Quote className="h-4 w-4" />
                 </div>
-                <p className="text-sm tracking-wide text-amber-700">{t.rating}</p>
+                <p className="text-sm tracking-wide text-violet-700">{t.rating}</p>
                 <p className="mt-3 text-sm leading-relaxed text-zinc-700">"{t.quote}"</p>
                 <div className="mt-5 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-yellow-600 text-xs font-bold text-white">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-violet-400 to-fuchsia-600 text-xs font-bold text-white">
                     {t.name
                       .split(" ")
                       .map((part) => part[0])
@@ -465,7 +465,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="pricing" className="border-y border-amber-200/60 bg-amber-50/60 py-16">
+      <section id="pricing" className="border-y border-violet-200/60 bg-violet-50/60 py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <h2 className="text-center font-serif text-3xl font-bold text-zinc-900">Simple pricing</h2>
           <p className="mt-2 text-center text-sm text-zinc-600">One powerful website plan with everything your jewellery business needs.</p>
@@ -475,13 +475,13 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
             whileHover={{ y: -6 }}
-            className="relative mx-auto mt-8 max-w-4xl overflow-hidden rounded-3xl border border-amber-300/80 bg-white shadow-xl"
+            className="relative mx-auto mt-8 max-w-4xl overflow-hidden rounded-3xl border border-violet-300/80 bg-white shadow-xl"
           >
-            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-amber-300/30 blur-2xl" />
+            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-violet-300/30 blur-2xl" />
             <div className="absolute -bottom-12 left-6 h-40 w-40 rounded-full bg-violet-300/20 blur-3xl" />
             <div className="relative grid gap-6 p-7 md:grid-cols-[1.1fr,1fr] md:p-8">
               <div>
-                <p className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-800">
+                <p className="inline-flex items-center rounded-full border border-violet-300 bg-violet-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-violet-800">
                   Website Plan
                 </p>
                 <p className="mt-4 text-4xl font-bold text-zinc-900">Contact for pricing</p>
@@ -491,14 +491,14 @@ export default function LandingPage() {
                 <div className="mt-6">
                   <Link
                     to="/contact"
-                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-700 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:scale-[1.02]"
+                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-violet-700 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:scale-[1.02]"
                   >
                     Book Demo
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
               </div>
-              <div className="rounded-2xl border border-amber-200/80 bg-amber-50/40 p-5">
+              <div className="rounded-2xl border border-violet-200/80 bg-violet-50/40 p-5">
                 <p className="text-sm font-semibold text-zinc-900">Everything included</p>
                 <ul className="mt-3 grid grid-cols-1 gap-2 text-sm text-zinc-700">
                   {[
@@ -530,16 +530,16 @@ export default function LandingPage() {
       </section>
 
       <section id="faqs" className="relative overflow-hidden py-16">
-        <div className="absolute inset-0 bg-gradient-to-b from-white to-amber-50/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white to-violet-50/50" />
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute -right-16 top-12 h-48 w-48 rounded-full bg-amber-300/25 blur-3xl"
+          className="pointer-events-none absolute -right-16 top-12 h-48 w-48 rounded-full bg-violet-300/25 blur-3xl"
           animate={{ y: [0, 16, 0], x: [0, -8, 0] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
           <div className="text-center">
-            <p className="inline-flex items-center gap-2 rounded-full border border-amber-300/70 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">
+            <p className="inline-flex items-center gap-2 rounded-full border border-violet-300/70 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-violet-700">
               <HelpCircle className="h-3.5 w-3.5" />
               FAQs
             </p>
@@ -557,20 +557,20 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.06 }}
-                className="group rounded-2xl border border-amber-200/80 bg-white/95 p-5 shadow-sm transition-all open:shadow-md hover:border-amber-300"
+                className="group rounded-2xl border border-violet-200/80 bg-white/95 p-5 shadow-sm transition-all open:shadow-md hover:border-violet-300"
               >
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-3">
                   <span className="text-sm font-semibold text-zinc-900">{item.q}</span>
                   <ChevronDown className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500 transition-transform duration-300 group-open:rotate-180" />
                 </summary>
-                <p className="mt-3 border-t border-amber-100 pt-3 text-sm leading-relaxed text-zinc-600">{item.a}</p>
+                <p className="mt-3 border-t border-violet-100 pt-3 text-sm leading-relaxed text-zinc-600">{item.a}</p>
               </motion.details>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="contact" className="border-t border-amber-200/70 bg-white py-16">
+      <section id="contact" className="border-t border-violet-200/70 bg-white py-16">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 md:grid-cols-2">
           <div>
             <h2 className="font-serif text-3xl font-bold text-zinc-900">Get in touch</h2>
@@ -578,20 +578,20 @@ export default function LandingPage() {
               Questions about setup, pricing, or migration? Our team can help you choose the right plan.
             </p>
             <div className="mt-5 space-y-2 text-sm text-zinc-700">
-              <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-amber-700" /> support@goldminderp.com</p>
-              <p className="flex items-center gap-2"><MessageCircle className="h-4 w-4 text-amber-700" /> WhatsApp: +91 95022 01143</p>
-              <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-amber-700" /> Phone: +91 95022 01143</p>
+              <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-violet-700" /> support@goldminderp.com</p>
+              <p className="flex items-center gap-2"><MessageCircle className="h-4 w-4 text-violet-700" /> WhatsApp: +91 95022 01143</p>
+              <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-violet-700" /> Phone: +91 95022 01143</p>
             </div>
           </div>
-          <div className="rounded-2xl border border-amber-200/70 bg-amber-50/60 p-6">
+          <div className="rounded-2xl border border-violet-200/70 bg-violet-50/60 p-6">
             <h3 className="text-sm font-semibold text-zinc-900">Quick enquiry</h3>
             <p className="mt-1 text-xs text-zinc-600">Share your details and we will get back shortly.</p>
             <div className="mt-4 grid grid-cols-1 gap-2">
-              <input className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm" placeholder="Your Name" />
-              <input className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm" placeholder="Mobile Number" />
-              <input className="rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm" placeholder="Email" />
-              <textarea className="min-h-[90px] rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm" placeholder="Message" />
-              <button type="button" className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700">
+              <input className="rounded-lg border border-violet-200 bg-white px-3 py-2 text-sm" placeholder="Your Name" />
+              <input className="rounded-lg border border-violet-200 bg-white px-3 py-2 text-sm" placeholder="Mobile Number" />
+              <input className="rounded-lg border border-violet-200 bg-white px-3 py-2 text-sm" placeholder="Email" />
+              <textarea className="min-h-[90px] rounded-lg border border-violet-200 bg-white px-3 py-2 text-sm" placeholder="Message" />
+              <button type="button" className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700">
                 Submit
               </button>
             </div>

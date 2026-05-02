@@ -49,7 +49,7 @@ const Sales = () => {
       order,
       customer,
       inventory,
-      goldRatePerGram: "₹7,245/g",
+      goldRatePerGram: "â‚¹7,245/g",
       paymentMethod: labelForPaymentMode(order.paymentMode),
     });
 
@@ -180,7 +180,7 @@ const Sales = () => {
                              e.stopPropagation();
                              sendReminder(order.id);
                            }}
-                           className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 transition-colors"
+                           className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-violet-500/40 bg-violet-500/10 text-violet-700 hover:bg-violet-500/20 transition-colors"
                            aria-label="Send reminder"
                            title="Send reminder"
                          >

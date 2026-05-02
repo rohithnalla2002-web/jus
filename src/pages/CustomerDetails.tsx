@@ -171,7 +171,7 @@ export default function CustomerDetails() {
             recency.
           </p>
           <div className="flex flex-wrap gap-2 mt-3 text-xs">
-            <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2.5 py-1 text-amber-800 dark:text-amber-200">
+            <span className="inline-flex items-center gap-1 rounded-full border border-violet-500/40 bg-violet-500/10 px-2.5 py-1 text-violet-800 dark:text-violet-200">
               <ShoppingBag className="w-3 h-3" /> Direct purchase
             </span>
             <span className="inline-flex items-center gap-1 rounded-full border border-violet-500/40 bg-violet-500/10 px-2.5 py-1 text-violet-800 dark:text-violet-200">
@@ -194,11 +194,11 @@ export default function CustomerDetails() {
               {customerOrders.map((order) => (
                 <tr
                   key={`order-${order.id}`}
-                  className="border-b border-border/50 hover:bg-secondary/30 transition-colors cursor-pointer bg-amber-500/[0.03]"
+                  className="border-b border-border/50 hover:bg-secondary/30 transition-colors cursor-pointer bg-violet-500/[0.03]"
                   onClick={() => navigate(`/orders/${order.id}`)}
                 >
                   <td className="px-4 py-3 align-top">
-                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/35 bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-900 dark:text-amber-100">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-violet-500/35 bg-violet-500/10 px-2 py-0.5 text-[11px] font-semibold text-violet-900 dark:text-violet-100">
                       <ShoppingBag className="w-3 h-3 shrink-0" /> Purchase
                     </span>
                   </td>

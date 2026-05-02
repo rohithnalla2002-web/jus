@@ -279,7 +279,7 @@ export default function OrderDetails() {
     "relative overflow-hidden rounded-xl border border-primary/15 dark:border-primary/25 bg-card/95 backdrop-blur-xl shadow-md ring-1 ring-primary/10";
 
   const sideCardClass =
-    "rounded-xl border border-amber-900/10 dark:border-amber-100/10 bg-card/75 backdrop-blur-xl shadow-sm ring-1 ring-primary/5";
+    "rounded-xl border border-violet-900/10 dark:border-violet-100/10 bg-card/75 backdrop-blur-xl shadow-sm ring-1 ring-primary/5";
 
   return (
     <AppLayout>
@@ -305,7 +305,7 @@ export default function OrderDetails() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className={`${docCardClass} p-5 pl-6 before:absolute before:left-0 before:top-4 before:bottom-4 before:w-1 before:rounded-full before:bg-gradient-to-b before:from-primary before:to-amber-600 dark:before:to-amber-500`}
+          className={`${docCardClass} p-5 pl-6 before:absolute before:left-0 before:top-4 before:bottom-4 before:w-1 before:rounded-full before:bg-gradient-to-b before:from-primary before:to-violet-600 dark:before:to-violet-500`}
         >
         <div className="flex items-start justify-between gap-6 flex-wrap">
           <div className="min-w-[220px]">

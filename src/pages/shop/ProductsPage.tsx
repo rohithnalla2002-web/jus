@@ -53,7 +53,7 @@ export default function ProductsPage() {
         <p className="mt-2 text-sm text-zinc-600">Filter by category, price, and popularity.</p>
       </motion.div>
 
-      <div id="categories" className="mt-10 rounded-2xl border border-amber-200/80 bg-white/90 p-4 shadow-md shadow-amber-100/40 sm:p-6">
+      <div id="categories" className="mt-10 rounded-2xl border border-violet-200/80 bg-white/90 p-4 shadow-md shadow-violet-100/40 sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
@@ -61,7 +61,7 @@ export default function ProductsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name or category..."
-              className="w-full rounded-xl border border-amber-200 bg-white py-3 pl-10 pr-4 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-xl border border-violet-200 bg-white py-3 pl-10 pr-4 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-violet-500 focus:outline-none"
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -72,7 +72,7 @@ export default function ProductsPage() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as typeof sort)}
-              className="rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm text-zinc-900 focus:border-amber-500 focus:outline-none"
+              className="rounded-xl border border-violet-200 bg-white px-3 py-2.5 text-sm text-zinc-900 focus:border-violet-500 focus:outline-none"
             >
               <option value="popular">Popularity</option>
               <option value="price-asc">Price: Low to High</option>
@@ -97,8 +97,8 @@ export default function ProductsPage() {
                 }}
                 className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
                   category === c
-                    ? "bg-gradient-to-r from-amber-500 to-amber-700 text-white shadow-md"
-                    : "border border-amber-200 text-zinc-700 hover:border-amber-400 hover:bg-amber-50"
+                    ? "bg-gradient-to-r from-violet-500 to-violet-700 text-white shadow-md"
+                    : "border border-violet-200 text-zinc-700 hover:border-violet-400 hover:bg-violet-50"
                 }`}
               >
                 {c}
@@ -116,7 +116,7 @@ export default function ProductsPage() {
             step={50000}
             value={Math.min(priceMax, 10000000)}
             onChange={(e) => setPriceMax(Number(e.target.value))}
-            className="mt-2 w-full accent-amber-500"
+            className="mt-2 w-full accent-violet-500"
           />
           <p className="mt-1 text-xs text-zinc-600">Up to ₹{(priceMax / 100000).toFixed(1)}L</p>
         </div>
@@ -129,10 +129,10 @@ export default function ProductsPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: Math.min(i * 0.04, 0.4) }}
-            className="group overflow-hidden rounded-2xl border border-amber-200/80 bg-white shadow-md transition-all hover:border-amber-300 hover:shadow-xl hover:shadow-amber-200/30"
+            className="group overflow-hidden rounded-2xl border border-violet-200/80 bg-white shadow-md transition-all hover:border-violet-300 hover:shadow-xl hover:shadow-violet-200/30"
           >
             <Link to={`/product/${item.id}`} className="block overflow-hidden">
-              <div className="aspect-square overflow-hidden bg-amber-50">
+              <div className="aspect-square overflow-hidden bg-violet-50">
                 <img
                   src={getProductImageUrl(item)}
                   alt={item.name}
@@ -141,21 +141,21 @@ export default function ProductsPage() {
               </div>
             </Link>
             <div className="p-5">
-              <p className="text-xs font-medium text-amber-800">{getShopCategory(item)}</p>
+              <p className="text-xs font-medium text-violet-800">{getShopCategory(item)}</p>
               <h2 className="mt-1 font-serif text-xl font-semibold text-zinc-900">{item.name}</h2>
               <p className="mt-2 line-clamp-2 text-sm text-zinc-600">{shortDescription(item)}</p>
-              <p className="mt-3 text-lg font-bold text-amber-800">{item.price}</p>
+              <p className="mt-3 text-lg font-bold text-violet-800">{item.price}</p>
               <div className="mt-4 flex gap-2">
                 <Link
                   to={`/product/${item.id}`}
-                  className="flex-1 rounded-xl border border-amber-200 py-2.5 text-center text-sm font-semibold text-zinc-800 hover:border-amber-400 hover:bg-amber-50"
+                  className="flex-1 rounded-xl border border-violet-200 py-2.5 text-center text-sm font-semibold text-zinc-800 hover:border-violet-400 hover:bg-violet-50"
                 >
                   View Details
                 </Link>
                 <button
                   type="button"
                   onClick={() => addToCart(item.id, 1)}
-                  className="flex-1 rounded-xl bg-gradient-to-r from-amber-500 to-amber-700 py-2.5 text-sm font-bold text-white shadow-md"
+                  className="flex-1 rounded-xl bg-gradient-to-r from-violet-500 to-violet-700 py-2.5 text-sm font-bold text-white shadow-md"
                 >
                   Add to Cart
                 </button>

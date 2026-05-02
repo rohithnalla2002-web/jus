@@ -13,7 +13,7 @@ type CategoryFilter = "all" | "gold" | "silver" | "platinum" | "diamond";
 type DateRangeFilter = "day" | "week" | "month" | "year" | "custom";
 
 const categoryColorMap: Record<string, string> = {
-  Gold: "hsl(43, 72%, 52%)",
+  Gold: "hsl(262, 83%, 52%)",
   Diamond: "hsl(217, 91%, 60%)",
   Silver: "hsl(0, 0%, 70%)",
   Platinum: "hsl(200, 30%, 60%)",
@@ -224,16 +224,16 @@ const Reports = () => {
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={chartData}>
               <defs>
-                <linearGradient id="goldGrad2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(43, 72%, 52%)" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(43, 72%, 52%)" stopOpacity={0} />
+                <linearGradient id="brandGrad2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(262, 83%, 52%)" stopOpacity={0.35} />
+                  <stop offset="95%" stopColor="hsl(262, 83%, 52%)" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
               <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickFormatter={(v) => `₹${(Number(v) / 100000).toFixed(1)}L`} />
               <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} formatter={(value: number) => [formatCurrency(value), "Sales"]} />
-              <Area type="monotone" dataKey="sales" stroke="hsl(43, 72%, 52%)" fill="url(#goldGrad2)" strokeWidth={2} />
+              <Area type="monotone" dataKey="sales" stroke="hsl(262, 83%, 52%)" fill="url(#brandGrad2)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
         </motion.div>

@@ -271,7 +271,7 @@ const Accounting = () => {
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickFormatter={(v) => `₹${(v / 100000).toFixed(0)}L`} />
                 <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} formatter={(value: number) => [formatCurrency(value)]} />
               <Legend />
-              <Bar dataKey="income" fill="hsl(43, 72%, 52%)" radius={[4, 4, 0, 0]} name="Income" />
+              <Bar dataKey="income" fill="hsl(262, 83%, 52%)" radius={[4, 4, 0, 0]} name="Income" />
               <Bar dataKey="expense" fill="hsl(0, 72%, 51%)" radius={[4, 4, 0, 0]} name="Expense" />
               <Bar dataKey="profit" fill="hsl(142, 65%, 40%)" radius={[4, 4, 0, 0]} name="Profit" />
             </BarChart>

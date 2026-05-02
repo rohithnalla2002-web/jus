@@ -37,7 +37,7 @@ export default function ContactPage() {
           <p className="mt-4 text-zinc-600">We’d love to hear from you — appointments, custom design, or general enquiries.</p>
           <ul className="mt-10 space-y-6 text-sm text-zinc-700">
             <li className="flex gap-4">
-              <MapPin className="h-5 w-5 shrink-0 text-amber-600" />
+              <MapPin className="h-5 w-5 shrink-0 text-violet-600" />
               <span>
                 {COMPANY_LEGAL_NAME}
                 <br />
@@ -45,13 +45,13 @@ export default function ContactPage() {
               </span>
             </li>
             <li className="flex gap-4">
-              <Phone className="h-5 w-5 shrink-0 text-amber-600" />
-              <a href={`tel:${COMPANY_PHONE_E164}`} className="hover:text-amber-800 hover:underline">
+              <Phone className="h-5 w-5 shrink-0 text-violet-600" />
+              <a href={`tel:${COMPANY_PHONE_E164}`} className="hover:text-violet-800 hover:underline">
                 {COMPANY_PHONE_DISPLAY}
               </a>
             </li>
             <li className="flex gap-4">
-              <Building2 className="h-5 w-5 shrink-0 text-amber-600" />
+              <Building2 className="h-5 w-5 shrink-0 text-violet-600" />
               <span>CIN {COMPANY_CIN}</span>
             </li>
           </ul>
@@ -61,10 +61,10 @@ export default function ContactPage() {
           initial={{ opacity: 0, x: 12 }}
           animate={{ opacity: 1, x: 0 }}
           onSubmit={submit}
-          className="rounded-2xl border border-amber-200/80 bg-white p-6 shadow-lg sm:p-8"
+          className="rounded-2xl border border-violet-200/80 bg-white p-6 shadow-lg sm:p-8"
         >
           {sent ? (
-            <p className="py-8 text-center font-medium text-amber-800">Thank you! We’ll get back to you shortly.</p>
+            <p className="py-8 text-center font-medium text-violet-800">Thank you! We’ll get back to you shortly.</p>
           ) : (
             <>
               <div>
@@ -72,7 +72,7 @@ export default function ContactPage() {
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-amber-200 bg-[#fefdfb] px-4 py-3 text-sm text-zinc-900 focus:border-amber-500 focus:outline-none"
+                  className="mt-2 w-full rounded-xl border border-violet-200 bg-[#faf8ff] px-4 py-3 text-sm text-zinc-900 focus:border-violet-500 focus:outline-none"
                 />
                 {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
               </div>
@@ -82,7 +82,7 @@ export default function ContactPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-amber-200 bg-[#fefdfb] px-4 py-3 text-sm text-zinc-900 focus:border-amber-500 focus:outline-none"
+                  className="mt-2 w-full rounded-xl border border-violet-200 bg-[#faf8ff] px-4 py-3 text-sm text-zinc-900 focus:border-violet-500 focus:outline-none"
                 />
                 {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
               </div>
@@ -92,13 +92,13 @@ export default function ContactPage() {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={5}
-                  className="mt-2 w-full rounded-xl border border-amber-200 bg-[#fefdfb] px-4 py-3 text-sm text-zinc-900 focus:border-amber-500 focus:outline-none"
+                  className="mt-2 w-full rounded-xl border border-violet-200 bg-[#faf8ff] px-4 py-3 text-sm text-zinc-900 focus:border-violet-500 focus:outline-none"
                 />
                 {errors.message && <p className="mt-1 text-xs text-red-600">{errors.message}</p>}
               </div>
               <button
                 type="submit"
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-700 py-4 text-sm font-bold text-white shadow-md"
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-violet-700 py-4 text-sm font-bold text-white shadow-md"
               >
                 <Send className="h-4 w-4" /> Send message
               </button>

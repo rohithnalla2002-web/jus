@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { GOLDMIND_AI_LOGO_SRC, GOLDMIND_APP_NAME } from "@/lib/company";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -43,12 +44,26 @@ export default function AppSidebar({
     <motion.aside
       animate={{ width }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className={`flex flex-col border-r border-border bg-sidebar ${variant === "desktop" ? "fixed left-0 top-0 h-screen z-40" : "relative h-screen"}`}
+      className={cn(
+        "flex flex-col overflow-hidden border-r border-violet-500/25 bg-gradient-to-b from-[#160828] via-[#1f0f3a] to-[#120622] shadow-[4px_0_36px_-8px_rgba(76,29,149,0.55),inset_0_1px_0_rgba(192,132,252,0.09)]",
+        /* Never mix `relative` with `fixed` — Tailwind order can leave `relative` winning so the bar stays in-flow and shoves main content down. */
+        variant === "desktop"
+          ? "fixed left-0 top-0 z-40 max-md:hidden h-[100dvh]"
+          : "relative h-screen",
+      )}
     >
+      <div
+        className="pointer-events-none absolute -right-20 top-0 h-56 w-56 rounded-full bg-fuchsia-600/25 blur-3xl"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -left-16 bottom-24 h-44 w-44 rounded-full bg-violet-600/20 blur-3xl"
+        aria-hidden
+      />
       {/* Logo */}
       <NavLink
         to="/dashboard"
-        className={`flex h-16 items-center border-b border-border bg-sidebar px-0 transition-colors hover:bg-sidebar`}
+        className="relative z-10 flex h-[4.25rem] shrink-0 items-center border-b border-violet-400/15 bg-gradient-to-r from-violet-950/90 via-purple-950/50 to-transparent px-0 transition-colors hover:from-violet-900/95 hover:via-purple-900/55"
       >
         <AnimatePresence mode="wait">
           <motion.div
@@ -62,7 +77,7 @@ export default function AppSidebar({
               <img
                 src={GOLDMIND_AI_LOGO_SRC}
                 alt={`${GOLDMIND_APP_NAME} logo`}
-                className="h-10 w-10 object-contain"
+                className="h-10 w-10 rounded-xl object-contain ring-1 ring-violet-400/25 drop-shadow-[0_0_14px_rgba(167,139,250,0.35)]"
                 width={512}
                 height={512}
                 decoding="async"
@@ -72,17 +87,21 @@ export default function AppSidebar({
                 <img
                   src={GOLDMIND_AI_LOGO_SRC}
                   alt={`${GOLDMIND_APP_NAME} logo`}
-                  className="h-10 w-10 object-contain"
+                  className="h-10 w-10 rounded-xl object-contain ring-1 ring-violet-400/25 drop-shadow-[0_0_14px_rgba(167,139,250,0.35)]"
                   width={512}
                   height={512}
                   decoding="async"
                 />
                 <div className="text-center leading-none">
-                <div className="text-[22px] font-bold">
-                  <span className="text-[#D4AF37]">Gold</span>
-                  <span className="text-[#4B1D7A]">Mind</span>
-                </div>
-                <p className="mt-1 text-[11px] text-zinc-600">AI Driven ERP for Jewellery RTL/WS</p>
+                  <div className="text-[22px] font-bold tracking-tight">
+                    <span className="bg-gradient-to-r from-violet-200 via-fuchsia-200 to-purple-300 bg-clip-text text-transparent">
+                      Gold
+                    </span>
+                    <span className="bg-gradient-to-r from-fuchsia-300 via-purple-400 to-violet-400 bg-clip-text text-transparent">
+                      Mind
+                    </span>
+                  </div>
+                  <p className="mt-1 text-[11px] text-violet-300/75">AI Driven ERP for Jewellery RTL/WS</p>
                 </div>
               </div>
             )}
@@ -91,7 +110,7 @@ export default function AppSidebar({
       </NavLink>
 
       {/* Nav */}
-      <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
+      <nav className="app-sidebar-nav-scroll relative z-10 flex-1 space-y-1 overflow-y-auto px-2 py-4">
         {navItems.map((item) => {
           const isActive =
             item.path === "/dashboard"
@@ -106,26 +125,30 @@ export default function AppSidebar({
               <motion.div
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.97 }}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 group relative ${
+                className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 ${
                   isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent"
+                    ? "bg-gradient-to-r from-fuchsia-600/35 via-violet-600/25 to-purple-900/20 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] ring-1 ring-white/10"
+                    : "text-violet-200/90 hover:bg-white/[0.06] hover:text-white"
                 }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeIndicator"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full gold-gradient"
+                    className="absolute left-0 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-fuchsia-400 via-purple-400 to-violet-500 shadow-[0_0_12px_rgba(217,70,239,0.55)]"
                   />
                 )}
-                <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`} />
+                <item.icon
+                  className={`h-5 w-5 flex-shrink-0 ${
+                    isActive ? "text-fuchsia-200" : "text-violet-400/80 group-hover:text-violet-100"
+                  }`}
+                />
                 <AnimatePresence>
                   {!collapsed && (
                     <motion.span
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="text-sm font-medium whitespace-nowrap"
+                      className="whitespace-nowrap text-sm font-medium"
                     >
                       {item.label}
                     </motion.span>
@@ -137,22 +160,22 @@ export default function AppSidebar({
         })}
       </nav>
 
-      <div className="p-2 border-t border-border">
+      <div className="relative z-10 border-t border-violet-400/15 bg-violet-950/25 p-2 backdrop-blur-[2px]">
         <button
           type="button"
           onClick={handleLogout}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors ${
+          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-violet-200/90 transition-colors hover:bg-rose-500/15 hover:text-rose-100 ${
             collapsed ? "justify-center" : ""
           }`}
         >
-          <LogOut className="w-5 h-5 flex-shrink-0" />
+          <LogOut className="h-5 w-5 flex-shrink-0 text-violet-400/90" />
           <AnimatePresence>
             {!collapsed && (
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-sm font-medium whitespace-nowrap"
+                className="whitespace-nowrap text-sm font-medium"
               >
                 Log out
               </motion.span>
@@ -163,10 +186,11 @@ export default function AppSidebar({
 
       {/* Collapse */}
       {variant === "desktop" && (
-        <div className="p-2 border-t border-border">
+        <div className="relative z-10 border-t border-violet-400/15 p-2">
           <button
+            type="button"
             onClick={() => onCollapsedChange(!collapsed)}
-            className="w-full flex items-center justify-center py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+            className="flex w-full items-center justify-center rounded-xl py-2.5 text-violet-400 transition-colors hover:bg-white/[0.07] hover:text-violet-100"
           >
             {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
           </button>

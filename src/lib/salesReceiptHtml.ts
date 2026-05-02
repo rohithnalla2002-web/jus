@@ -91,12 +91,12 @@ export function buildSalesReceiptHtml(args: {
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Receipt ${escapeHtml(orderId)}</title>
   <style>
-    :root { --border:#e5e7eb; --muted:#6b7280; --gold:#b8860b; }
+    :root { --border:#e5e7eb; --muted:#6b7280; --gold:#5b21b6; }
     body { margin:0; font-family: system-ui, sans-serif; color:#111827; background:#fff; }
     .page { max-width: 920px; margin: 20px auto; padding: 24px; }
     h1 { font-size: 22px; margin: 0 0 4px; }
     .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
-    .bar { height: 3px; background: linear-gradient(90deg, var(--gold), #eab308, var(--gold)); margin: 16px 0 20px; }
+    .bar { height: 3px; background: linear-gradient(90deg, var(--gold), #a855f7, var(--gold)); margin: 16px 0 20px; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
     .box { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
     .box h3 { margin: 0 0 10px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }

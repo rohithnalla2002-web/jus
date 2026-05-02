@@ -507,13 +507,13 @@ const Dashboard = () => {
           </h3>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(40, 15%, 85%)" />
-              <XAxis dataKey="label" stroke="hsl(40, 10%, 50%)" fontSize={12} />
-              <YAxis stroke="hsl(40, 10%, 50%)" fontSize={12} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(270, 18%, 87%)" />
+              <XAxis dataKey="label" stroke="hsl(270, 12%, 42%)" fontSize={12} />
+              <YAxis stroke="hsl(270, 12%, 42%)" fontSize={12} />
               <Tooltip
-                contentStyle={{ background: "hsl(40, 15%, 100%)", border: "1px solid hsl(40, 15%, 85%)", borderRadius: 8, color: "hsl(40, 10%, 10%)" }}
+                contentStyle={{ background: "hsl(0, 0%, 100%)", border: "1px solid hsl(270, 18%, 87%)", borderRadius: 8, color: "hsl(270, 18%, 11%)" }}
               />
-              <Bar dataKey="orders" fill="hsl(43, 72%, 52%)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="orders" fill="hsl(262, 83%, 52%)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -529,19 +529,19 @@ const Dashboard = () => {
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={chartData}>
               <defs>
-                <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(43, 72%, 52%)" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(43, 72%, 52%)" stopOpacity={0} />
+                <linearGradient id="brandGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(262, 83%, 52%)" stopOpacity={0.35} />
+                  <stop offset="95%" stopColor="hsl(262, 83%, 52%)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(40, 15%, 85%)" />
-              <XAxis dataKey="label" stroke="hsl(40, 10%, 50%)" fontSize={12} />
-              <YAxis stroke="hsl(40, 10%, 50%)" fontSize={12} tickFormatter={(v) => `₹${(v / 100000).toFixed(1)}L`} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(270, 18%, 87%)" />
+              <XAxis dataKey="label" stroke="hsl(270, 12%, 42%)" fontSize={12} />
+              <YAxis stroke="hsl(270, 12%, 42%)" fontSize={12} tickFormatter={(v) => `₹${(v / 100000).toFixed(1)}L`} />
               <Tooltip
-                contentStyle={{ background: "hsl(40, 15%, 100%)", border: "1px solid hsl(40, 15%, 85%)", borderRadius: 8, color: "hsl(40, 10%, 10%)" }}
+                contentStyle={{ background: "hsl(0, 0%, 100%)", border: "1px solid hsl(270, 18%, 87%)", borderRadius: 8, color: "hsl(270, 18%, 11%)" }}
                 formatter={(value: number) => [formatCurrency(value), "Sales"]}
               />
-              <Area type="monotone" dataKey="sales" stroke="hsl(43, 72%, 52%)" fill="url(#goldGrad)" strokeWidth={2} />
+              <Area type="monotone" dataKey="sales" stroke="hsl(262, 83%, 52%)" fill="url(#brandGrad)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
         </motion.div>

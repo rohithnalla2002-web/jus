@@ -491,7 +491,7 @@ export default function AiInsightsSection() {
         initial={{ opacity: 0, y: 22 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 340, damping: 30 }}
-        className="relative mb-5 overflow-hidden rounded-2xl border border-violet-200/50 bg-gradient-to-br from-white via-violet-50/35 to-amber-50/25 font-sans text-[11px] leading-normal text-foreground antialiased shadow-md shadow-violet-500/10 sm:text-xs"
+        className="relative mb-5 overflow-hidden rounded-2xl border border-violet-200/50 bg-gradient-to-br from-white via-violet-50/35 to-violet-50/25 font-sans text-[11px] leading-normal text-foreground antialiased shadow-md shadow-violet-500/10 sm:text-xs"
         aria-label="GoldMind AI suggestions"
       >
         <div
@@ -499,11 +499,11 @@ export default function AiInsightsSection() {
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute -bottom-14 -left-14 h-40 w-40 rounded-full bg-gradient-to-tr from-amber-300/25 to-violet-400/20 blur-3xl"
+          className="pointer-events-none absolute -bottom-14 -left-14 h-40 w-40 rounded-full bg-gradient-to-tr from-violet-300/25 to-violet-400/20 blur-3xl"
           aria-hidden
         />
 
-        <div className="relative h-1 w-full bg-gradient-to-r from-violet-600 via-fuchsia-500 to-amber-400" />
+        <div className="relative h-1 w-full bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-400" />
 
         <motion.div
           variants={aiSectionContainer}
@@ -521,7 +521,7 @@ export default function AiInsightsSection() {
               </div>
               <div className="min-w-0 pt-0.5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="bg-gradient-to-r from-violet-800 via-fuchsia-700 to-amber-600 bg-clip-text font-sans text-sm font-semibold tracking-normal text-transparent sm:text-[15px]">
+                  <h2 className="bg-gradient-to-r from-violet-800 via-fuchsia-700 to-violet-600 bg-clip-text font-sans text-sm font-semibold tracking-normal text-transparent sm:text-[15px]">
                     GoldMind AI
                   </h2>
                   <span className="rounded-full border border-violet-300/80 bg-violet-500/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-violet-800 sm:text-[10px]">
@@ -552,7 +552,7 @@ export default function AiInsightsSection() {
               className="group relative flex flex-col overflow-hidden rounded-xl border border-violet-200/55 bg-white/90 p-4 shadow-sm transition-shadow hover:border-fuchsia-300/60 hover:shadow-md"
             >
               <div
-                className="absolute inset-y-2.5 left-0 w-0.5 rounded-full bg-gradient-to-b from-violet-500 via-fuchsia-500 to-amber-400 opacity-90"
+                className="absolute inset-y-2.5 left-0 w-0.5 rounded-full bg-gradient-to-b from-violet-500 via-fuchsia-500 to-violet-400 opacity-90"
                 aria-hidden
               />
               <BrainCircuit
@@ -684,7 +684,7 @@ export default function AiInsightsSection() {
                           <p className="text-[11px] font-medium uppercase tracking-wide text-violet-700/90">Recipient</p>
                           <p className="mt-0.5 text-sm font-semibold text-zinc-900">{reach.recipientName}</p>
                           {!reach.email && !reach.phone ? (
-                            <p className="mt-1 text-[11px] leading-snug text-amber-800/90">
+                            <p className="mt-1 text-[11px] leading-snug text-violet-800/90">
                               No email or phone on file — you can still edit and copy the message below.
                             </p>
                           ) : null}

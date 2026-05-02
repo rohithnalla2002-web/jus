@@ -23,10 +23,10 @@ export default function PublicLayout() {
   }, [location.hash, location.pathname, dataLoading]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#fefdfb] via-[#faf8f5] to-[#f5f0e8] text-zinc-900">
+    <div className="min-h-screen bg-gradient-to-b from-[#faf8ff] via-[#f4f0ff] to-[#ebe4f9] text-zinc-900">
       <ShopNav />
       {dataError && !isLandingPage && (
-        <div className="mx-auto max-w-4xl px-4 pt-3 text-sm text-amber-900 bg-amber-100/90 border border-amber-200 rounded-lg py-2">
+        <div className="mx-auto max-w-4xl px-4 pt-3 text-sm text-violet-900 bg-violet-100/90 border border-violet-200 rounded-lg py-2">
           Shop data could not load: {dataError}. Start the API (<code className="text-xs">npm run dev --prefix server</code>) and refresh.
         </div>
       )}

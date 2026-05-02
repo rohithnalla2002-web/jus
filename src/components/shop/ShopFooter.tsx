@@ -12,7 +12,7 @@ import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
 
 export default function ShopFooter() {
   return (
-    <footer className="border-t border-amber-200/70 bg-white/90 text-zinc-600 shadow-[0_-4px_24px_-8px_rgba(180,83,9,0.08)]">
+    <footer className="border-t border-violet-200/70 bg-white/90 text-zinc-600 shadow-[0_-4px_24px_-8px_rgba(91,33,182,0.09)]">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           <div>
@@ -28,7 +28,7 @@ export default function ShopFooter() {
                 <a
                   key={i}
                   href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-amber-200 text-zinc-500 transition-all hover:border-amber-400 hover:bg-amber-50 hover:text-amber-800"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-violet-200 text-zinc-500 transition-all hover:border-violet-400 hover:bg-violet-50 hover:text-violet-800"
                   aria-label="Social"
                 >
                   <Icon className="h-4 w-4" />
@@ -48,7 +48,7 @@ export default function ShopFooter() {
                   ["/#core-features", "Core Features"],
                 ].map(([to, label]) => (
                   <li key={to}>
-                    <Link to={to} className="text-zinc-600 hover:text-amber-800 transition-colors">
+                    <Link to={to} className="text-zinc-600 hover:text-violet-800 transition-colors">
                       {label}
                     </Link>
                   </li>
@@ -62,7 +62,7 @@ export default function ShopFooter() {
                   ["/#contact", "Contact"],
                 ].map(([to, label]) => (
                   <li key={to}>
-                    <Link to={to} className="text-zinc-600 hover:text-amber-800 transition-colors">
+                    <Link to={to} className="text-zinc-600 hover:text-violet-800 transition-colors">
                       {label}
                     </Link>
                   </li>
@@ -75,7 +75,7 @@ export default function ShopFooter() {
             <p className="mt-4 text-sm leading-relaxed text-zinc-600">
               {COMPANY_ADDRESS_FULL}
               <br />
-              <a href={`tel:${COMPANY_PHONE_E164}`} className="font-medium text-amber-800 hover:underline">
+              <a href={`tel:${COMPANY_PHONE_E164}`} className="font-medium text-violet-800 hover:underline">
                 {COMPANY_PHONE_DISPLAY}
               </a>
               <br />
@@ -83,7 +83,7 @@ export default function ShopFooter() {
             </p>
           </div>
         </div>
-        <div className="mt-10 border-t border-amber-200/60 pt-8 text-center text-xs text-zinc-500">
+        <div className="mt-10 border-t border-violet-200/60 pt-8 text-center text-xs text-zinc-500">
           © {new Date().getFullYear()} {COMPANY_LEGAL_NAME}. {GOLDMIND_APP_NAME}. All rights reserved.
         </div>
       </div>

@@ -21,7 +21,7 @@ export default function TopNavbar({ onOpenMobileNav }: { onOpenMobileNav: () => 
   const [showProfile, setShowProfile] = useState(false);
 
   return (
-    <header className="h-16 border-b border-border glass sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-border glass px-4 sm:px-6">
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <button
           type="button"

@@ -24,9 +24,9 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="rounded-2xl border border-amber-200/80 bg-white p-6 text-center shadow-md"
+            className="rounded-2xl border border-violet-200/80 bg-white p-6 text-center shadow-md"
           >
-            <Icon className="mx-auto h-8 w-8 text-amber-600" />
+            <Icon className="mx-auto h-8 w-8 text-violet-600" />
             <h3 className="mt-4 font-serif text-lg font-semibold text-zinc-900">{title}</h3>
             <p className="mt-2 text-sm text-zinc-600">{desc}</p>
           </motion.div>
