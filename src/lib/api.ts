@@ -58,6 +58,10 @@ export type InventoryItem = {
   id: number;
   name: string;
   category: string;
+  /** jewellery | raw gold/silver/platinum | diamond | other — drives raw-stock dashboard. */
+  inventoryTrack?: string;
+  /** g = grams (metals), ct = carats (diamonds), pcs = pieces (gift cards, packs). */
+  quantityUnit?: string;
   weight: string;
   purity: string;
   price: string;

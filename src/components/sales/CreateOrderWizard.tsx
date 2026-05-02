@@ -1,4 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  amountDuePaise as calcAmountDuePaise,
+  clearOldGoldExchangeSession,
+  findOldGoldHistoryById,
+  readOldGoldExchangeFromSession,
+  saveOldGoldExchangeToSession,
+  sessionPayloadFromHistoryEntry,
+  type OldGoldExchangeSessionPayload,
+} from "@/lib/oldGoldExchange";
 import { Camera, ChevronLeft, ChevronRight, Download, Loader2, Trash2 } from "lucide-react";
 import type { Customer, InventoryItem, Order } from "@/lib/api";
 import { lookupContactByPhone, normalizePhoneDigits } from "@/lib/customerPhoneLookup";
@@ -108,6 +117,15 @@ export function CreateOrderWizard({
   const [paymentMode, setPaymentMode] = useState<OrderPaymentModeValue>(DEFAULT_PAYMENT_MODE);
   const { pending: submitting, runExclusive } = useSubmitLock();
   const [savedOrderId, setSavedOrderId] = useState<string | null>(null);
+  const [oldGoldPayload, setOldGoldPayload] = useState<OldGoldExchangeSessionPayload | null>(null);
+  const [exchangeIdInput, setExchangeIdInput] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+    const p = readOldGoldExchangeFromSession();
+    setOldGoldPayload(p);
+    setExchangeIdInput(p?.historyEntryId?.trim() ?? "");
+  }, [open]);
 
   const reset = useCallback(() => {
     setStep(1);
@@ -119,6 +137,8 @@ export function CreateOrderWizard({
     setOrderDate(new Date().toISOString().slice(0, 10));
     setPaymentMode(DEFAULT_PAYMENT_MODE);
     setSavedOrderId(null);
+    setOldGoldPayload(null);
+    setExchangeIdInput("");
   }, []);
 
   useEffect(() => {
@@ -164,6 +184,30 @@ export function CreateOrderWizard({
   );
   const grandTotalFormatted = useMemo(() => formatCurrency(grandTotalRupees), [grandTotalRupees]);
 
+  const lineSubtotalPaise = useMemo(() => Math.round(grandTotalRupees * 100), [grandTotalRupees]);
+  const exchangeCreditPaise = oldGoldPayload?.creditPaise ?? 0;
+  const amountDuePaise = useMemo(
+    () => calcAmountDuePaise(lineSubtotalPaise, exchangeCreditPaise),
+    [lineSubtotalPaise, exchangeCreditPaise],
+  );
+  const amountDueRupees = amountDuePaise / 100;
+  const amountDueFormatted = useMemo(() => formatCurrency(Math.round(amountDueRupees)), [amountDueRupees]);
+  const exchangeCreditFormatted = useMemo(
+    () => (exchangeCreditPaise > 0 ? formatCurrency(exchangeCreditPaise / 100) : null),
+    [exchangeCreditPaise],
+  );
+
+  const itemsSummaryForApi = useMemo(
+    () => {
+      const base = lines.map((l) => `${l.name} [${l.productIdLabel}] ×${Math.max(1, l.qty)}`).join("; ");
+      if (oldGoldPayload && exchangeCreditPaise > 0) {
+        return `${base} | ${oldGoldPayload.summaryLine}`.trim();
+      }
+      return base;
+    },
+    [lines, oldGoldPayload, exchangeCreditPaise],
+  );
+
   const applyProduct = useCallback(
     (raw: string) => {
       const id = parseProductIdInput(raw);
@@ -205,12 +249,15 @@ export function CreateOrderWizard({
       lineTotal: receiptLineTotals({ unitPrice: l.unitPrice, qty: Math.max(1, l.qty) }),
     }));
 
-  const itemsSummaryForApi = useMemo(
-    () => lines.map((l) => `${l.name} [${l.productIdLabel}] ×${Math.max(1, l.qty)}`).join("; "),
-    [lines],
-  );
-
   const downloadReceipt = (orderId: string, subtitle?: string) => {
+    const breakdown =
+      exchangeCreditPaise > 0
+        ? {
+            lineSubtotal: grandTotalFormatted,
+            exchangeCredit: exchangeCreditFormatted,
+            amountDue: amountDueFormatted,
+          }
+        : undefined;
     downloadSalesReceiptHtml({
       filename: `receipt-${orderId}`.toLowerCase().replace(/\s+/g, "-"),
       orderId,
@@ -222,15 +269,50 @@ export function CreateOrderWizard({
         address: customer.address,
       },
       lines: toReceiptLines(),
-      grandTotal: grandTotalFormatted,
+      grandTotal: breakdown ? amountDueFormatted : grandTotalFormatted,
       subtitle: subtitle ?? SALES_RECEIPT_SUBTITLE,
       paymentModeLabel: labelForPaymentMode(paymentMode),
+      totalsBreakdown: breakdown,
     });
     toast({ title: "Receipt downloaded", description: "Open the HTML file or print to PDF." });
   };
 
   const canStep1Next = normalizePhoneDigits(customer.phone).length >= 10 && customer.name.trim().length > 0;
   const canStep2Next = lines.length > 0 && grandTotalRupees > 0;
+
+  const applyExchangeId = () => {
+    const raw = exchangeIdInput.trim();
+    if (!raw) {
+      toast({
+        title: "Enter an exchange ID",
+        description: "Use Save only on Old Gold Exchange, then copy the ID from the toast or history.",
+      });
+      return;
+    }
+    const entry = findOldGoldHistoryById(raw);
+    if (!entry || entry.exchangeValuePaise <= 0) {
+      toast({
+        title: "Not found",
+        description: "No saved exchange with that ID on this device. Check spelling or save again on Old Gold Exchange.",
+      });
+      return;
+    }
+    const payload = sessionPayloadFromHistoryEntry(entry);
+    saveOldGoldExchangeToSession(payload);
+    setOldGoldPayload(payload);
+    setExchangeIdInput(entry.id);
+    toast({
+      title: "Exchange credit applied",
+      description: `${formatCurrency(entry.exchangeValuePaise / 100)} will reduce the amount due.`,
+    });
+  };
+
+  const clearExchangeCredit = () => {
+    clearOldGoldExchangeSession();
+    setOldGoldPayload(null);
+    setExchangeIdInput("");
+    toast({ title: "Old gold credit cleared" });
+  };
 
   const handleCreateOrder = async () => {
     if (!canStep1Next || !canStep2Next) return;
@@ -243,11 +325,23 @@ export function CreateOrderWizard({
           customerAddress: customer.address.trim(),
           paymentMode,
           items: itemsSummaryForApi,
-          total: grandTotalFormatted,
+          total: amountDueFormatted,
           status: DEFAULT_NEW_ORDER_STATUS,
           date: orderDate,
         });
         setSavedOrderId(created.id);
+        if (exchangeCreditPaise > 0) {
+          clearOldGoldExchangeSession();
+          setOldGoldPayload(null);
+        }
+        const savedBreakdown =
+          exchangeCreditPaise > 0
+            ? {
+                lineSubtotal: grandTotalFormatted,
+                exchangeCredit: exchangeCreditFormatted,
+                amountDue: amountDueFormatted,
+              }
+            : undefined;
         downloadSalesReceiptHtml({
           filename: `receipt-${created.id}`.toLowerCase(),
           orderId: created.id,
@@ -259,9 +353,10 @@ export function CreateOrderWizard({
             address: customer.address,
           },
           lines: toReceiptLines(),
-          grandTotal: grandTotalFormatted,
+          grandTotal: savedBreakdown ? amountDueFormatted : grandTotalFormatted,
           subtitle: SALES_RECEIPT_SAVED_SUBTITLE,
           paymentModeLabel: labelForPaymentMode(paymentMode),
+          totalsBreakdown: savedBreakdown,
         });
         toast({ title: "Order saved", description: `${created.id} — receipt downloaded.` });
       } catch {
@@ -430,6 +525,53 @@ export function CreateOrderWizard({
                 </div>
               </div>
 
+              <div className="rounded-xl border border-border bg-card/40 p-4 space-y-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Old gold exchange ID</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    After <strong className="font-medium text-foreground">Save only</strong> on Old Gold Exchange, paste the ID here to apply that valuation as credit on this bill.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    value={exchangeIdInput}
+                    onChange={(e) => setExchangeIdInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        applyExchangeId();
+                      }
+                    }}
+                    className="flex-1 px-4 py-2.5 rounded-lg bg-background border border-border text-sm font-mono focus:outline-none focus:border-primary/50"
+                    placeholder="Paste exchange ID"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => applyExchangeId()}
+                    className="px-4 py-2.5 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium border border-border hover:bg-secondary/80"
+                  >
+                    Apply credit
+                  </button>
+                </div>
+                {exchangeCreditPaise > 0 && (
+                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-xs">
+                    <span className="text-muted-foreground">
+                      {oldGoldPayload?.historyEntryId ? (
+                        <>
+                          Applied exchange ID{" "}
+                          <span className="font-mono text-foreground">{oldGoldPayload.historyEntryId}</span>
+                        </>
+                      ) : (
+                        <>Credit from Old Gold Exchange (applied automatically — no ID).</>
+                      )}
+                    </span>
+                    <button type="button" onClick={clearExchangeCredit} className="font-medium text-destructive hover:underline shrink-0">
+                      Clear credit
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {lines.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8 border border-dashed border-border rounded-xl">
                   No lines yet. Scan a label or type a product ID above.
@@ -545,8 +687,13 @@ export function CreateOrderWizard({
                 </div>
               )}
 
+              {exchangeCreditPaise > 0 && (
+                <p className="mb-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
+                  Old gold credit {exchangeCreditFormatted} will apply on review (items subtotal − credit = amount due).
+                </p>
+              )}
               <div className="flex items-center justify-between border-t border-border pt-4">
-                <p className="text-lg font-serif font-bold gold-text">Total: {grandTotalFormatted}</p>
+                <p className="text-lg font-serif font-bold gold-text">Items subtotal: {grandTotalFormatted}</p>
                 <div className="flex gap-2">
                   <button
                     type="button"
@@ -629,7 +776,22 @@ export function CreateOrderWizard({
                     ))}
                   </tbody>
                 </table>
-                <div className="px-3 py-3 text-right font-serif text-lg font-bold border-t border-border">{grandTotalFormatted}</div>
+                <div className="border-t border-border px-3 py-3 text-sm space-y-1">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Items subtotal</span>
+                    <span className="font-medium text-foreground">{grandTotalFormatted}</span>
+                  </div>
+                  {exchangeCreditPaise > 0 && (
+                    <div className="flex justify-between text-emerald-700 dark:text-emerald-400">
+                      <span>Old gold exchange credit</span>
+                      <span className="font-medium">− {exchangeCreditFormatted}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between border-t border-border pt-2 font-serif text-lg font-bold text-foreground">
+                    <span>Amount due</span>
+                    <span>{amountDueFormatted}</span>
+                  </div>
+                </div>
               </div>
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-2 justify-between items-stretch sm:items-center">

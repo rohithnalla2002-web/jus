@@ -19,6 +19,7 @@ import Employees from "./pages/Employees";
 import EmployeeDetails from "./pages/EmployeeDetails";
 import Accounting from "./pages/Accounting";
 import Reports from "./pages/Reports";
+import OldGoldExchange from "./pages/OldGoldExchange";
 import NotFound from "./pages/NotFound";
 import PublicLayout from "./components/shop/PublicLayout";
 import LandingPage from "./pages/shop/LandingPage";
@@ -71,6 +72,7 @@ const AppRoutes = () => (
     <Route path="/employees/:employeeId" element={<ProtectedAdmin><EmployeeDetails /></ProtectedAdmin>} />
     <Route path="/accounting" element={<ProtectedAdmin><Accounting /></ProtectedAdmin>} />
     <Route path="/reports" element={<ProtectedAdmin><Reports /></ProtectedAdmin>} />
+    <Route path="/old-gold-exchange" element={<ProtectedAdmin><OldGoldExchange /></ProtectedAdmin>} />
 
     <Route path="*" element={<NotFound />} />
   </Routes>

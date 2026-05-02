@@ -2,13 +2,37 @@ import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import PageHeader from "@/components/shared/PageHeader";
-import { Plus, Filter, Grid3X3, List, Star, Shield, QrCode, X, Loader2 } from "lucide-react";
+import {
+  Plus,
+  Filter,
+  Grid3X3,
+  List,
+  Star,
+  Shield,
+  QrCode,
+  X,
+  Loader2,
+  Gem,
+  Coins,
+  CircleDot,
+  Cuboid,
+} from "lucide-react";
 import { useAppDemo } from "@/context/AppDemoContext";
 import { toast } from "@/hooks/use-toast";
 import { useSubmitLock } from "@/hooks/useSubmitLock";
 import { ProductQrDialog } from "@/components/shared/ProductQrDialog";
 import { InventoryItemDetailDialog } from "@/components/inventory/InventoryItemDetailDialog";
 import type { InventoryItem } from "@/lib/api";
+import {
+  computeRawStockTotals,
+  INVENTORY_TRACKS,
+  labelForTrack,
+  normalizeInventoryTrack,
+  normalizeQuantityUnit,
+  parseWeightNumber,
+  type InventoryTrack,
+  type QuantityUnit,
+} from "@/lib/inventoryTrack";
 import { formatProductId } from "@/lib/productQr";
 
 const categories = ["All", "Gold", "Silver", "Diamond", "Bridal", "Platinum"];
@@ -17,6 +41,8 @@ const purities = ["All", "22K (916)", "18K (750)", "925 Sterling", "950 Pt"];
 const initialForm = {
   name: "",
   category: "Gold",
+  inventoryTrack: "jewellery" as InventoryTrack,
+  quantityUnit: "g" as QuantityUnit,
   weight: "",
   purity: "22K (916)",
   price: "",
@@ -33,6 +59,7 @@ const Inventory = () => {
   const { pending: addingItem, runExclusive } = useSubmitLock();
   const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, globalSearch } = useAppDemo();
   const [category, setCategory] = useState("All");
+  const [stockKind, setStockKind] = useState<string>("All");
   const [purity, setPurity] = useState("All");
   const [view, setView] = useState<"grid" | "list">("grid");
   const [showModal, setShowModal] = useState(false);
@@ -41,19 +68,28 @@ const Inventory = () => {
   const [qrItem, setQrItem] = useState<InventoryItem | null>(null);
   const [qrCelebrate, setQrCelebrate] = useState(false);
 
+  const stockTotals = useMemo(() => computeRawStockTotals(inventory), [inventory]);
+
   const filtered = useMemo(() => {
     const query = globalSearch.trim().toLowerCase();
 
-    return inventory.filter(
-      (item) =>
+    return inventory.filter((item) => {
+      const track = normalizeInventoryTrack(item.inventoryTrack);
+      const stockOk =
+        stockKind === "All" ||
+        (stockKind !== "All" && track === stockKind);
+      return (
+        stockOk &&
         (category === "All" || item.category === category) &&
         (purity === "All" || item.purity === purity) &&
         (!query ||
           item.name.toLowerCase().includes(query) ||
           item.category.toLowerCase().includes(query) ||
-          item.purity.toLowerCase().includes(query)),
-    );
-  }, [inventory, category, purity, globalSearch]);
+          item.purity.toLowerCase().includes(query) ||
+          labelForTrack(track).toLowerCase().includes(query))
+      );
+    });
+  }, [inventory, category, stockKind, purity, globalSearch]);
 
   const updateForm = <K extends keyof typeof initialForm>(key: K, value: (typeof initialForm)[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -74,18 +110,43 @@ const Inventory = () => {
   };
 
   const handleSubmit = async () => {
-    if (!form.name.trim() || !form.weight.trim() || !form.price.trim() || !form.size.trim() || !form.providerName.trim() || !form.storageBoxNumber.trim()) {
+    const track = normalizeInventoryTrack(form.inventoryTrack);
+    const unit = normalizeQuantityUnit(form.quantityUnit);
+    const w = parseWeightNumber(form.weight);
+
+    if (!form.name.trim() || !form.price.trim() || !form.storageBoxNumber.trim()) {
       toast({
         title: "Missing item details",
-        description: "Please fill in name, weight, price, size, provider name, and storage box number before adding the item.",
+        description: "Please fill in name, price, and storage box number.",
       });
       return;
     }
 
-    if (form.hallmark && !form.hallmarkNumber.trim()) {
+    if (track === "jewellery" && (!form.size.trim() || !form.providerName.trim())) {
+      toast({
+        title: "Missing item details",
+        description: "Finished jewellery needs size and provider.",
+      });
+      return;
+    }
+
+    if (track !== "other" && w <= 0) {
+      toast({
+        title: "Quantity needed",
+        description: "Enter a positive weight / carat amount (or switch stock type to Other for piece-only SKUs).",
+      });
+      return;
+    }
+
+    if (track === "other" && unit === "pcs" && (!form.stock || form.stock < 1)) {
+      toast({ title: "Stock needed", description: "Set at least 1 piece in stock." });
+      return;
+    }
+
+    if (form.hallmark && track === "jewellery" && !form.hallmarkNumber.trim()) {
       toast({
         title: "Hallmark number required",
-        description: "Please enter the hallmark number for hallmark-certified items.",
+        description: "Please enter the hallmark number for hallmark-certified jewellery.",
       });
       return;
     }
@@ -112,7 +173,7 @@ const Inventory = () => {
     <AppLayout>
       <PageHeader
         title="Inventory"
-        subtitle="Manage your jewellery collection"
+        subtitle="Track raw gold, silver, platinum, and diamonds — totals update live."
         action={
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -126,7 +187,70 @@ const Inventory = () => {
         }
       />
 
+      {/* Raw & material stock summary */}
+      <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          {
+            key: "au",
+            label: "Raw gold",
+            value: `${stockTotals.rawGoldG.toFixed(2)} g`,
+            icon: Coins,
+            tint: "from-amber-500/15 to-amber-600/5 border-amber-500/20",
+          },
+          {
+            key: "ag",
+            label: "Raw silver",
+            value: `${stockTotals.rawSilverG.toFixed(2)} g`,
+            icon: Coins,
+            tint: "from-slate-400/20 to-slate-500/10 border-slate-400/25",
+          },
+          {
+            key: "pt",
+            label: "Raw platinum",
+            value: `${stockTotals.rawPlatinumG.toFixed(2)} g`,
+            icon: CircleDot,
+            tint: "from-violet-500/15 to-primary/10 border-violet-400/25",
+          },
+          {
+            key: "di",
+            label: "Diamonds",
+            value: `${stockTotals.diamondCt.toFixed(3)} ct`,
+            icon: Gem,
+            tint: "from-sky-400/15 to-cyan-500/10 border-sky-400/25",
+          },
+        ].map((c) => (
+          <div
+            key={c.key}
+            className={`relative overflow-hidden rounded-xl border bg-gradient-to-br p-4 shadow-sm ${c.tint}`}
+          >
+            <div className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <c.icon className="h-3.5 w-3.5 text-primary" />
+              {c.label}
+            </div>
+            <p className="font-serif text-lg font-bold text-foreground sm:text-xl">{c.value}</p>
+          </div>
+        ))}
+      </div>
+
       {/* Filters */}
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <Cuboid className="w-4 h-4 text-muted-foreground shrink-0" />
+        <span className="text-xs font-medium text-muted-foreground mr-1">Stock type</span>
+        {(["All", ...INVENTORY_TRACKS.map((t) => t.value)] as const).map((k) => (
+          <button
+            key={k}
+            type="button"
+            onClick={() => setStockKind(k)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+              stockKind === k
+                ? "gold-gradient text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            }`}
+          >
+            {k === "All" ? "All" : labelForTrack(k as InventoryTrack)}
+          </button>
+        ))}
+      </div>
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-muted-foreground" />
@@ -215,6 +339,14 @@ const Inventory = () => {
               </div>
 
               <div className="p-4">
+                <div className="mb-2 flex flex-wrap gap-1">
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
+                    {labelForTrack(normalizeInventoryTrack(item.inventoryTrack))}
+                  </span>
+                  <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                    {item.category}
+                  </span>
+                </div>
                 <h3 className="font-serif font-semibold text-foreground text-sm mb-1">{item.name}</h3>
                 <p className="text-[11px] font-mono text-muted-foreground mb-2">{formatProductId(item.id)}</p>
                 <div className="flex items-center gap-2 mb-3">
@@ -300,6 +432,38 @@ const Inventory = () => {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Stock type</label>
+                    <select
+                      value={form.inventoryTrack}
+                      onChange={(event) => {
+                        const v = event.target.value as InventoryTrack;
+                        const u = v === "diamond" ? "ct" : v === "other" ? "pcs" : "g";
+                        setForm((cur) => ({ ...cur, inventoryTrack: v, quantityUnit: u }));
+                      }}
+                      className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                    >
+                      {INVENTORY_TRACKS.map((t) => (
+                        <option key={t.value} value={t.value}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Quantity unit</label>
+                    <select
+                      value={form.quantityUnit}
+                      onChange={(event) => updateForm("quantityUnit", event.target.value as QuantityUnit)}
+                      className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                    >
+                      <option value="g">Grams (g)</option>
+                      <option value="ct">Carats (ct)</option>
+                      <option value="pcs">Pieces (pcs)</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
                     <label className="text-sm text-muted-foreground mb-1 block">Category</label>
                     <select
                       value={form.category}
@@ -330,12 +494,26 @@ const Inventory = () => {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm text-muted-foreground mb-1 block">Weight (grams)</label>
+                    <label className="text-sm text-muted-foreground mb-1 block">
+                      {form.inventoryTrack === "diamond"
+                        ? "Carats (numeric × stock)"
+                        : form.inventoryTrack === "other" && form.quantityUnit === "pcs"
+                          ? "Label / batch ref"
+                          : form.inventoryTrack.startsWith("raw")
+                            ? "Weight (g)"
+                            : "Weight (grams)"}
+                    </label>
                     <input
                       value={form.weight}
                       onChange={(event) => updateForm("weight", event.target.value)}
                       className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
-                      placeholder="45.2g"
+                      placeholder={
+                        form.inventoryTrack === "diamond"
+                          ? "e.g. 1.25"
+                          : form.inventoryTrack === "other" && form.quantityUnit === "pcs"
+                            ? "e.g. Gift card ₹5000"
+                            : "45.2 or 45.2g"
+                      }
                     />
                   </div>
                   <div>

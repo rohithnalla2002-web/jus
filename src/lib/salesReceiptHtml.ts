@@ -49,6 +49,12 @@ export function buildSalesReceiptHtml(args: {
   grandTotal: string;
   subtitle?: string;
   paymentModeLabel?: string;
+  /** When set, receipt shows subtotal, optional old-gold credit, then amount due as grandTotal. */
+  totalsBreakdown?: {
+    lineSubtotal: string;
+    exchangeCredit: string | null;
+    amountDue: string;
+  };
 }) {
   const {
     orderId,
@@ -58,6 +64,7 @@ export function buildSalesReceiptHtml(args: {
     grandTotal,
     subtitle = SALES_RECEIPT_SUBTITLE,
     paymentModeLabel = "—",
+    totalsBreakdown,
   } = args;
   const formattedDate = date
     ? new Intl.DateTimeFormat("en-IN", { year: "numeric", month: "short", day: "numeric" }).format(new Date(`${date}T12:00:00`))
@@ -148,7 +155,22 @@ export function buildSalesReceiptHtml(args: {
       </thead>
       <tbody>${rows}</tbody>
     </table>
-    <div class="grand">Grand total: ${escapeHtml(grandTotal)}</div>
+    ${
+      totalsBreakdown
+        ? `
+    <div class="receipt-totals">
+      <div class="receipt-total-line"><span>Items subtotal</span><span>${escapeHtml(totalsBreakdown.lineSubtotal)}</span></div>
+      ${totalsBreakdown.exchangeCredit ? `<div class="receipt-total-line credit"><span>Old gold exchange credit</span><span>− ${escapeHtml(totalsBreakdown.exchangeCredit)}</span></div>` : ""}
+      <div class="receipt-total-due"><span>Amount due</span><span>${escapeHtml(totalsBreakdown.amountDue)}</span></div>
+    </div>
+    <style>
+      .receipt-totals { margin-top: 20px; text-align: right; max-width: 360px; margin-left: auto; font-size: 15px; }
+      .receipt-total-line { display: flex; justify-content: space-between; gap: 16px; margin: 6px 0; color: #4b5563; }
+      .receipt-total-line.credit { color: #059669; }
+      .receipt-total-due { display: flex; justify-content: space-between; gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 18px; font-weight: 800; }
+    </style>`
+        : `<div class="grand">Grand total: ${escapeHtml(grandTotal)}</div>`
+    }
     <div class="foot">Open this file in a browser and use Print → Save as PDF if needed.</div>
   </div>
 </body>

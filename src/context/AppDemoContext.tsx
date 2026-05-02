@@ -33,6 +33,8 @@ type NotificationItem = {
 type NewInventoryItem = {
   name: string;
   category: string;
+  inventoryTrack?: string;
+  quantityUnit?: string;
   weight: string;
   purity: string;
   price: string;

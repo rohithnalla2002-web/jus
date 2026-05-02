@@ -29,6 +29,12 @@ async function ensureBaseSchema() {
       );
     `);
     await client.query(`
+      ALTER TABLE inventory_items ADD COLUMN IF NOT EXISTS inventory_track TEXT NOT NULL DEFAULT 'jewellery';
+    `);
+    await client.query(`
+      ALTER TABLE inventory_items ADD COLUMN IF NOT EXISTS quantity_unit TEXT NOT NULL DEFAULT 'g';
+    `);
+    await client.query(`
       CREATE TABLE IF NOT EXISTS customers (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
@@ -201,6 +207,8 @@ function mapInventory(r) {
     id: r.id,
     name: r.name,
     category: r.category,
+    inventoryTrack: r.inventory_track ?? "jewellery",
+    quantityUnit: r.quantity_unit ?? "g",
     weight: r.weight,
     purity: r.purity,
     price: formatCurrency(Number(r.price_rupees)),
@@ -529,13 +537,17 @@ app.post("/api/inventory", async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    const invTrack = String(b.inventoryTrack ?? "jewellery").trim() || "jewellery";
+    const qtyUnit = String(b.quantityUnit ?? "g").trim() || "g";
     const { rows } = await client.query(
-      `INSERT INTO inventory_items (name, category, weight, purity, price_rupees, hallmark, hallmark_number, size, provider_name, storage_box_number, image, stock, high_selling)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,false)
+      `INSERT INTO inventory_items (name, category, inventory_track, quantity_unit, weight, purity, price_rupees, hallmark, hallmark_number, size, provider_name, storage_box_number, image, stock, high_selling)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,false)
        RETURNING *`,
       [
         String(b.name ?? "").trim(),
         String(b.category ?? ""),
+        invTrack,
+        qtyUnit,
         String(b.weight ?? "").trim(),
         String(b.purity ?? ""),
         priceRupees,
@@ -586,15 +598,22 @@ app.patch("/api/inventory/:id", async (req, res) => {
     const imageRaw = b.image !== undefined ? String(b.image).trim() : "";
     const image = imageRaw.length > 0 ? imageRaw : cur.image;
 
+    const nextTrack =
+      b.inventoryTrack !== undefined ? String(b.inventoryTrack).trim() || cur.inventory_track || "jewellery" : cur.inventory_track || "jewellery";
+    const nextUnit =
+      b.quantityUnit !== undefined ? String(b.quantityUnit).trim() || cur.quantity_unit || "g" : cur.quantity_unit || "g";
     const { rows } = await client.query(
       `UPDATE inventory_items SET
-        name = $1, category = $2, weight = $3, purity = $4, price_rupees = $5,
-        hallmark = $6, hallmark_number = $7, size = $8, provider_name = $9,
-        storage_box_number = $10, image = $11, stock = $12, high_selling = $13
-       WHERE id = $14 RETURNING *`,
+        name = $1, category = $2, inventory_track = $3, quantity_unit = $4,
+        weight = $5, purity = $6, price_rupees = $7,
+        hallmark = $8, hallmark_number = $9, size = $10, provider_name = $11,
+        storage_box_number = $12, image = $13, stock = $14, high_selling = $15
+       WHERE id = $16 RETURNING *`,
       [
         String(b.name ?? cur.name).trim(),
         String(b.category ?? cur.category),
+        nextTrack,
+        nextUnit,
         String(b.weight ?? cur.weight).trim(),
         String(b.purity ?? cur.purity),
         priceRupees,

@@ -19,6 +19,15 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import type { InventoryItem } from "@/lib/api";
+import {
+  INVENTORY_TRACKS,
+  labelForTrack,
+  normalizeInventoryTrack,
+  normalizeQuantityUnit,
+  parseWeightNumber,
+  type InventoryTrack,
+  type QuantityUnit,
+} from "@/lib/inventoryTrack";
 import { formatCurrency, parseCurrency } from "@/lib/demo";
 import { downloadDataUrlPng, formatProductId, generateQrDataUrl } from "@/lib/productQr";
 
@@ -28,6 +37,8 @@ const purities = ["22K (916)", "18K (750)", "925 Sterling", "950 Pt"];
 type Draft = {
   name: string;
   category: string;
+  inventoryTrack: InventoryTrack;
+  quantityUnit: QuantityUnit;
   weight: string;
   purity: string;
   price: string;
@@ -45,6 +56,8 @@ function itemToDraft(item: InventoryItem): Draft {
   return {
     name: item.name,
     category: item.category,
+    inventoryTrack: normalizeInventoryTrack(item.inventoryTrack),
+    quantityUnit: normalizeQuantityUnit(item.quantityUnit),
     weight: item.weight,
     purity: item.purity,
     price: String(parseCurrency(item.price) || 0),
@@ -63,6 +76,8 @@ function draftToInventoryPayload(d: Draft) {
   return {
     name: d.name.trim(),
     category: d.category,
+    inventoryTrack: d.inventoryTrack,
+    quantityUnit: d.quantityUnit,
     weight: d.weight.trim(),
     purity: d.purity,
     price: d.price,
@@ -142,14 +157,28 @@ export function InventoryItemDetailDialog({ item, onClose, onUpdate, onDelete }:
   };
 
   const validate = (d: Draft) => {
-    if (!d.name.trim() || !d.weight.trim() || !d.price.trim() || !d.size.trim() || !d.providerName.trim() || !d.storageBoxNumber.trim()) {
+    const track = d.inventoryTrack;
+    const w = parseWeightNumber(d.weight);
+    if (!d.name.trim() || !d.price.trim() || !d.storageBoxNumber.trim()) {
       toast({
         title: "Missing details",
-        description: "Fill name, weight, price, size, provider, and storage box.",
+        description: "Fill name, price, and storage box.",
       });
       return false;
     }
-    if (d.hallmark && !d.hallmarkNumber.trim()) {
+    if (track === "jewellery" && (!d.size.trim() || !d.providerName.trim())) {
+      toast({ title: "Missing details", description: "Finished jewellery needs size and provider." });
+      return false;
+    }
+    if (track !== "other" && w <= 0) {
+      toast({ title: "Quantity needed", description: "Enter a positive weight or carat amount." });
+      return false;
+    }
+    if (track === "other" && d.quantityUnit === "pcs" && d.stock < 1) {
+      toast({ title: "Stock needed", description: "Set at least 1 piece in stock." });
+      return false;
+    }
+    if (d.hallmark && track === "jewellery" && !d.hallmarkNumber.trim()) {
       toast({ title: "Hallmark number required", description: "Enter hallmark number or turn off hallmark." });
       return false;
     }
@@ -218,6 +247,8 @@ export function InventoryItemDetailDialog({ item, onClose, onUpdate, onDelete }:
             </div>
 
             <div className="rounded-xl border border-border bg-card/40 px-3">
+              <Row label="Stock type">{labelForTrack(normalizeInventoryTrack(item.inventoryTrack))}</Row>
+              <Row label="Unit">{normalizeQuantityUnit(item.quantityUnit).toUpperCase()}</Row>
               <Row label="Category">{item.category}</Row>
               <Row label="Purity">{item.purity}</Row>
               <Row label="Weight">{item.weight}</Row>
@@ -277,6 +308,38 @@ export function InventoryItemDetailDialog({ item, onClose, onUpdate, onDelete }:
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
+                <label className="text-xs text-muted-foreground">Stock type</label>
+                <select
+                  value={draft.inventoryTrack}
+                  onChange={(e) => {
+                    const v = e.target.value as InventoryTrack;
+                    const u = v === "diamond" ? "ct" : v === "other" ? "pcs" : "g";
+                    setDraft((d) => ({ ...d, inventoryTrack: v, quantityUnit: u }));
+                  }}
+                  className="mt-1 w-full px-3 py-2 rounded-lg bg-secondary border border-border text-sm"
+                >
+                  {INVENTORY_TRACKS.map((t) => (
+                    <option key={t.value} value={t.value}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Quantity unit</label>
+                <select
+                  value={draft.quantityUnit}
+                  onChange={(e) => updateDraft("quantityUnit", e.target.value as QuantityUnit)}
+                  className="mt-1 w-full px-3 py-2 rounded-lg bg-secondary border border-border text-sm"
+                >
+                  <option value="g">Grams (g)</option>
+                  <option value="ct">Carats (ct)</option>
+                  <option value="pcs">Pieces (pcs)</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
                 <label className="text-xs text-muted-foreground">Category</label>
                 <select
                   value={draft.category}
@@ -307,7 +370,7 @@ export function InventoryItemDetailDialog({ item, onClose, onUpdate, onDelete }:
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-muted-foreground">Weight</label>
+                <label className="text-xs text-muted-foreground">Weight / amount</label>
                 <input
                   value={draft.weight}
                   onChange={(e) => updateDraft("weight", e.target.value)}

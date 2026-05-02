@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, UserCog,
   Wallet, BarChart3, ChevronLeft, ChevronRight, Hammer, LogOut,
+  Scale,
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { GOLDMIND_AI_LOGO_SRC, GOLDMIND_APP_NAME } from "@/lib/company";
@@ -17,6 +18,7 @@ const navItems = [
   { path: "/employees", label: "Employees", icon: UserCog },
   { path: "/accounting", label: "Accounting", icon: Wallet },
   { path: "/reports", label: "Reports", icon: BarChart3 },
+  { path: "/old-gold-exchange", label: "Old Gold Exchange", icon: Scale },
 ];
 
 type SidebarVariant = "desktop" | "mobile";
