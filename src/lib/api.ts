@@ -263,3 +263,58 @@ export async function adminSession(token: string): Promise<{ username: string }>
   if (!res.ok) throw new Error(await parseError(res));
   return res.json() as Promise<{ username: string }>;
 }
+
+export type CashBookLineSource = "order" | "scheme_payment" | "salary";
+
+export type CashBookLine = {
+  id: string;
+  dayId: number | null;
+  direction: "in" | "out";
+  category: string;
+  amountRupees: number;
+  amount: string;
+  memo: string;
+  createdAt: string | null;
+  source: CashBookLineSource;
+  /** Order id, payment row id, or salary payment id depending on source */
+  sourceId: string;
+  schemeId?: number;
+  employeeId?: number;
+  paymentMode?: string;
+};
+
+export type CashBookDayPayload = {
+  bookDate: string;
+  dayExists: boolean;
+  dayId: number | null;
+  openingRupees: number;
+  opening: string;
+  openingNote: string;
+  totalInRupees: number;
+  totalIn: string;
+  totalOutRupees: number;
+  totalOut: string;
+  closingRupees: number;
+  closing: string;
+  isClosed: boolean;
+  notes: string;
+  lines: CashBookLine[];
+  linesIn: CashBookLine[];
+  linesOut: CashBookLine[];
+  sourcesSummary: {
+    ordersInCount: number;
+    schemePaymentsInCount: number;
+    salaryCashOutCount: number;
+  };
+};
+
+export function fetchCashBookDay(date: string): Promise<CashBookDayPayload> {
+  return apiGet<CashBookDayPayload>(`/api/cash-book/day/${encodeURIComponent(date)}`);
+}
+
+export function patchCashBookDay(
+  date: string,
+  body: Partial<{ notes: string; isClosed: boolean }>,
+): Promise<CashBookDayPayload> {
+  return apiPatch<CashBookDayPayload>(`/api/cash-book/day/${encodeURIComponent(date)}`, body);
+}

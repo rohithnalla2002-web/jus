@@ -20,6 +20,8 @@ import EmployeeDetails from "./pages/EmployeeDetails";
 import Accounting from "./pages/Accounting";
 import Reports from "./pages/Reports";
 import OldGoldExchange from "./pages/OldGoldExchange";
+import GoldSchemes from "./pages/GoldSchemes";
+import DayBook from "./pages/DayBook";
 import NotFound from "./pages/NotFound";
 import PublicLayout from "./components/shop/PublicLayout";
 import LandingPage from "./pages/shop/LandingPage";
@@ -50,6 +52,12 @@ function ProtectedAdmin({ children }: { children: ReactElement }) {
 const AppRoutes = () => (
   <Routes>
     <Route path="/admin/login" element={<AdminLogin />} />
+
+    {/* Gold schemes early so this path always wins over catch-all; aliases for typos */}
+    <Route path="/gold-schemes" element={<ProtectedAdmin><GoldSchemes /></ProtectedAdmin>} />
+    <Route path="/goldscheme" element={<Navigate to="/gold-schemes" replace />} />
+    <Route path="/gold-saving-schemes" element={<Navigate to="/gold-schemes" replace />} />
+    <Route path="/day-book" element={<ProtectedAdmin><DayBook /></ProtectedAdmin>} />
 
     <Route element={<PublicLayout />}>
       <Route path="/" element={<LandingPage />} />

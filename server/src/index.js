@@ -47,6 +47,58 @@ async function ensureBaseSchema() {
       );
     `);
     await client.query(`
+      CREATE TABLE IF NOT EXISTS gold_schemes (
+        id SERIAL PRIMARY KEY,
+        customer_id INT NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
+        monthly_amount_rupees BIGINT NOT NULL,
+        tenure_months INT NOT NULL,
+        benefit_type TEXT NOT NULL DEFAULT 'one_month_free',
+        benefit_bonus_rupees BIGINT NOT NULL DEFAULT 0,
+        benefit_making_discount_pct INT NOT NULL DEFAULT 0,
+        start_date DATE NOT NULL,
+        status TEXT NOT NULL DEFAULT 'active',
+        redeemed_at TIMESTAMPTZ,
+        notes TEXT NOT NULL DEFAULT '',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        CONSTRAINT gold_schemes_tenure_chk CHECK (tenure_months IN (6, 10, 12)),
+        CONSTRAINT gold_schemes_benefit_chk CHECK (
+          benefit_type IN ('one_month_free', 'bonus_rupees', 'making_discount_pct')
+        )
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS gold_scheme_payments (
+        id SERIAL PRIMARY KEY,
+        scheme_id INT NOT NULL REFERENCES gold_schemes(id) ON DELETE CASCADE,
+        amount_rupees BIGINT NOT NULL,
+        paid_date DATE NOT NULL DEFAULT CURRENT_DATE,
+        installment_no INT NOT NULL,
+        notes TEXT NOT NULL DEFAULT '',
+        UNIQUE (scheme_id, installment_no)
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS cash_book_days (
+        id SERIAL PRIMARY KEY,
+        book_date DATE NOT NULL UNIQUE,
+        opening_rupees BIGINT NOT NULL DEFAULT 0,
+        is_closed BOOLEAN NOT NULL DEFAULT false,
+        notes TEXT NOT NULL DEFAULT ''
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS cash_book_lines (
+        id SERIAL PRIMARY KEY,
+        day_id INT NOT NULL REFERENCES cash_book_days(id) ON DELETE CASCADE,
+        direction TEXT NOT NULL CHECK (direction IN ('in', 'out')),
+        category TEXT NOT NULL DEFAULT '',
+        amount_rupees BIGINT NOT NULL CHECK (amount_rupees >= 0),
+        memo TEXT NOT NULL DEFAULT '',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_cash_book_lines_day_id ON cash_book_lines(day_id);`);
+    await client.query(`
       CREATE TABLE IF NOT EXISTS employees (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
@@ -220,6 +272,209 @@ function mapInventory(r) {
     image: r.image,
     stock: r.stock,
     highSelling: r.high_selling,
+  };
+}
+
+function mapGoldSchemeRow(r) {
+  const monthly = Number(r.monthly_amount_rupees);
+  const tenure = Number(r.tenure_months);
+  const paid = Number(r.installments_paid ?? 0);
+  const totalPaid = Number(r.total_paid_rupees ?? 0);
+  const expectedTotal = monthly * tenure;
+  const sd = r.start_date;
+  const startStr =
+    sd instanceof Date ? sd.toISOString().slice(0, 10) : String(sd ?? "").slice(0, 10);
+  return {
+    id: r.id,
+    customerId: r.customer_id,
+    customerName: r.customer_name,
+    customerPhone: r.customer_phone ?? "",
+    monthlyAmountRupees: monthly,
+    monthlyAmount: formatCurrency(monthly),
+    tenureMonths: tenure,
+    benefitType: r.benefit_type,
+    benefitBonusRupees: Number(r.benefit_bonus_rupees ?? 0),
+    benefitMakingDiscountPct: Number(r.benefit_making_discount_pct ?? 0),
+    startDate: startStr,
+    status: r.status,
+    redeemedAt: r.redeemed_at ? new Date(r.redeemed_at).toISOString() : null,
+    notes: r.notes ?? "",
+    createdAt: r.created_at ? new Date(r.created_at).toISOString() : null,
+    installmentsPaid: paid,
+    totalPaidRupees: totalPaid,
+    totalPaid: formatCurrency(totalPaid),
+    expectedTotalRupees: expectedTotal,
+    expectedTotal: formatCurrency(expectedTotal),
+    isComplete: paid >= tenure,
+    canRedeem: r.status === "active" && paid >= tenure,
+  };
+}
+
+function isValidBookDate(s) {
+  if (typeof s !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  const [y, m, d] = s.split("-").map(Number);
+  const dt = new Date(y, m - 1, d);
+  return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
+}
+
+/** Cash book inflows: orders except credit_note; gold scheme installments. Outflows: salary when payment method is Cash. */
+function syntheticCashBookLineOrder(r) {
+  const amt = Number(r.total_rupees);
+  const mode = r.payment_mode ?? "cash";
+  return {
+    id: `order:${r.id}`,
+    source: "order",
+    sourceId: r.id,
+    dayId: null,
+    direction: "in",
+    category: "Sale",
+    amountRupees: amt,
+    amount: formatCurrency(amt),
+    memo: `${r.customer} · ${mode}`,
+    paymentMode: mode,
+    createdAt: r.order_date ? `${String(r.order_date).slice(0, 10)}T12:00:00.000Z` : null,
+  };
+}
+
+function syntheticCashBookLineScheme(r) {
+  const amt = Number(r.amount_rupees);
+  return {
+    id: `scheme_payment:${r.id}`,
+    source: "scheme_payment",
+    sourceId: String(r.id),
+    schemeId: Number(r.scheme_id),
+    dayId: null,
+    direction: "in",
+    category: "Gold scheme installment",
+    amountRupees: amt,
+    amount: formatCurrency(amt),
+    memo: `${r.customer_name ?? ""} · scheme #${r.scheme_id}${r.notes ? ` · ${r.notes}` : ""}`.trim(),
+    createdAt: r.paid_date ? `${String(r.paid_date).slice(0, 10)}T12:00:00.000Z` : null,
+  };
+}
+
+function syntheticCashBookLineSalary(r) {
+  const amt = Number(r.amount_rupees);
+  return {
+    id: `salary:${r.id}`,
+    source: "salary",
+    sourceId: String(r.id),
+    employeeId: Number(r.employee_id),
+    dayId: null,
+    direction: "out",
+    category: "Salary (cash)",
+    amountRupees: amt,
+    amount: formatCurrency(amt),
+    memo: `${r.employee_name ?? ""} · ${r.month_period ?? ""}`.trim(),
+    paymentMode: r.payment_method ?? "",
+    createdAt: r.created_at ? new Date(r.created_at).toISOString() : null,
+  };
+}
+
+async function loadCashBookDayPayload(bookDate) {
+  const { rows: metaRows } = await pool.query(
+    `SELECT id, notes, is_closed FROM cash_book_days WHERE book_date = $1`,
+    [bookDate],
+  );
+  const meta = metaRows[0];
+  const dayId = meta?.id ?? null;
+  const notes = meta?.notes ?? "";
+  const isClosed = Boolean(meta?.is_closed);
+
+  const [beforeRows, orderRows, schemeRows, salaryRows] = await Promise.all([
+    pool.query(
+      `SELECT
+        (SELECT COALESCE(SUM(total_rupees), 0)::bigint FROM orders
+         WHERE order_date < $1::date AND COALESCE(payment_mode, '') <> 'credit_note') AS ord_in,
+        (SELECT COALESCE(SUM(amount_rupees), 0)::bigint FROM gold_scheme_payments WHERE paid_date < $1::date) AS sch_in,
+        (SELECT COALESCE(SUM(amount_rupees), 0)::bigint FROM salary_payments
+         WHERE created_at::date < $1::date AND LOWER(TRIM(COALESCE(payment_method, ''))) = 'cash') AS sal_out`,
+      [bookDate],
+    ),
+    pool.query(
+      `SELECT id, customer, total_rupees, payment_mode, order_date FROM orders
+       WHERE order_date = $1::date AND COALESCE(payment_mode, '') <> 'credit_note'
+       ORDER BY id`,
+      [bookDate],
+    ),
+    pool.query(
+      `SELECT p.id, p.amount_rupees, p.paid_date, p.notes, c.name AS customer_name, gs.id AS scheme_id
+       FROM gold_scheme_payments p
+       JOIN gold_schemes gs ON gs.id = p.scheme_id
+       JOIN customers c ON c.id = gs.customer_id
+       WHERE p.paid_date = $1::date
+       ORDER BY p.id`,
+      [bookDate],
+    ),
+    pool.query(
+      `SELECT sp.id, sp.employee_id, sp.amount_rupees, sp.created_at, sp.payment_method, sp.month_period, e.name AS employee_name
+       FROM salary_payments sp
+       JOIN employees e ON e.id = sp.employee_id
+       WHERE sp.created_at::date = $1::date AND LOWER(TRIM(COALESCE(sp.payment_method, ''))) = 'cash'
+       ORDER BY sp.id`,
+      [bookDate],
+    ),
+  ]);
+
+  const b = beforeRows.rows[0];
+  const openingRupees =
+    Number(b.ord_in) + Number(b.sch_in) - Number(b.sal_out);
+
+  const linesIn = [];
+  const linesOut = [];
+  const mappedLines = [];
+
+  for (const r of orderRows.rows) {
+    const m = syntheticCashBookLineOrder(r);
+    mappedLines.push(m);
+    linesIn.push(m);
+  }
+  for (const r of schemeRows.rows) {
+    const m = syntheticCashBookLineScheme(r);
+    mappedLines.push(m);
+    linesIn.push(m);
+  }
+  for (const r of salaryRows.rows) {
+    const m = syntheticCashBookLineSalary(r);
+    mappedLines.push(m);
+    linesOut.push(m);
+  }
+
+  mappedLines.sort((a, b) => {
+    const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    if (ta !== tb) return ta - tb;
+    return String(a.id).localeCompare(String(b.id));
+  });
+
+  const tin = linesIn.reduce((s, x) => s + x.amountRupees, 0);
+  const tout = linesOut.reduce((s, x) => s + x.amountRupees, 0);
+  const closingRupees = openingRupees + tin - tout;
+
+  return {
+    bookDate,
+    dayExists: Boolean(meta),
+    dayId,
+    openingRupees,
+    opening: formatCurrency(openingRupees),
+    openingNote:
+      "Opening equals the running position from earlier days: all sales (except credit note) plus gold scheme installments received, minus salaries paid in cash, before this date. Starts from ₹0 before your first recorded transaction.",
+    totalInRupees: tin,
+    totalIn: formatCurrency(tin),
+    totalOutRupees: tout,
+    totalOut: formatCurrency(tout),
+    closingRupees,
+    closing: formatCurrency(closingRupees),
+    isClosed,
+    notes,
+    lines: mappedLines,
+    linesIn,
+    linesOut,
+    sourcesSummary: {
+      ordersInCount: orderRows.rows.length,
+      schemePaymentsInCount: schemeRows.rows.length,
+      salaryCashOutCount: salaryRows.rows.length,
+    },
   };
 }
 
@@ -1117,6 +1372,405 @@ app.patch("/api/activities/read-all", async (_req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Failed" });
+  }
+});
+
+app.get("/api/gold-schemes", async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT gs.*, c.name AS customer_name, c.phone AS customer_phone,
+        (SELECT COUNT(*)::int FROM gold_scheme_payments p WHERE p.scheme_id = gs.id) AS installments_paid,
+        (SELECT COALESCE(SUM(p.amount_rupees), 0)::bigint FROM gold_scheme_payments p WHERE p.scheme_id = gs.id) AS total_paid_rupees
+      FROM gold_schemes gs
+      JOIN customers c ON c.id = gs.customer_id
+      ORDER BY gs.id DESC
+    `);
+    res.json(rows.map(mapGoldSchemeRow));
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Failed to load gold schemes" });
+  }
+});
+
+app.get("/api/gold-schemes/:id", async (req, res) => {
+  const schemeId = Number(req.params.id);
+  if (!Number.isFinite(schemeId) || schemeId < 1) {
+    res.status(400).json({ error: "Invalid scheme" });
+    return;
+  }
+  try {
+    const { rows } = await pool.query(
+      `SELECT gs.*, c.name AS customer_name, c.phone AS customer_phone,
+        (SELECT COUNT(*)::int FROM gold_scheme_payments p WHERE p.scheme_id = gs.id) AS installments_paid,
+        (SELECT COALESCE(SUM(p.amount_rupees), 0)::bigint FROM gold_scheme_payments p WHERE p.scheme_id = gs.id) AS total_paid_rupees
+       FROM gold_schemes gs
+       JOIN customers c ON c.id = gs.customer_id WHERE gs.id = $1`,
+      [schemeId],
+    );
+    if (!rows.length) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const pay = await pool.query(
+      `SELECT id, amount_rupees, paid_date, installment_no, notes
+       FROM gold_scheme_payments WHERE scheme_id = $1 ORDER BY installment_no ASC`,
+      [schemeId],
+    );
+    const scheme = mapGoldSchemeRow(rows[0]);
+    scheme.payments = pay.rows.map((p) => ({
+      id: p.id,
+      amountRupees: Number(p.amount_rupees),
+      amount: formatCurrency(Number(p.amount_rupees)),
+      paidDate:
+        p.paid_date instanceof Date
+          ? p.paid_date.toISOString().slice(0, 10)
+          : String(p.paid_date).slice(0, 10),
+      installmentNo: p.installment_no,
+      notes: p.notes ?? "",
+    }));
+    res.json(scheme);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Failed to load scheme" });
+  }
+});
+
+app.post("/api/gold-schemes", async (req, res) => {
+  const b = req.body ?? {};
+  const customerId = Number(b.customerId);
+  const monthly = parseCurrency(String(b.monthlyAmount ?? "0"));
+  const tenure = Number(b.tenureMonths);
+  const benefitType = String(b.benefitType ?? "one_month_free").trim();
+  const bonus = Number(b.benefitBonusRupees ?? 0) || 0;
+  const mkPct = Number(b.benefitMakingDiscountPct ?? 0) || 0;
+  const startDate = b.startDate ? String(b.startDate).slice(0, 10) : new Date().toISOString().slice(0, 10);
+  const notes = String(b.notes ?? "").trim();
+
+  if (!Number.isFinite(customerId) || customerId < 1) {
+    res.status(400).json({ error: "Invalid customer" });
+    return;
+  }
+  if (!monthly || monthly < 1) {
+    res.status(400).json({ error: "Monthly amount required" });
+    return;
+  }
+  if (![6, 10, 12].includes(tenure)) {
+    res.status(400).json({ error: "Tenure must be 6, 10, or 12 months" });
+    return;
+  }
+  if (!["one_month_free", "bonus_rupees", "making_discount_pct"].includes(benefitType)) {
+    res.status(400).json({ error: "Invalid benefit type" });
+    return;
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const cust = await client.query("SELECT id FROM customers WHERE id = $1", [customerId]);
+    if (!cust.rows.length) {
+      await client.query("ROLLBACK");
+      res.status(400).json({ error: "Customer not found" });
+      return;
+    }
+    const { rows } = await client.query(
+      `INSERT INTO gold_schemes (
+        customer_id, monthly_amount_rupees, tenure_months, benefit_type,
+        benefit_bonus_rupees, benefit_making_discount_pct, start_date, status, notes
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,'active',$8)
+      RETURNING *`,
+      [customerId, monthly, tenure, benefitType, bonus, mkPct, startDate, notes],
+    );
+    const gs = rows[0];
+    const { rows: joinRows } = await client.query(
+      `SELECT gs.*, c.name AS customer_name, c.phone AS customer_phone,
+        0::int AS installments_paid, 0::bigint AS total_paid_rupees
+       FROM gold_schemes gs
+       JOIN customers c ON c.id = gs.customer_id WHERE gs.id = $1`,
+      [gs.id],
+    );
+    await insertActivity(client, {
+      action: "Gold saving scheme enrolled",
+      detail: `Customer #${customerId} · ${formatCurrency(monthly)}/mo × ${tenure} mo`,
+      type: "inventory",
+    });
+    await client.query("COMMIT");
+    res.json(mapGoldSchemeRow(joinRows[0]));
+  } catch (e) {
+    await client.query("ROLLBACK");
+    console.error(e);
+    res.status(500).json({ error: "Failed to create scheme" });
+  } finally {
+    client.release();
+  }
+});
+
+app.post("/api/gold-schemes/:id/payments", async (req, res) => {
+  const schemeId = Number(req.params.id);
+  if (!Number.isFinite(schemeId) || schemeId < 1) {
+    res.status(400).json({ error: "Invalid scheme" });
+    return;
+  }
+  const b = req.body ?? {};
+  const paidDate = b.paidDate ? String(b.paidDate).slice(0, 10) : new Date().toISOString().slice(0, 10);
+  const note = String(b.notes ?? "").trim();
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const { rows: sch } = await client.query(
+      "SELECT * FROM gold_schemes WHERE id = $1 FOR UPDATE",
+      [schemeId],
+    );
+    if (!sch.length) {
+      await client.query("ROLLBACK");
+      res.status(404).json({ error: "Scheme not found" });
+      return;
+    }
+    if (sch[0].status !== "active") {
+      await client.query("ROLLBACK");
+      res.status(400).json({ error: "Scheme is not active" });
+      return;
+    }
+    const tenure = Number(sch[0].tenure_months);
+    const { rows: cnt } = await client.query(
+      "SELECT COUNT(*)::int AS n FROM gold_scheme_payments WHERE scheme_id = $1",
+      [schemeId],
+    );
+    const paidCount = cnt[0]?.n ?? 0;
+    if (paidCount >= tenure) {
+      await client.query("ROLLBACK");
+      res.status(400).json({ error: "All installments already recorded" });
+      return;
+    }
+    const defaultAmt = Number(sch[0].monthly_amount_rupees);
+    const amount = b.amount !== undefined ? parseCurrency(String(b.amount)) : defaultAmt;
+    if (!amount || amount < 1) {
+      await client.query("ROLLBACK");
+      res.status(400).json({ error: "Invalid amount" });
+      return;
+    }
+    const nextNo = paidCount + 1;
+    await client.query(
+      `INSERT INTO gold_scheme_payments (scheme_id, amount_rupees, paid_date, installment_no, notes)
+       VALUES ($1,$2,$3,$4,$5)`,
+      [schemeId, amount, paidDate, nextNo, note],
+    );
+    const { rows: summary } = await client.query(
+      `SELECT gs.*, c.name AS customer_name, c.phone AS customer_phone,
+        (SELECT COUNT(*)::int FROM gold_scheme_payments p WHERE p.scheme_id = gs.id) AS installments_paid,
+        (SELECT COALESCE(SUM(p.amount_rupees), 0)::bigint FROM gold_scheme_payments p WHERE p.scheme_id = gs.id) AS total_paid_rupees
+       FROM gold_schemes gs
+       JOIN customers c ON c.id = gs.customer_id WHERE gs.id = $1`,
+      [schemeId],
+    );
+    await insertActivity(client, {
+      action: "Gold scheme installment",
+      detail: `Scheme #${schemeId} · installment ${nextNo}/${tenure} · ${formatCurrency(amount)}`,
+      type: "inventory",
+    });
+    await client.query("COMMIT");
+    res.json(mapGoldSchemeRow(summary[0]));
+  } catch (e) {
+    await client.query("ROLLBACK");
+    if (e && e.code === "23505") {
+      res.status(409).json({ error: "Duplicate installment number" });
+      return;
+    }
+    console.error(e);
+    res.status(500).json({ error: "Failed to record payment" });
+  } finally {
+    client.release();
+  }
+});
+
+app.patch("/api/gold-schemes/:id/redeem", async (req, res) => {
+  const schemeId = Number(req.params.id);
+  if (!Number.isFinite(schemeId) || schemeId < 1) {
+    res.status(400).json({ error: "Invalid scheme" });
+    return;
+  }
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const { rows: sch } = await client.query(
+      `SELECT gs.*, c.name AS customer_name, c.phone AS customer_phone,
+        (SELECT COUNT(*)::int FROM gold_scheme_payments p WHERE p.scheme_id = gs.id) AS installments_paid,
+        (SELECT COALESCE(SUM(p.amount_rupees), 0)::bigint FROM gold_scheme_payments p WHERE p.scheme_id = gs.id) AS total_paid_rupees
+       FROM gold_schemes gs
+       JOIN customers c ON c.id = gs.customer_id
+       WHERE gs.id = $1 FOR UPDATE`,
+      [schemeId],
+    );
+    if (!sch.length) {
+      await client.query("ROLLBACK");
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const row = sch[0];
+    if (row.status !== "active") {
+      await client.query("ROLLBACK");
+      res.status(400).json({ error: "Scheme is not active" });
+      return;
+    }
+    const tenure = Number(row.tenure_months);
+    const paid = Number(row.installments_paid ?? 0);
+    if (paid < tenure) {
+      await client.query("ROLLBACK");
+      res.status(400).json({ error: "All installments must be paid before redemption" });
+      return;
+    }
+    await client.query(
+      `UPDATE gold_schemes SET status = 'redeemed', redeemed_at = NOW() WHERE id = $1 RETURNING *`,
+      [schemeId],
+    );
+    const { rows: out } = await client.query(
+      `SELECT gs.*, c.name AS customer_name, c.phone AS customer_phone,
+        (SELECT COUNT(*)::int FROM gold_scheme_payments p WHERE p.scheme_id = gs.id) AS installments_paid,
+        (SELECT COALESCE(SUM(p.amount_rupees), 0)::bigint FROM gold_scheme_payments p WHERE p.scheme_id = gs.id) AS total_paid_rupees
+       FROM gold_schemes gs
+       JOIN customers c ON c.id = gs.customer_id WHERE gs.id = $1`,
+      [schemeId],
+    );
+    await insertActivity(client, {
+      action: "Gold scheme redeemed",
+      detail: `${row.customer_name} · scheme #${schemeId}`,
+      type: "inventory",
+    });
+    await client.query("COMMIT");
+    res.json(mapGoldSchemeRow(out[0]));
+  } catch (e) {
+    await client.query("ROLLBACK");
+    console.error(e);
+    res.status(500).json({ error: "Failed to redeem" });
+  } finally {
+    client.release();
+  }
+});
+
+app.patch("/api/gold-schemes/:id/cancel", async (req, res) => {
+  const schemeId = Number(req.params.id);
+  if (!Number.isFinite(schemeId) || schemeId < 1) {
+    res.status(400).json({ error: "Invalid scheme" });
+    return;
+  }
+  try {
+    const { rows } = await pool.query(
+      `UPDATE gold_schemes SET status = 'cancelled' WHERE id = $1 AND status = 'active' RETURNING id`,
+      [schemeId],
+    );
+    if (!rows.length) {
+      res.status(400).json({ error: "Cannot cancel" });
+      return;
+    }
+    await insertActivity(null, {
+      action: "Gold scheme cancelled",
+      detail: `Scheme #${schemeId}`,
+      type: "inventory",
+    });
+    res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Failed" });
+  }
+});
+
+app.get("/api/cash-book/day/:date", async (req, res) => {
+  const bookDate = decodeURIComponent(String(req.params.date)).slice(0, 10);
+  if (!isValidBookDate(bookDate)) {
+    res.status(400).json({ error: "Invalid date" });
+    return;
+  }
+  try {
+    const payload = await loadCashBookDayPayload(bookDate);
+    res.json(payload);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Failed to load cash book" });
+  }
+});
+
+app.patch("/api/cash-book/day/:date", async (req, res) => {
+  const bookDate = decodeURIComponent(String(req.params.date)).slice(0, 10);
+  if (!isValidBookDate(bookDate)) {
+    res.status(400).json({ error: "Invalid date" });
+    return;
+  }
+  const body = req.body ?? {};
+  const notes = typeof body.notes === "string" ? body.notes : undefined;
+  const isClosed = typeof body.isClosed === "boolean" ? body.isClosed : undefined;
+
+  try {
+    const { rows: existing } = await pool.query(`SELECT * FROM cash_book_days WHERE book_date = $1`, [bookDate]);
+    if (!existing.length) {
+      const n = notes !== undefined ? notes : "";
+      const closed = isClosed === true;
+      await pool.query(
+        `INSERT INTO cash_book_days (book_date, opening_rupees, is_closed, notes) VALUES ($1, 0, $2, $3)`,
+        [bookDate, closed, n],
+      );
+      if (closed) {
+        await insertActivity(null, {
+          action: "Cash book day closed",
+          detail: bookDate,
+          type: "payment",
+        });
+      }
+      const payload = await loadCashBookDayPayload(bookDate);
+      res.json(payload);
+      return;
+    }
+
+    const row = existing[0];
+    if (row.is_closed) {
+      const keys = Object.keys(body).filter((k) => body[k] !== undefined);
+      const onlyReopen = keys.length === 1 && keys[0] === "isClosed" && body.isClosed === false;
+      if (!onlyReopen) {
+        res
+          .status(400)
+          .json({ error: "Day is closed. Set isClosed to false to reopen before editing." });
+        return;
+      }
+      await pool.query(`UPDATE cash_book_days SET is_closed = false WHERE id = $1`, [row.id]);
+      await insertActivity(null, {
+        action: "Cash book day reopened",
+        detail: bookDate,
+        type: "payment",
+      });
+      const payload = await loadCashBookDayPayload(bookDate);
+      res.json(payload);
+      return;
+    }
+
+    const updates = [];
+    const vals = [];
+    let i = 1;
+    if (notes !== undefined) {
+      updates.push(`notes = $${i++}`);
+      vals.push(notes);
+    }
+    if (isClosed !== undefined) {
+      updates.push(`is_closed = $${i++}`);
+      vals.push(isClosed);
+    }
+    if (!updates.length) {
+      const payload = await loadCashBookDayPayload(bookDate);
+      res.json(payload);
+      return;
+    }
+    vals.push(row.id);
+    await pool.query(`UPDATE cash_book_days SET ${updates.join(", ")} WHERE id = $${i}`, vals);
+    if (isClosed === true) {
+      await insertActivity(null, {
+        action: "Cash book day closed",
+        detail: bookDate,
+        type: "payment",
+      });
+    }
+    const payload = await loadCashBookDayPayload(bookDate);
+    res.json(payload);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Failed to update cash book day" });
   }
 });
 
