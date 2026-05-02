@@ -257,7 +257,7 @@ export function InventoryItemDetailDialog({ item, onClose, onUpdate, onDelete }:
               <Row label="Storage box">{item.storageBoxNumber}</Row>
               <Row label="Stock">{item.stock}</Row>
               <Row label="Price">{item.price}</Row>
-              <Row label="Hallmark">{item.hallmark ? `Yes · ${item.hallmarkNumber || "—"}` : "No"}</Row>
+              <Row label="Hallmark">{item.hallmark ? `Yes · ${item.hallmarkNumber || "-"}` : "No"}</Row>
               <Row label="Top seller">{item.highSelling ? "Yes" : "No"}</Row>
             </div>
 

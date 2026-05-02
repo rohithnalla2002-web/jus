@@ -34,7 +34,7 @@ export default function ContactPage() {
       <div className="grid gap-12 lg:grid-cols-2">
         <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}>
           <h1 className="font-serif text-4xl font-bold text-zinc-900">Contact Us</h1>
-          <p className="mt-4 text-zinc-600">We’d love to hear from you — appointments, custom design, or general enquiries.</p>
+          <p className="mt-4 text-zinc-600">We’d love to hear from you - appointments, custom design, or general enquiries.</p>
           <ul className="mt-10 space-y-6 text-sm text-zinc-700">
             <li className="flex gap-4">
               <MapPin className="h-5 w-5 shrink-0 text-violet-600" />

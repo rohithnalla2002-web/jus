@@ -20,7 +20,7 @@ import { ArrowLeft, ArrowRight, FileText, Hammer, Loader2, Mail, MapPin, Phone, 
 
 function displayStr(value: string | undefined | null) {
   const t = String(value ?? "").trim();
-  return t.length > 0 ? t : "—";
+  return t.length > 0 ? t : "-";
 }
 
 function inferColumnKey(board: KarigarBoard, jobId: number): KarigarColumnKey | undefined {
@@ -44,7 +44,7 @@ function workflowLabel(stage: KarigarColumnKey | undefined) {
     case "completed":
       return "Completed";
     default:
-      return "—";
+      return "-";
   }
 }
 
@@ -188,7 +188,7 @@ export default function KarigarJobDetails() {
 
   const job = baseJob;
   const priceRupees = parseCurrency(String(job.price ?? ""));
-  const priceDisplay = priceRupees > 0 ? formatCurrency(priceRupees) : "—";
+  const priceDisplay = priceRupees > 0 ? formatCurrency(priceRupees) : "-";
 
   return (
     <AppLayout>

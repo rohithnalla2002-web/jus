@@ -22,6 +22,8 @@ import {
 import { GOLDMIND_APP_NAME } from "@/lib/company";
 import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
 import GoldMindCopilotSection from "@/components/shop/GoldMindCopilotSection";
+import LandingStorySections from "@/components/shop/LandingStorySections";
+import LandingStoryContinued from "@/components/shop/LandingStoryContinued";
 
 const fadeUp = { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 } };
 
@@ -62,21 +64,25 @@ const testimonials = [
   {
     quote: "Very user-friendly and quick accounting app for jewellers.",
     name: "Mihir Soni",
-    rating: "â˜…â˜…â˜…â˜…â˜†",
+    rating: "★★★★☆",
   },
   {
     quote: "Best cross-platform ERP so far, data sync is very fast.",
     name: "Manish Dholakia",
-    rating: "â˜…â˜…â˜…â˜…â˜…",
+    rating: "★★★★★",
   },
   {
     quote: "Great for sales, purchase, and inventory management.",
     name: "Himanshu Tomar",
-    rating: "â˜…â˜…â˜…â˜…â˜…",
+    rating: "★★★★★",
   },
 ];
 
 const faqs = [
+  {
+    q: "How is GoldMind different from Busy or generic ERP?",
+    a: `${GOLDMIND_APP_NAME} is built for jewellery: GST, karigar workflow, metal-weight inventory, schemes, and old-gold exchange in one cloud workspace - plus AI forecasting, Copilot action cards, and one-tap WhatsApp or email outreach. Most legacy tools never ship those AI layers.`,
+  },
   {
     q: "What is the use of jewellery ERP software?",
     a: "ERP combines billing, inventory, accounting, and reports into one platform to simplify operations.",
@@ -129,15 +135,17 @@ export default function LandingPage() {
             <h1 className="mt-6 font-serif text-4xl font-bold leading-tight text-zinc-900 sm:text-5xl md:text-6xl">
               AI-Driven ERP for <span className="gold-text-shop">Jewellery Retail & Workshop</span>
             </h1>
-            <p className="mt-6 text-lg text-zinc-600">
-              Manage billing, inventory, karigar workflow, and customer engagement in one beautiful platform with built-in AI insights.
+            <p className="mt-6 text-lg leading-relaxed text-zinc-600">
+              GST-ready billing, karigar jobs, gold-weight inventory, schemes, old-gold exchange, and CRM - one cloud source of
+              truth. Then Predict demand, Act with Copilot cards on every screen, and Connect via WhatsApp or email when you
+              approve. Legacy tools record data; {GOLDMIND_APP_NAME} helps you run the store.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
-                to="/#visual-analytics"
+                to="/#ai-integration"
                 className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 via-fuchsia-500 to-purple-700 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-violet-400/40 transition-all hover:scale-[1.02] hover:shadow-fuchsia-500/35"
               >
-                Explore Platform
+                See Copilot in action
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
@@ -194,6 +202,29 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
+
+      <LandingStorySections />
+
+      <section id="ai-integration" className="relative overflow-hidden border-y border-violet-200/40 bg-gradient-to-br from-violet-50/70 via-white to-cyan-50/60 py-16">
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute -right-20 top-0 h-64 w-64 rounded-full bg-violet-300/25 blur-3xl"
+          animate={{ y: [0, 20, 0], x: [0, -12, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="mb-8 text-center sm:text-left">
+            <h2 className="font-serif text-3xl font-bold text-zinc-900 sm:text-4xl">GoldMind Copilot</h2>
+            <p className="mt-2 max-w-2xl text-sm text-zinc-600">
+              Live preview of chat + insight cards - the fastest way to show prospects how AI turns data into action on your
+              floor.
+            </p>
+          </div>
+          <GoldMindCopilotSection />
+        </div>
+      </section>
+
+      <LandingStoryContinued />
 
       <section id="visual-analytics" className="relative overflow-hidden py-16">
         <div className="absolute inset-0 bg-gradient-to-b from-violet-50/70 to-white" />
@@ -265,31 +296,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="ai-integration" className="relative overflow-hidden border-y border-violet-200/40 bg-gradient-to-br from-violet-50/70 via-white to-cyan-50/60 py-16">
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute -right-20 top-0 h-64 w-64 rounded-full bg-violet-300/25 blur-3xl"
-          animate={{ y: [0, 20, 0], x: [0, -12, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mb-8 text-center sm:text-left">
-            <h2 className="font-serif text-3xl font-bold text-zinc-900 sm:text-4xl">GoldMind Copilot</h2>
-            <p className="mt-2 max-w-2xl text-sm text-zinc-600">
-              Chat with your business and act on AI insights—trending stock, follow-ups, and staff recommendations in one
-              place.
-            </p>
-          </div>
-          <GoldMindCopilotSection />
-        </div>
-      </section>
-
       <section id="why-us" className="border-y border-violet-200/60 bg-white/80 py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="font-serif text-3xl font-bold text-zinc-900 sm:text-4xl">Why {GOLDMIND_APP_NAME}?</h2>
             <p className="mt-3 text-sm text-zinc-600">
-              Built for jewellery retailers, wholesalers, and workshops to run daily business with confidence.
+              From GST counters to karigar benches - one platform so you are not juggling Busy, Excel, and WhatsApp while your
+              competitor gets AI-led reorder and outreach from {GOLDMIND_APP_NAME}.
             </p>
           </div>
           <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

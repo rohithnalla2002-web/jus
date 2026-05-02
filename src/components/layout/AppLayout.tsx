@@ -20,7 +20,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background">
-      {/* Desktop sidebar: `fixed` + `max-md:hidden` live on <aside> — no wrapper (avoids flow height). */}
+      {/* Desktop sidebar: `fixed` + `max-md:hidden` live on <aside> - no wrapper (avoids flow height). */}
       <AppSidebar
         collapsed={collapsed}
         onCollapsedChange={setCollapsed}

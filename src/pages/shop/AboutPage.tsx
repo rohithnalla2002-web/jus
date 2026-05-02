@@ -8,7 +8,7 @@ export default function AboutPage() {
         <h1 className="font-serif text-4xl font-bold text-zinc-900">Our Story</h1>
         <p className="mt-6 text-lg leading-relaxed text-zinc-600">
           GoldMind ERP is the jewellery retail and workshop platform from Appera Private Limited. We focus on transparent inventory,
-          hallmark-ready catalogue data, karigar workflow, and billing — so your team can serve customers with confidence from showroom to
+          hallmark-ready catalogue data, karigar workflow, and billing - so your team can serve customers with confidence from showroom to
           workshop.
         </p>
       </motion.div>

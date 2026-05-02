@@ -21,7 +21,7 @@ The browser must know where your API lives. That value is **`VITE_API_URL`**.
 
 ---
 
-## 2. Render (backend API) — env vars to set
+## 2. Render (backend API) - env vars to set
 
 In Render: your **Web Service** → **Environment** → add:
 
@@ -46,7 +46,7 @@ npm run db:init --prefix server
 
 ---
 
-## 3. Netlify (frontend) — env vars to set
+## 3. Netlify (frontend) - env vars to set
 
 In Netlify: **Site settings** → **Environment variables** → add:
 
@@ -81,7 +81,7 @@ netlify deploy --prod
 
 ---
 
-### Render (Web Service — API)
+### Render (Web Service - API)
 
 Create a **Web Service** connected to this Git repo, then:
 
@@ -90,13 +90,13 @@ Create a **Web Service** connected to this Git repo, then:
 | **Root directory** | `server` |
 | **Runtime** | **Node** (not Bun) |
 | **Build command** | `npm install` |
-| **Start command** | `sh start.sh` *(use this — see below)* |
+| **Start command** | `sh start.sh` *(use this - see below)* |
 
 Add the environment variables from section 2.
 
 ### Render still shows `Running 'npm start`'` and crashes?
 
-Your **Start Command** in the Render dashboard is **saved with a broken character** (a backtick `` ` ``). **Blueprint / `render.yaml` does not always overwrite** an existing service’s start command — you must fix it once in the UI.
+Your **Start Command** in the Render dashboard is **saved with a broken character** (a backtick `` ` ``). **Blueprint / `render.yaml` does not always overwrite** an existing service’s start command - you must fix it once in the UI.
 
 1. Render Dashboard → your **Web Service** → **Settings**.
 2. Find **Start Command**.
@@ -111,11 +111,11 @@ Your **Start Command** in the Render dashboard is **saved with a broken characte
 
 The repo includes **`server/start.sh`**, which runs `node src/index.js`. Using `sh start.sh` avoids `npm` and stray quote bugs.
 
-**If deploy fails with** `unexpected EOF while looking for matching` **quotes:** that is always a **corrupted Start Command** — repeat steps 2–5.
+**If deploy fails with** `unexpected EOF while looking for matching` **quotes:** that is always a **corrupted Start Command** - repeat steps 2–5.
 
-Optional: use the repo’s **`render.yaml`** (Blueprint) so Render picks **Node 20**, `rootDir: server`, and the start command from Git — no manual typing.
+Optional: use the repo’s **`render.yaml`** (Blueprint) so Render picks **Node 20**, `rootDir: server`, and the start command from Git - no manual typing.
 
-**Bun vs Node:** If logs say “Using Bun”, the service runtime is wrong — switch the service to **Node** in Settings, or redeploy from the Blueprint.
+**Bun vs Node:** If logs say “Using Bun”, the service runtime is wrong - switch the service to **Node** in Settings, or redeploy from the Blueprint.
 
 **CLI (optional)**
 

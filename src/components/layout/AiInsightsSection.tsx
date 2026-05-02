@@ -66,7 +66,7 @@ const AI_INSIGHT_ENABLED_PATHS = [
   "/reports",
 ] as const;
 
-/** Routes where KPI stat cards are rendered in the page body — insert `<AiInsightsSection />` after that row, not in AppLayout. */
+/** Routes where KPI stat cards are rendered in the page body - insert `<AiInsightsSection />` after that row, not in AppLayout. */
 export const AI_INSIGHT_AFTER_KPI_PATHS = ["/dashboard"] as const;
 
 export function aiInsightRenderedInPageBody(pathname: string) {
@@ -76,7 +76,7 @@ export function aiInsightRenderedInPageBody(pathname: string) {
 type AiInsight = {
   title: string;
   narrative: string;
-  /** Person names that appear in `narrative` as exact substrings — clickable for reach-out. */
+  /** Person names that appear in `narrative` as exact substrings - clickable for reach-out. */
   mentionNames: string[];
 };
 
@@ -259,7 +259,7 @@ export default function AiInsightsSection() {
     }
   };
 
-  const mailSubject = useMemo(() => (reach ? `${GOLDMIND_APP_NAME} — ${reach.insightTitle}` : ""), [reach]);
+  const mailSubject = useMemo(() => (reach ? `${GOLDMIND_APP_NAME} - ${reach.insightTitle}` : ""), [reach]);
 
   const mailLink = useMemo(() => {
     if (!reach) return null;
@@ -306,9 +306,9 @@ export default function AiInsightsSection() {
     const vipMentionNames = vipPick.map((c) => c.name).filter(Boolean);
     const vipNarrative =
       vipPick.length >= 3
-        ? `${vipPick[0].name}, ${vipPick[1].name}, and ${vipPick[2].name} are your top-value profiles. Call these 3 customers first today — even 1 successful revisit can unlock a high-ticket sale.`
+        ? `${vipPick[0].name}, ${vipPick[1].name}, and ${vipPick[2].name} are your top-value profiles. Call these 3 customers first today - even 1 successful revisit can unlock a high-ticket sale.`
         : vipPick.length === 2
-          ? `${vipPick[0].name} and ${vipPick[1].name} are priority profiles. Call them first today — even 1 successful revisit can unlock a high-ticket sale.`
+          ? `${vipPick[0].name} and ${vipPick[1].name} are priority profiles. Call them first today - even 1 successful revisit can unlock a high-ticket sale.`
           : vipPick.length === 1
             ? `${vipPick[0].name} is a top-value profile. Reach out today to unlock follow-up opportunities.`
             : "Add customers to your CRM to get AI VIP targeting suggestions.";
@@ -324,7 +324,7 @@ export default function AiInsightsSection() {
       "/dashboard": [
         {
           title: "AI Suggestion for You",
-          narrative: `Gold necklace sets are moving fast today — ${Math.max(
+          narrative: `Gold necklace sets are moving fast today - ${Math.max(
             2,
             Math.min(9, readyOrders + 2),
           )} sold in a short window. Ask ${namesText(
@@ -598,7 +598,7 @@ export default function AiInsightsSection() {
                       <button
                         type="button"
                         onClick={() => openReachBulk(insight)}
-                        title="AI Connects — email everyone named in this suggestion"
+                        title="AI Connects - email everyone named in this suggestion"
                         className="rounded-lg border border-violet-300/35 bg-violet-500/20 p-1.5 text-left transition-colors hover:border-violet-200/50 hover:bg-violet-400/30"
                         aria-label="AI Connects: open send dialog for everyone on this card"
                       >
@@ -607,7 +607,7 @@ export default function AiInsightsSection() {
                       <button
                         type="button"
                         onClick={() => openReachBulk(insight)}
-                        title="AI Connects — WhatsApp everyone named in this suggestion"
+                        title="AI Connects - WhatsApp everyone named in this suggestion"
                         className="rounded-lg border border-violet-300/35 bg-violet-500/20 p-1.5 text-left transition-colors hover:border-violet-200/50 hover:bg-violet-400/30"
                         aria-label="AI Connects: open send dialog for everyone on this card"
                       >
@@ -699,7 +699,7 @@ export default function AiInsightsSection() {
                           <p className="mt-0.5 text-sm font-semibold text-zinc-900">{reach.recipientName}</p>
                           {!reach.email && !reach.phone ? (
                             <p className="mt-1 text-[11px] leading-snug text-violet-800/90">
-                              No email or phone on file — you can still edit and copy the message below.
+                              No email or phone on file - you can still edit and copy the message below.
                             </p>
                           ) : null}
                           {reach.email ? (

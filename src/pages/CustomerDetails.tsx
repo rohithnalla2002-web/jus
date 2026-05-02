@@ -226,7 +226,7 @@ export default function CustomerDetails() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-primary align-top font-mono">Job #{job.id}</td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground align-top">{job.deadline.trim() || "—"}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground align-top">{job.deadline.trim() || "-"}</td>
                   <td className="px-4 py-3 text-sm text-foreground align-top max-w-[min(28rem,50vw)]">
                     <p className="font-medium text-foreground">{job.title}</p>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
@@ -241,7 +241,7 @@ export default function CustomerDetails() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm font-semibold text-foreground align-top whitespace-nowrap">
-                    {job.price && job.price !== "₹0" ? job.price : "—"}
+                    {job.price && job.price !== "₹0" ? job.price : "-"}
                   </td>
                 </tr>
               ))}

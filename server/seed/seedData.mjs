@@ -1,4 +1,4 @@
-/** Initial rows — rupees are integer INR amounts (same as frontend parseCurrency). */
+/** Initial rows - rupees are integer INR amounts (same as frontend parseCurrency). */
 
 export const inventorySeed = [
   { name: "Royal Gold Necklace", category: "Gold", weight: "45.2g", purity: "22K (916)", priceRupees: 327200, hallmark: true, hallmarkNumber: "HC-1029", size: "45cm", providerName: "GoldMind ERP Suppliers", storageBoxNumber: "SB-07", image: "necklace", stock: 5, highSelling: true },

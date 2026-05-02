@@ -116,7 +116,7 @@ export default function DayBook() {
                 </li>
                 <li>
                   <span className="text-foreground/90">Opening</span> is computed from all prior days in the same way;
-                  there are no manual lines here—change source transactions (orders, schemes, salary) to correct totals.
+                  there are no manual lines here - change source transactions (orders, schemes, salary) to correct totals.
                 </li>
               </ul>
             </div>

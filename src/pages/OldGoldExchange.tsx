@@ -169,7 +169,7 @@ export default function OldGoldExchange() {
     }
     toast({
       title: "Saved",
-      description: `Exchange ID: ${entry.id} — enter this in Create order (items step) to apply the credit, or find it in history below.`,
+      description: `Exchange ID: ${entry.id} - enter this in Create order (items step) to apply the credit, or find it in history below.`,
     });
   };
 
@@ -263,7 +263,7 @@ export default function OldGoldExchange() {
               </h1>
               <p className="text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
                 Weigh and assay customer jewellery, compute fine gold after melting loss, and turn it into store credit
-                for their next purchase — with a clear paper trail.
+                for their next purchase - with a clear paper trail.
               </p>
             </div>
             <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
@@ -293,7 +293,7 @@ export default function OldGoldExchange() {
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wider text-primary">Active credit</p>
                   <p className="mt-0.5 text-sm text-muted-foreground">
-                    Pending for the next order —{" "}
+                    Pending for the next order - {" "}
                     <span className="font-semibold text-foreground">{formatCurrency(pending.creditPaise / 100)}</span>
                   </p>
                 </div>
@@ -367,7 +367,7 @@ export default function OldGoldExchange() {
                         inputMode="decimal"
                         value={testedPct}
                         onChange={(e) => setTestedPct(e.target.value)}
-                        placeholder="Overrides karat when set — e.g. 91.2"
+                        placeholder="Overrides karat when set - e.g. 91.2"
                         className={fieldClass}
                       />
                     </label>
@@ -607,7 +607,7 @@ export default function OldGoldExchange() {
               <p className="font-serif text-lg font-semibold text-foreground">No records yet</p>
               <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
                 {history.length === 0
-                  ? "Save a valuation or queue credit — both appear here with Exchange or Bought status."
+                  ? "Save a valuation or queue credit - both appear here with Exchange or Bought status."
                   : "Nothing matches these filters. Try clearing dates or status."}
               </p>
             </div>

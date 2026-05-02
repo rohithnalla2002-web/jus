@@ -217,7 +217,7 @@ export default function GoldSchemes() {
     <AppLayout>
       <PageHeader
         title="Gold Saving Schemes"
-        subtitle="Monthly installments toward jewellery — track payments and redemption."
+        subtitle="Monthly installments toward jewellery - track payments and redemption."
         action={
           <Button onClick={() => setEnrollOpen(true)} className="gold-gradient text-primary-foreground gap-2">
             <Plus className="h-4 w-4" /> Enroll customer
@@ -245,13 +245,13 @@ export default function GoldSchemes() {
             <p className="font-medium text-foreground">Shops often offer a benefit such as:</p>
             <ul className="list-inside list-disc space-y-1 pl-1">
               <li>
-                <strong className="text-foreground">1 month free</strong> — one installment waived or credited
+                <strong className="text-foreground">1 month free</strong> - one installment waived or credited
               </li>
               <li>
-                <strong className="text-foreground">Bonus amount</strong> — extra rupees on maturity
+                <strong className="text-foreground">Bonus amount</strong> - extra rupees on maturity
               </li>
               <li>
-                <strong className="text-foreground">Making charges discount</strong> — % off making charges at purchase
+                <strong className="text-foreground">Making charges discount</strong> - % off making charges at purchase
               </li>
             </ul>
             <p className="flex flex-wrap items-center gap-2 border-t border-border/60 pt-3 text-xs">
@@ -306,7 +306,7 @@ export default function GoldSchemes() {
                 <div className="mb-3 flex items-start justify-between gap-2">
                   <div>
                     <p className="font-serif text-lg font-semibold text-foreground">{s.customerName}</p>
-                    <p className="text-xs text-muted-foreground">{s.customerPhone || "—"}</p>
+                    <p className="text-xs text-muted-foreground">{s.customerPhone || "-"}</p>
                   </div>
                   <span
                     className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
@@ -515,7 +515,7 @@ export default function GoldSchemes() {
               <h3 className="mb-1 font-serif text-lg font-semibold">Record installment</h3>
               <p className="mb-4 text-sm text-muted-foreground">{payScheme.customerName}</p>
               <label className="mb-3 block text-sm">
-                Amount (₹) — default {payScheme.monthlyAmount}
+                Amount (₹) - default {payScheme.monthlyAmount}
                 <input
                   value={payAmount}
                   onChange={(e) => setPayAmount(e.target.value)}

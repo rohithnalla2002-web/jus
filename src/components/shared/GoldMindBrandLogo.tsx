@@ -7,7 +7,7 @@ import {
 } from "@/lib/company";
 import { cn } from "@/lib/utils";
 
-/** Text wordmark for public nav — AI mark image + gradient “Gold” / “Mind”. */
+/** Text wordmark for public nav - AI mark image + gradient “Gold” / “Mind”. */
 export function GoldMindNavbarWordmark({ className }: { className?: string }) {
   return (
     <div className={cn("flex min-w-0 items-center gap-2.5 sm:gap-3", className)}>

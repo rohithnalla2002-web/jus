@@ -26,7 +26,7 @@ export function resolvePersonContact(
 export function buildReachOutMessage(recipientName: string, insightTitle: string, narrative: string) {
   return `Hi ${recipientName},
 
-${GOLDMIND_APP_NAME} — ${insightTitle}
+${GOLDMIND_APP_NAME} - ${insightTitle}
 
 ${narrative}
 
@@ -42,7 +42,7 @@ export function buildReachOutMessageGroup(recipientNames: string[], insightTitle
 
   return `${greeting}
 
-${GOLDMIND_APP_NAME} — ${insightTitle}
+${GOLDMIND_APP_NAME} - ${insightTitle}
 
 ${narrative}
 

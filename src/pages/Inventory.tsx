@@ -173,7 +173,7 @@ const Inventory = () => {
     <AppLayout>
       <PageHeader
         title="Inventory"
-        subtitle="Track raw gold, silver, platinum, and diamonds — totals update live."
+        subtitle="Track raw gold, silver, platinum, and diamonds - totals update live."
         action={
           <motion.button
             whileHover={{ scale: 1.05 }}

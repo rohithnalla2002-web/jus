@@ -50,7 +50,7 @@ export default function AppSidebar({
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className={cn(
         "flex flex-col overflow-hidden border-r border-violet-500/25 bg-gradient-to-b from-[#160828] via-[#1f0f3a] to-[#120622] shadow-[4px_0_36px_-8px_rgba(76,29,149,0.55),inset_0_1px_0_rgba(192,132,252,0.09)]",
-        /* Never mix `relative` with `fixed` — Tailwind order can leave `relative` winning so the bar stays in-flow and shoves main content down. */
+        /* Never mix `relative` with `fixed` - Tailwind order can leave `relative` winning so the bar stays in-flow and shoves main content down. */
         variant === "desktop"
           ? "fixed left-0 top-0 z-40 max-md:hidden h-[100dvh]"
           : "relative h-screen",

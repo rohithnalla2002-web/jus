@@ -161,8 +161,8 @@ export function CreateOrderWizard({
             title: found.source === "customer" ? "Customer found" : "Welcome back",
             description:
               found.source === "customer"
-                ? `${found.name} — from your Customers list.`
-                : `${found.name} — details from their most recent order.`,
+                ? `${found.name} - from your Customers list.`
+                : `${found.name} - details from their most recent order.`,
           });
         }
       } else {
@@ -358,7 +358,7 @@ export function CreateOrderWizard({
           paymentModeLabel: labelForPaymentMode(paymentMode),
           totalsBreakdown: savedBreakdown,
         });
-        toast({ title: "Order saved", description: `${created.id} — receipt downloaded.` });
+        toast({ title: "Order saved", description: `${created.id} - receipt downloaded.` });
       } catch {
         toast({ title: "Failed", description: "Could not save order." });
       }
@@ -383,7 +383,7 @@ export function CreateOrderWizard({
             <div>
               <h2 className="text-xl font-serif font-bold gold-text">Create New Order</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Step {step} of 3 — {step === 1 ? "Customer" : step === 2 ? "Items" : "Review & receipt"}
+                Step {step} of 3 - {step === 1 ? "Customer" : step === 2 ? "Items" : "Review & receipt"}
               </p>
             </div>
             <button
@@ -442,7 +442,7 @@ export function CreateOrderWizard({
 
               {matchedExisting && (
                 <div className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-foreground">
-                  Existing customer — details loaded from Customers or a previous order with this mobile number.
+                  Existing customer - details loaded from Customers or a previous order with this mobile number.
                 </div>
               )}
 
@@ -562,7 +562,7 @@ export function CreateOrderWizard({
                           <span className="font-mono text-foreground">{oldGoldPayload.historyEntryId}</span>
                         </>
                       ) : (
-                        <>Credit from Old Gold Exchange (applied automatically — no ID).</>
+                        <>Credit from Old Gold Exchange (applied automatically - no ID).</>
                       )}
                     </span>
                     <button type="button" onClick={clearExchangeCredit} className="font-medium text-destructive hover:underline shrink-0">
@@ -723,8 +723,8 @@ export function CreateOrderWizard({
                   <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">Customer</h3>
                   <p className="text-sm font-medium">{customer.name}</p>
                   <p className="text-sm text-muted-foreground">{customer.phone}</p>
-                  <p className="text-sm text-muted-foreground">{customer.email || "—"}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{customer.address || "—"}</p>
+                  <p className="text-sm text-muted-foreground">{customer.email || "-"}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{customer.address || "-"}</p>
                 </div>
                 <div className="rounded-xl border border-border p-4 space-y-3">
                   <div>

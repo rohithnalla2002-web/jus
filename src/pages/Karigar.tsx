@@ -108,10 +108,10 @@ const Karigar = () => {
         const title = found.source === "customer" ? "Customer found" : "Details loaded";
         const description =
           found.source === "customer"
-            ? `${found.name} — from your Customers list.`
+            ? `${found.name} - from your Customers list.`
             : found.source === "order"
-              ? `${found.name} — from a previous order with this number.`
-              : `${found.name} — from a prior karigar job. Add email or address if missing.`;
+              ? `${found.name} - from a previous order with this number.`
+              : `${found.name} - from a prior karigar job. Add email or address if missing.`;
         toast({ title, description });
       }
     } else {
@@ -193,7 +193,7 @@ const Karigar = () => {
 
     const rawTitle = form.title.trim();
     const jobTitle =
-      assignItemMode === "repair" && rawTitle && !/^repair\b/i.test(rawTitle) ? `Repair — ${rawTitle}` : rawTitle;
+      assignItemMode === "repair" && rawTitle && !/^repair\b/i.test(rawTitle) ? `Repair - ${rawTitle}` : rawTitle;
     const karigarName = form.karigar.trim();
 
     await runExclusive(async () => {
@@ -299,7 +299,7 @@ const Karigar = () => {
                     className={`glass rounded-lg p-3 card-shine hover:ring-1 hover:ring-primary/25 outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
                       karigarBusy ? "cursor-not-allowed opacity-80" : "cursor-grab active:cursor-grabbing"
                     }`}
-                    title="Open job details — or drag to another column"
+                    title="Open job details - or drag to another column"
                     draggable={!karigarBusy}
                     onDragStart={(e) => {
                       setDraggedJobId(job.id);
@@ -424,7 +424,7 @@ const Karigar = () => {
               <div>
                 <h2 className="text-xl font-serif font-bold gold-text">Assign Item</h2>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Step {assignStep} of 2 —{" "}
+                  Step {assignStep} of 2 - {" "}
                   {assignStep === 2
                     ? assignItemMode === "repair"
                       ? "Repair job details & item photo"
@@ -533,7 +533,7 @@ const Karigar = () => {
 
                     {matchedExisting && (
                       <div className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-foreground">
-                        Existing or known contact — review name, email, and address below.
+                        Existing or known contact - review name, email, and address below.
                       </div>
                     )}
 
@@ -615,7 +615,7 @@ const Karigar = () => {
                       onChange={(e) => setForm((current) => ({ ...current, title: e.target.value }))}
                       className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-sm text-foreground focus:outline-none focus:border-primary/50"
                       placeholder={
-                        assignItemMode === "repair" ? "e.g. Gold chain — clasp repair" : "Royal Bridal Necklace"
+                        assignItemMode === "repair" ? "e.g. Gold chain - clasp repair" : "Royal Bridal Necklace"
                       }
                     />
                   </div>

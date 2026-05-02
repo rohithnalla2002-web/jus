@@ -7,6 +7,7 @@ import { GOLDMIND_APP_NAME } from "@/lib/company";
 
 const links = [
   { to: "/#home", label: "Home" },
+  { to: "/#positioning", label: "Positioning" },
   { to: "/#visual-analytics", label: "Analytics" },
   { to: "/#ai-integration", label: "Copilot" },
   { to: "/#why-us", label: "Why Us" },

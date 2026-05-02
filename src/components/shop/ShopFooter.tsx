@@ -21,7 +21,7 @@ export default function ShopFooter() {
               <span className="font-serif text-lg font-semibold">{GOLDMIND_APP_NAME}</span>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-zinc-600">
-              Jewellery retail and workshop operations — inventory, karigar workflow, and billing in one place.
+              Jewellery retail and workshop operations - inventory, karigar workflow, and billing in one place.
             </p>
             <div className="mt-4 flex gap-3">
               {[Instagram, Facebook, Twitter, Youtube].map((Icon, i) => (
@@ -42,8 +42,10 @@ export default function ShopFooter() {
               <ul className="space-y-2 text-sm">
                 {[
                   ["/#home", "Home"],
+                  ["/#positioning", "Why GoldMind"],
                   ["/#visual-analytics", "Visual Analytics"],
                   ["/#ai-integration", "Copilot"],
+                  ["/#compare", "Compare"],
                   ["/#why-us", "Why Us"],
                   ["/#core-features", "Core Features"],
                 ].map(([to, label]) => (

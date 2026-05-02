@@ -63,12 +63,12 @@ export function buildSalesReceiptHtml(args: {
     lines,
     grandTotal,
     subtitle = SALES_RECEIPT_SUBTITLE,
-    paymentModeLabel = "—",
+    paymentModeLabel = "-",
     totalsBreakdown,
   } = args;
   const formattedDate = date
     ? new Intl.DateTimeFormat("en-IN", { year: "numeric", month: "short", day: "numeric" }).format(new Date(`${date}T12:00:00`))
-    : "—";
+    : "-";
 
   const rows = lines
     .map(
@@ -83,7 +83,7 @@ export function buildSalesReceiptHtml(args: {
         <td>${escapeHtml(l.weight)}</td>
         <td>${escapeHtml(l.size)}</td>
         <td>${escapeHtml(l.storageBox)}</td>
-        <td>${l.hallmark ? escapeHtml(`Yes · ${l.hallmarkNumber || "—"}`) : "No"}</td>
+        <td>${l.hallmark ? escapeHtml(`Yes · ${l.hallmarkNumber || "-"}`) : "No"}</td>
         <td class="num">${l.qty}</td>
         <td class="num">${escapeHtml(l.unitPrice)}</td>
         <td class="num strong">${escapeHtml(l.lineTotal)}</td>
@@ -130,8 +130,8 @@ export function buildSalesReceiptHtml(args: {
         <h3>Customer</h3>
         <div class="row"><span class="lbl">Name</span> ${escapeHtml(customer.name)}</div>
         <div class="row"><span class="lbl">Mobile</span> ${escapeHtml(customer.phone)}</div>
-        <div class="row"><span class="lbl">Email</span> ${escapeHtml(customer.email || "—")}</div>
-        <div class="row"><span class="lbl">Address</span> ${escapeHtml(customer.address || "—")}</div>
+        <div class="row"><span class="lbl">Email</span> ${escapeHtml(customer.email || "-")}</div>
+        <div class="row"><span class="lbl">Address</span> ${escapeHtml(customer.address || "-")}</div>
       </div>
       <div class="box">
         <h3>Store</h3>

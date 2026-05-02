@@ -113,12 +113,12 @@ export const buildInvoiceHtml = (args: {
     <title>Invoice ${escapeHtml(order.id)}</title>
     <style>
       :root{
-        --bg:#ffffff;
-        --text:#111827;
-        --muted:#6b7280;
-        --border:#e5e7eb;
-        --gold:#5b21b6;
-        --gold-2:#a855f7;
+       --bg:#ffffff;
+       --text:#111827;
+       --muted:#6b7280;
+       --border:#e5e7eb;
+       --gold:#5b21b6;
+       --gold-2:#a855f7;
       }
       *{ box-sizing:border-box; }
       body{
@@ -365,7 +365,7 @@ export const buildInvoiceHtml = (args: {
                   }
                 </div>
               </td>
-              <td class="weight">${escapeHtml(line.weight ?? "—")}</td>
+              <td class="weight">${escapeHtml(line.weight ?? "-")}</td>
               <td class="amount">${escapeHtml(formatCurrency(line.amount))}</td>
             </tr>
           `,
@@ -451,7 +451,7 @@ export const buildKarigarJobReceiptHtml = (args: {
 }) => {
   const { job, workflowStage, customerEmail = "", customerAddress = "" } = args;
   const priceRupees = parseCurrency(String(job.price ?? ""));
-  const priceLine = priceRupees > 0 ? formatCurrency(priceRupees) : "—";
+  const priceLine = priceRupees > 0 ? formatCurrency(priceRupees) : "-";
   const ref = job.referenceImage.trim();
   const refBlock =
     ref && isTrustedReceiptImageSrc(ref)
@@ -467,12 +467,12 @@ export const buildKarigarJobReceiptHtml = (args: {
     <title>Karigar job #${escapeHtml(job.id)}</title>
     <style>
       :root{
-        --bg:#ffffff;
-        --text:#111827;
-        --muted:#6b7280;
-        --border:#e5e7eb;
-        --gold:#5b21b6;
-        --gold-2:#a855f7;
+       --bg:#ffffff;
+       --text:#111827;
+       --muted:#6b7280;
+       --border:#e5e7eb;
+       --gold:#5b21b6;
+       --gold-2:#a855f7;
       }
       *{ box-sizing:border-box; }
       body{
@@ -574,9 +574,9 @@ export const buildKarigarJobReceiptHtml = (args: {
           <div class="box-title">Job</div>
           <div class="row"><span class="label">Title</span><span class="value">${escapeHtml(job.title)}</span></div>
           <div class="row"><span class="label">Karigar</span><span class="value">${escapeHtml(job.karigar)}</span></div>
-          <div class="row"><span class="label">Material</span><span class="value">${escapeHtml(job.material || "—")}</span></div>
-          <div class="row"><span class="label">Size</span><span class="value">${escapeHtml(job.size || "—")}</span></div>
-          <div class="row"><span class="label">Deadline</span><span class="value">${escapeHtml(job.deadline || "—")}</span></div>
+          <div class="row"><span class="label">Material</span><span class="value">${escapeHtml(job.material || "-")}</span></div>
+          <div class="row"><span class="label">Size</span><span class="value">${escapeHtml(job.size || "-")}</span></div>
+          <div class="row"><span class="label">Deadline</span><span class="value">${escapeHtml(job.deadline || "-")}</span></div>
           <div class="row"><span class="label">Priority</span><span class="value">${escapeHtml(job.priority)}</span></div>
           <div class="row"><span class="label">Quoted price</span><span class="value price-big">${escapeHtml(priceLine)}</span></div>
         </div>

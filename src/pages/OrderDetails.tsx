@@ -22,7 +22,7 @@ const orderStatusLabels: Record<string, string> = {
 
 function displayStr(value: string | undefined | null) {
   const t = String(value ?? "").trim();
-  return t.length > 0 ? t : "—";
+  return t.length > 0 ? t : "-";
 }
 
 type BillToCustomer = {
@@ -167,7 +167,7 @@ export default function OrderDetails() {
   /** Purchases / visits / last visit from actual orders (same normalized name), not only the CRM row. */
   const orderHistoryStats = useMemo(() => {
     if (customerOrders.length === 0) {
-      return { totalPurchases: "—", visits: "—", lastVisit: "—" };
+      return { totalPurchases: "-", visits: "-", lastVisit: "-" };
     }
     const totalRupees = customerOrders.reduce((sum, o) => sum + parseCurrency(o.total), 0);
     let maxTs = -Infinity;
@@ -180,7 +180,7 @@ export default function OrderDetails() {
       }
     }
     const lastVisit =
-      maxTs > -Infinity ? formatShortDate(maxDateRaw.slice(0, 10)) : "—";
+      maxTs > -Infinity ? formatShortDate(maxDateRaw.slice(0, 10)) : "-";
     return {
       totalPurchases: formatCurrency(totalRupees),
       visits: String(customerOrders.length),
@@ -369,7 +369,7 @@ export default function OrderDetails() {
               {invoiceItems.map((item) => (
                 <tr key={item.name} className="border-b border-border/50">
                   <td className="px-4 py-3 text-sm font-medium text-foreground">{item.name}</td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground">{item.weight ?? "—"}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">{item.weight ?? "-"}</td>
                   <td className="px-4 py-3 text-sm text-right font-semibold text-foreground">
                     {formatCurrency(item.amount)}
                   </td>
@@ -472,7 +472,7 @@ export default function OrderDetails() {
               <h3 className="font-serif font-semibold text-foreground">Customer History</h3>
               <p className="text-xs text-muted-foreground mt-1">
                 Total purchases, visits, and last visit are calculated from every order that uses this same customer name.
-                {!customer?.linked && " This name is not linked to a saved customer profile under Customers — contact fields above come from the order."}
+                {!customer?.linked && " This name is not linked to a saved customer profile under Customers - contact fields above come from the order."}
               </p>
             </div>
           </div>

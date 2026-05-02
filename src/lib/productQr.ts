@@ -34,7 +34,7 @@ export function formatInventoryItemForOrderLine(item: InventoryItem): string {
     `Product ID: ${formatProductId(item.id)}`,
     `Category: ${item.category} · Purity: ${item.purity} · Weight: ${item.weight}`,
     `Size: ${item.size} · Box: ${item.storageBoxNumber} · Stock: ${item.stock}`,
-    `Hallmark: ${item.hallmark ? `Yes (${item.hallmarkNumber || "—"})` : "No"}`,
+    `Hallmark: ${item.hallmark ? `Yes (${item.hallmarkNumber || "-"})` : "No"}`,
     `Unit price: ${item.price}`,
   ];
   return lines.join("\n");

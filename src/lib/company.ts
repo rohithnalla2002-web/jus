@@ -1,11 +1,11 @@
-/** GoldMind ERP — registered business identity (Appera Private Limited). */
+/** GoldMind ERP - registered business identity (Appera Private Limited). */
 
 export const GOLDMIND_APP_NAME = "GoldMind ERP";
 
 /** Public marketing line (navbar, landing). */
 export const GOLDMIND_PUBLIC_TAGLINE = "AI Driven ERP for Jewellery RTL/WS";
 
-/** GoldMind AI mark — navbar prefix, sidebar, hero badge (PNG in `/public`). */
+/** GoldMind AI mark - navbar prefix, sidebar, hero badge (PNG in `/public`). */
 export const GOLDMIND_AI_LOGO_SRC = "/ChatGPT_Image_Apr_25__2026__05_53_47_AM-removebg-preview.png";
 
 /** Brand lockup image (JPEG in `/public`). */
@@ -27,11 +27,11 @@ export const COMPANY_ADDRESS_CITY_PIN = "Hyderabad, Telangana 50055";
 
 export const COMPANY_ADDRESS_FULL = `${COMPANY_ADDRESS_LINE1}, ${COMPANY_ADDRESS_CITY_PIN}`;
 
-export const SALES_RECEIPT_SUBTITLE = `${GOLDMIND_APP_NAME} — Sales receipt`;
+export const SALES_RECEIPT_SUBTITLE = `${GOLDMIND_APP_NAME} - Sales receipt`;
 
 export const SALES_RECEIPT_SAVED_SUBTITLE = `${SALES_RECEIPT_SUBTITLE} (saved)`;
 
-export const PROVISIONAL_RECEIPT_SUBTITLE = `${GOLDMIND_APP_NAME} — Provisional receipt`;
+export const PROVISIONAL_RECEIPT_SUBTITLE = `${GOLDMIND_APP_NAME} - Provisional receipt`;
 
 export const INVOICE_FOOTER_NOTE = `Generated from ${GOLDMIND_APP_NAME} Admin Dashboard · ${COMPANY_LEGAL_NAME} · Thanks for your business.`;
 

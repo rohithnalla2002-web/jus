@@ -1,4 +1,4 @@
-# Netlify — static frontend (Vite + React).
+# Netlify - static frontend (Vite + React).
 # Deploy the Express/Postgres API separately (Render, Railway, Fly.io, etc.) and set
 # VITE_API_URL in Netlify: Site settings → Environment variables (build-time).
 
