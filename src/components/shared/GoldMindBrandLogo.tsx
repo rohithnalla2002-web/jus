@@ -1,6 +1,40 @@
 import type { ReactNode } from "react";
-import { GOLDMIND_AI_LOGO_SRC, GOLDMIND_APP_NAME, GOLDMIND_BRAND_NAME_IMAGE_SRC } from "@/lib/company";
+import {
+  GOLDMIND_AI_LOGO_SRC,
+  GOLDMIND_APP_NAME,
+  GOLDMIND_BRAND_NAME_IMAGE_SRC,
+  GOLDMIND_PUBLIC_TAGLINE,
+} from "@/lib/company";
 import { cn } from "@/lib/utils";
+
+/** Text wordmark for public nav — AI mark image + gradient “Gold” / “Mind”. */
+export function GoldMindNavbarWordmark({ className }: { className?: string }) {
+  return (
+    <div className={cn("flex min-w-0 items-center gap-2.5 sm:gap-3", className)}>
+      <img
+        src={GOLDMIND_AI_LOGO_SRC}
+        alt=""
+        className="h-10 w-10 shrink-0 rounded-xl object-contain shadow-sm ring-1 ring-violet-200/70 sm:h-11 sm:w-11"
+        width={512}
+        height={512}
+        decoding="async"
+      />
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <div className="flex flex-wrap items-baseline gap-x-0 drop-shadow-sm">
+          <span className="inline-block bg-gradient-to-r from-amber-400 via-amber-500 to-orange-600 bg-clip-text font-extrabold tracking-tight text-[1.35rem] leading-none text-transparent sm:text-[1.55rem]">
+            Gold
+          </span>
+          <span className="inline-block bg-gradient-to-r from-violet-600 via-fuchsia-600 to-indigo-700 bg-clip-text font-extrabold tracking-tight text-[1.35rem] leading-none text-transparent sm:text-[1.55rem]">
+            Mind
+          </span>
+        </div>
+        <p className="hidden font-medium leading-snug tracking-wide text-violet-950/85 sm:block sm:text-[0.62rem]">
+          {GOLDMIND_PUBLIC_TAGLINE}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 const logoSizes = {
   xs: "h-9 w-9",

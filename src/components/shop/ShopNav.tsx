@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { GOLDMIND_APP_NAME, GOLDMIND_BRAND_NAME_IMAGE_SRC } from "@/lib/company";
+import { GoldMindNavbarWordmark } from "@/components/shared/GoldMindBrandLogo";
+import { GOLDMIND_APP_NAME } from "@/lib/company";
 
 const links = [
   { to: "/#home", label: "Home" },
   { to: "/#visual-analytics", label: "Analytics" },
+  { to: "/#ai-integration", label: "Copilot" },
   { to: "/#why-us", label: "Why Us" },
   { to: "/#core-features", label: "Features" },
   { to: "/#testimonials", label: "Reviews" },
@@ -53,15 +55,12 @@ export default function ShopNav() {
   return (
     <header className="sticky top-0 z-50 border-b border-violet-200/60 bg-white/80 backdrop-blur-2xl shadow-[0_8px_28px_-16px_rgba(91,33,182,0.35)]">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link to="/#home" className="group flex min-w-0 items-center transition-all hover:opacity-95">
-          <img
-            src={GOLDMIND_BRAND_NAME_IMAGE_SRC}
-            alt={GOLDMIND_APP_NAME}
-            className="h-11 w-auto max-w-full object-contain sm:h-12"
-            width={800}
-            height={250}
-            decoding="async"
-          />
+        <Link
+          to="/#home"
+          className="group flex min-w-0 items-center rounded-xl outline-none ring-violet-400/30 transition-all hover:opacity-95 focus-visible:ring-2"
+          aria-label={GOLDMIND_APP_NAME}
+        >
+          <GoldMindNavbarWordmark className="transition-transform duration-300 group-hover:scale-[1.02]" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-1 rounded-2xl border border-violet-200/70 bg-white/85 p-1.5 shadow-sm">

@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Sparkles,
   Smartphone,
   ShieldCheck,
   FileCheck2,
@@ -16,15 +15,13 @@ import {
   TrendingUp,
   Gem,
   Clock3,
-  Bot,
-  BrainCircuit,
-  WandSparkles,
   Quote,
   HelpCircle,
   ChevronDown,
 } from "lucide-react";
 import { GOLDMIND_APP_NAME } from "@/lib/company";
 import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
+import GoldMindCopilotSection from "@/components/shop/GoldMindCopilotSection";
 
 const fadeUp = { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 } };
 
@@ -119,48 +116,13 @@ const heroStats = [
   { label: "Avg. Billing Time", value: "45s" },
 ];
 
-const aiShots = [
-  {
-    title: "AI Demand Forecasting",
-    img: "/4.jpg",
-    desc: "Predict fast-moving designs and optimize replenishment before stock-outs.",
-  },
-  {
-    title: "AI Sales Co-Pilot",
-    img: "/5.jpg",
-    desc: "Suggest upsell bundles, follow-ups, and next best actions for staff.",
-  },
-];
-
 export default function LandingPage() {
   return (
     <>
-      <section id="home" className="relative overflow-hidden bg-gradient-to-br from-[#fffef9] via-[#faf6ef] to-[#f3e8d8]">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-25"
-          style={{
-            backgroundImage: "url(/4.jpg)",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#faf8ff] via-[#faf8ff]/95 to-[#faf8ff]/70" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(251,191,36,0.2),transparent_55%)]" />
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute -left-16 top-16 h-48 w-48 rounded-full bg-violet-300/30 blur-3xl"
-          animate={{ y: [0, -16, 0], x: [0, 10, 0] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute -right-10 bottom-10 h-56 w-56 rounded-full bg-violet-300/20 blur-3xl"
-          animate={{ y: [0, 18, 0], x: [0, -12, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-
+      <section id="home" className="relative overflow-hidden bg-white">
         <div className="relative mx-auto grid min-h-[78vh] max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2">
           <motion.div {...fadeUp} transition={{ duration: 0.6 }} className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-violet-200/80 bg-white/90 px-4 py-1.5 text-sm font-medium text-violet-900 shadow-sm">
-              <Sparkles className="h-4 w-4 shrink-0 text-violet-600" />
               <GoldMindLogoMark size="xs" />
               {GOLDMIND_APP_NAME}
             </span>
@@ -311,48 +273,14 @@ export default function LandingPage() {
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-violet-700">
-                <Bot className="h-3.5 w-3.5" />
-                AI Integration
-              </p>
-              <h2 className="mt-3 font-serif text-3xl font-bold text-zinc-900 sm:text-4xl">
-                Built-in AI for smarter jewellery operations
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm text-zinc-600">
-                From forecasting and reminders to customer outreach, AI helps your team take faster and better decisions every day.
-              </p>
-            </div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-white px-4 py-2 text-xs font-medium text-zinc-700 shadow-sm">
-              <BrainCircuit className="h-4 w-4 text-violet-700" />
-              AI suggestions update in real time
-            </div>
+          <div className="mb-8 text-center sm:text-left">
+            <h2 className="font-serif text-3xl font-bold text-zinc-900 sm:text-4xl">GoldMind Copilot</h2>
+            <p className="mt-2 max-w-2xl text-sm text-zinc-600">
+              Chat with your business and act on AI insights—trending stock, follow-ups, and staff recommendations in one
+              place.
+            </p>
           </div>
-
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            {aiShots.map((item) => (
-              <motion.article
-                key={item.title}
-                whileHover={{ y: -5 }}
-                transition={{ type: "spring", stiffness: 180, damping: 16 }}
-                className="group overflow-hidden rounded-3xl border border-violet-200/60 bg-white shadow-md"
-              >
-                <div className="relative">
-                  <img src={item.img} alt={item.title} className="h-56 w-full object-cover md:h-64" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                  <p className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-700">
-                    <WandSparkles className="h-3.5 w-3.5" />
-                    AI Powered
-                  </p>
-                </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-semibold text-zinc-900">{item.title}</h3>
-                  <p className="mt-2 text-sm text-zinc-600">{item.desc}</p>
-                </div>
-              </motion.article>
-            ))}
-          </div>
+          <GoldMindCopilotSection />
         </div>
       </section>
 

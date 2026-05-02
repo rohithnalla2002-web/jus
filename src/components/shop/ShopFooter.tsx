@@ -43,7 +43,7 @@ export default function ShopFooter() {
                 {[
                   ["/#home", "Home"],
                   ["/#visual-analytics", "Visual Analytics"],
-                  ["/#ai-integration", "AI Integration"],
+                  ["/#ai-integration", "Copilot"],
                   ["/#why-us", "Why Us"],
                   ["/#core-features", "Core Features"],
                 ].map(([to, label]) => (
