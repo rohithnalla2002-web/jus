@@ -1,7 +1,7 @@
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useMemo, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { BrainCircuit, Sparkles } from "lucide-react";
-import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
+import { Bot, BrainCircuit, Megaphone, MoreVertical, Send, Sparkles, WandSparkles } from "lucide-react";
+import GoldMindCopilotLayout from "@/components/layout/GoldMindCopilotLayout";
 import { useLocation } from "react-router-dom";
 import { useAppDemo } from "@/context/AppDemoContext";
 import { formatCurrency, parseCurrency } from "@/lib/demo";
@@ -73,30 +73,58 @@ export function aiInsightRenderedInPageBody(pathname: string) {
   return (AI_INSIGHT_AFTER_KPI_PATHS as readonly string[]).includes(pathname);
 }
 
+const ROUTE_COPILOT_COPY: Record<
+  (typeof AI_INSIGHT_ENABLED_PATHS)[number],
+  { headerSubtitle: string; insightsSubtitle: string; chips: string[] }
+> = {
+  "/dashboard": {
+    headerSubtitle: "Operational pulse for your showroom and sales floor",
+    insightsSubtitle: "Suggestions grounded in today's orders, stock, and alerts",
+    chips: ["Today's sales pulse", "Open notifications", "Staff focus"],
+  },
+  "/inventory": {
+    headerSubtitle: "Stock levels, SKUs, and reorder signals",
+    insightsSubtitle: "Inventory and margin signals for this workspace",
+    chips: ["Low-stock SKUs", "Top sellers", "Reorder review"],
+  },
+  "/sales": {
+    headerSubtitle: "Pipeline, billing, and delivery momentum",
+    insightsSubtitle: "Sales and collections aligned to this screen",
+    chips: ["Ready to deliver", "Pipeline value", "Collection calls"],
+  },
+  "/karigar": {
+    headerSubtitle: "Job board, deadlines, and karigar capacity",
+    insightsSubtitle: "Workshop flow and QC reminders",
+    chips: ["Overdue jobs", "Active karigars", "Reassign work"],
+  },
+  "/customers": {
+    headerSubtitle: "CRM, loyalty, and win-back targets",
+    insightsSubtitle: "Customer touchpoints for this screen",
+    chips: ["VIP list", "Low visits", "Follow-up queue"],
+  },
+  "/employees": {
+    headerSubtitle: "Roster, leave, and counter coverage",
+    insightsSubtitle: "People and capacity for this workspace",
+    chips: ["On leave today", "Top performers", "Shift balance"],
+  },
+  "/accounting": {
+    headerSubtitle: "Cashflow, billing, and receivables",
+    insightsSubtitle: "Finance signals tied to open orders",
+    chips: ["Invoice reminders", "Ready orders", "Week-end liquidity"],
+  },
+  "/reports": {
+    headerSubtitle: "Executive snapshot and risk flags",
+    insightsSubtitle: "Cross-module highlights for reporting",
+    chips: ["Stock risk", "Active orders", "Key accounts"],
+  },
+};
+
 type AiInsight = {
   title: string;
   narrative: string;
   /** Person names that appear in `narrative` as exact substrings - clickable for reach-out. */
   mentionNames: string[];
 };
-
-const aiSectionContainer = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.13, delayChildren: 0.05 },
-  },
-} as const;
-
-const aiSectionItem = {
-  hidden: { opacity: 0, y: 18, scale: 0.97 },
-  show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { type: "spring" as const, stiffness: 420, damping: 32 },
-  },
-} as const;
 
 function uniqueMentionOrder(narrative: string, mentionNames: string[]) {
   const seen = new Set<string>();
@@ -111,8 +139,8 @@ function uniqueMentionOrder(narrative: string, mentionNames: string[]) {
   return ordered.sort((a, b) => b.length - a.length);
 }
 
-const mentionBtnOnPurpleCard =
-  "font-semibold text-white underline decoration-white/45 underline-offset-2 transition-colors hover:text-violet-100 hover:decoration-white/75 focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#1a0f35]";
+const mentionBtnOnLightCard =
+  "font-semibold text-violet-700 underline decoration-violet-300 underline-offset-2 transition-colors hover:text-violet-900 hover:decoration-violet-500 focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2";
 
 function InsightNarrativeWithMentions({
   narrative,
@@ -489,138 +517,292 @@ export default function AiInsightsSection() {
     return routeInsights[activeBasePath] ?? routeInsights["/dashboard"];
   }, [activeBasePath, customerList, employeeList, inventory, karigarBoard, salesOrders, unreadNotifications]);
 
+  const copilotMeta =
+    ROUTE_COPILOT_COPY[activeBasePath as keyof typeof ROUTE_COPILOT_COPY] ?? ROUTE_COPILOT_COPY["/dashboard"];
+
+  const copilotLeft = useMemo(() => {
+    const timeLabel = new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+    const lowStockItems = inventory.filter((item) => item.stock <= 3);
+    const lowStockCount = lowStockItems.length;
+    const readyOrders = salesOrders.filter((order) => order.status === "ready").length;
+    const activeOrders = salesOrders.filter((order) => order.status !== "delivered").length;
+    const overdueJobs = [...karigarBoard.assigned, ...karigarBoard.inProgress].filter((job) => {
+      const parsed = Date.parse(job.deadline);
+      if (Number.isNaN(parsed)) return false;
+      return parsed < Date.now();
+    }).length;
+    const karigarInFlight = karigarBoard.assigned.length + karigarBoard.inProgress.length;
+    const leaveEmployees = employeeList.filter((employee) => employee.status === "on-leave").length;
+    const lowVisitCustomers = customerList.filter((customer) => customer.visits <= 2).length;
+    const pipelineRupees = salesOrders
+      .filter((order) => order.status !== "delivered")
+      .reduce((sum, order) => sum + parseCurrency(order.total), 0);
+
+    let bubble: ReactNode;
+    switch (activeBasePath) {
+      case "/inventory":
+        bubble =
+          lowStockCount > 0 ? (
+            <p>
+              <span className="font-semibold text-zinc-900">{lowStockCount} SKUs</span> are at or below low stock. Review
+              cards on the right for reorder and margin hints.
+            </p>
+          ) : (
+            <p>
+              Stock levels look balanced. Use insights to prioritise top sellers and your next purchase bundle.
+            </p>
+          );
+        break;
+      case "/sales":
+        bubble = (
+          <p>
+            <span className="font-semibold text-zinc-900">{readyOrders}</span> orders ready to deliver. Open pipeline:{" "}
+            <span className="font-semibold text-zinc-900">{formatCurrency(pipelineRupees)}</span> across{" "}
+            <span className="font-semibold text-zinc-900">{activeOrders}</span> active orders.
+          </p>
+        );
+        break;
+      case "/karigar":
+        bubble = (
+          <p>
+            <span className="font-semibold text-zinc-900">{karigarInFlight}</span> jobs in motion.
+            {overdueJobs > 0 ? (
+              <>
+                {" "}
+                <span className="font-semibold text-red-700">{overdueJobs} overdue</span> - prioritise QC and dispatch.
+              </>
+            ) : (
+              <> No overdue jobs right now. KeepQC tight on premium custom.</>
+            )}
+          </p>
+        );
+        break;
+      case "/customers":
+        bubble = (
+          <p>
+            <span className="font-semibold text-zinc-900">{lowVisitCustomers}</span> customers are low-visit. VIP and
+            win-back cards on the right name who to contact first.
+          </p>
+        );
+        break;
+      case "/employees":
+        bubble = (
+          <p>
+            <span className="font-semibold text-zinc-900">{leaveEmployees}</span> on leave out of{" "}
+            <span className="font-semibold text-zinc-900">{employeeList.length}</span>. Balance counter coverage using the
+            suggestions.
+          </p>
+        );
+        break;
+      case "/accounting":
+        bubble = (
+          <p>
+            <span className="font-semibold text-zinc-900">{formatCurrency(pipelineRupees)}</span> tied up in non-delivered
+            orders. <span className="font-semibold text-zinc-900">{readyOrders}</span> ready to bill - close cash gaps first.
+          </p>
+        );
+        break;
+      case "/reports":
+        bubble = (
+          <p>
+            Cross-check <span className="font-semibold text-zinc-900">{lowStockCount}</span> stock risks and{" "}
+            <span className="font-semibold text-zinc-900">{activeOrders}</span> active orders in your narrative for
+            leadership.
+          </p>
+        );
+        break;
+      case "/dashboard":
+      default:
+        bubble = (
+          <p>
+            Live snapshot: <span className="font-semibold text-zinc-900">{readyOrders}</span> orders ready,{" "}
+            <span className="font-semibold text-zinc-900">{unreadNotifications}</span> open alerts,{" "}
+            <span className="font-semibold text-zinc-900">{activeOrders}</span> active orders in pipeline.
+          </p>
+        );
+    }
+
+    return (
+      <>
+        <div className="flex gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-100">
+            <Bot className="h-4 w-4 text-violet-700" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="rounded-2xl rounded-tl-md bg-zinc-100 px-4 py-3 text-sm leading-relaxed text-zinc-800">
+              {bubble}
+              <p className="mt-3 text-xs font-medium text-zinc-400">{timeLabel}</p>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-violet-700"
+                onClick={() =>
+                  toast({
+                    title: "Team ping",
+                    description: "Use Notifications and Staff views to broadcast urgent tasks.",
+                  })
+                }
+              >
+                <Megaphone className="h-3.5 w-3.5" />
+                Ping team
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-violet-300 bg-white px-3 py-2 text-xs font-semibold text-violet-800 transition hover:bg-violet-50"
+                onClick={() =>
+                  toast({
+                    title: "Next best action",
+                    description: "Follow the priority card on the right for this screen.",
+                  })
+                }
+              >
+                <WandSparkles className="h-3.5 w-3.5 text-violet-600" />
+                Next best action
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-2">
+          {copilotMeta.chips.map((label) => (
+            <button
+              key={label}
+              type="button"
+              className="rounded-full border border-violet-200/90 bg-white px-3 py-1.5 text-left text-[11px] font-medium text-violet-900 shadow-sm transition hover:border-violet-300 hover:bg-violet-50/80"
+              onClick={() =>
+                toast({
+                  title: label,
+                  description: "Explore this area using the tools on this page.",
+                })
+              }
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-auto flex gap-2 pt-6">
+          <input
+            type="text"
+            placeholder="Ask Copilot (demo)"
+            readOnly
+            className="min-h-[44px] flex-1 rounded-2xl border border-zinc-200 bg-white px-4 text-sm text-zinc-800 placeholder:text-zinc-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
+            aria-label="Ask Copilot"
+          />
+          <button
+            type="button"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white shadow-md transition hover:bg-violet-700"
+            aria-label="Send message"
+            onClick={() => toast({ title: "Copilot", description: "Full chat is coming soon. Use insight cards to act now." })}
+          >
+            <Send className="h-4 w-4" />
+          </button>
+        </div>
+      </>
+    );
+  }, [activeBasePath, copilotMeta.chips, customerList, employeeList, inventory, karigarBoard, salesOrders, unreadNotifications]);
+
   if (!enabled) return null;
 
   return (
     <>
-      <motion.section
+      <motion.div
         key={location.pathname}
         layout
-        initial={{ opacity: 0, y: 22 }}
+        initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 340, damping: 30 }}
-        className="relative mb-5 overflow-hidden rounded-2xl border border-violet-500/35 bg-gradient-to-br from-[#160828] via-[#2e1065] to-[#120622] font-sans text-[11px] leading-normal text-violet-100 antialiased shadow-[0_24px_56px_-14px_rgba(76,29,149,0.55)] ring-1 ring-violet-400/20 sm:text-xs"
-        aria-label="GoldMind AI suggestions"
+        className="relative mb-5"
+        aria-label="GoldMind Copilot suggestions"
       >
-        <div
-          className="pointer-events-none absolute -right-16 -top-24 h-56 w-56 rounded-full bg-fuchsia-600/25 blur-3xl"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -bottom-20 -left-16 h-48 w-48 rounded-full bg-violet-500/30 blur-3xl"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-300/40 to-transparent"
-          aria-hidden
-        />
-
-        <div className="relative h-1 w-full bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-500" />
-
-        <motion.div
-          variants={aiSectionContainer}
-          initial="hidden"
-          animate="show"
-          className="relative grid gap-3.5 px-4 pb-4 pt-4 sm:px-5 sm:pb-5 sm:pt-4 md:grid-cols-2"
-        >
-          <motion.div
-            variants={aiSectionItem}
-            className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:col-span-2"
-          >
-            <div className="flex items-start gap-3">
-              <div className="relative shrink-0">
-                <GoldMindLogoMark size="lg" />
-              </div>
-              <div className="min-w-0 pt-0.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="font-sans text-sm font-semibold tracking-tight text-white sm:text-[15px]">
-                    GoldMind AI
-                  </h2>
-                  <span className="rounded-full border border-violet-300/45 bg-violet-500/25 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-violet-100 sm:text-[10px]">
-                    Copilot
-                  </span>
-                </div>
-                <p className="mt-1 max-w-xl text-[11px] leading-snug text-violet-200/85 sm:text-xs">
-                  Suggestions for this screen. Click a name, or use{" "}
-                  <span className="font-semibold text-white">AI Connects</span> (mail and WhatsApp icons on each card) to message
-                  everyone listed there at once.
-                </p>
-              </div>
-            </div>
-
-            <div className="inline-flex w-fit items-center gap-2 self-start rounded-full border border-violet-300/40 bg-violet-500/25 px-3 py-1.5 text-[11px] font-medium text-violet-50 sm:self-center sm:text-xs">
-              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_1px_rgba(167,139,250,0.5)]" />
-              Live
-            </div>
-          </motion.div>
-
-          {aiInsights.map((insight) => (
-            <motion.article
-              key={insight.title}
-              variants={aiSectionItem}
-              whileHover={{
-                y: -2,
-                transition: { type: "spring", stiffness: 400, damping: 28 },
-              }}
-              className="group relative flex flex-col overflow-hidden rounded-xl border border-violet-400/30 bg-gradient-to-br from-violet-950/75 via-purple-950/50 to-violet-950/70 p-4 shadow-lg shadow-black/25 ring-1 ring-white/5 transition-[border-color,box-shadow] hover:border-fuchsia-400/35 hover:shadow-violet-950/40"
-            >
-              <div
-                className="absolute inset-y-2.5 left-0 w-0.5 rounded-full bg-gradient-to-b from-fuchsia-400 via-violet-400 to-violet-600 opacity-95"
-                aria-hidden
-              />
-              <BrainCircuit
-                className="pointer-events-none absolute right-2 top-2 h-10 w-10 text-violet-300/15 group-hover:text-fuchsia-300/22"
-                strokeWidth={1.25}
-                aria-hidden
-              />
-              <div className="relative flex min-h-0 flex-1 flex-col pl-3">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-r from-fuchsia-400 to-violet-300"
-                    aria-hidden
-                  />
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-100 sm:text-xs">{insight.title}</p>
-                </div>
-                <p className="mt-2 text-[11px] leading-relaxed text-white/90 sm:text-[13px] sm:leading-relaxed">
-                  <InsightNarrativeWithMentions
-                    narrative={insight.narrative}
-                    mentionNames={insight.mentionNames}
-                    onPick={(name) => openReachOut(name, insight.title, insight.narrative)}
-                    mentionButtonClassName={mentionBtnOnPurpleCard}
-                  />
-                </p>
-                {insight.mentionNames.length > 0 ? (
-                  <div className="mt-3 flex shrink-0 items-center justify-between gap-2 border-t border-violet-400/25 pt-2">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-200/95">
-                      AI Connects
-                    </span>
-                    <div className="flex shrink-0 items-center gap-1">
+        <GoldMindCopilotLayout
+          headerSubtitle={copilotMeta.headerSubtitle}
+          insightsPanelSubtitle={copilotMeta.insightsSubtitle}
+          showViewAllLink={false}
+          leftColumn={copilotLeft}
+          rightColumn={
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {aiInsights.map((insight, index) => {
+                const accent =
+                  index === 0
+                    ? { badge: "Priority", badgeClass: "bg-red-50 text-red-700 ring-red-200/80" }
+                    : { badge: "Insight", badgeClass: "bg-amber-50 text-amber-900 ring-amber-200/80" };
+                const confidence = 82 + index * 5;
+                return (
+                  <motion.article
+                    key={insight.title}
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    whileHover={{ y: -2 }}
+                    className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200/90 bg-white p-4 shadow-sm transition hover:shadow-md"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-50">
+                        <BrainCircuit className="h-5 w-5 text-violet-600" strokeWidth={2} />
+                      </div>
+                      <span
+                        className={cn(
+                          "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ring-1 ring-inset",
+                          accent.badgeClass,
+                        )}
+                      >
+                        {accent.badge}
+                      </span>
                       <button
                         type="button"
-                        onClick={() => openReachBulk(insight)}
-                        title="AI Connects - email everyone named in this suggestion"
-                        className="rounded-lg border border-violet-300/35 bg-violet-500/20 p-1.5 text-left transition-colors hover:border-violet-200/50 hover:bg-violet-400/30"
-                        aria-label="AI Connects: open send dialog for everyone on this card"
+                        className="-mr-1 rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600"
+                        aria-label="More options"
                       >
-                        <GmailLogoMark className="h-5 w-5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => openReachBulk(insight)}
-                        title="AI Connects - WhatsApp everyone named in this suggestion"
-                        className="rounded-lg border border-violet-300/35 bg-violet-500/20 p-1.5 text-left transition-colors hover:border-violet-200/50 hover:bg-violet-400/30"
-                        aria-label="AI Connects: open send dialog for everyone on this card"
-                      >
-                        <WhatsAppLogoMark className="h-5 w-5" />
+                        <MoreVertical className="h-4 w-4" />
                       </button>
                     </div>
-                  </div>
-                ) : null}
-              </div>
-            </motion.article>
-          ))}
-        </motion.div>
-      </motion.section>
+                    <h5 className="mt-3 text-sm font-bold text-zinc-900">{insight.title}</h5>
+                    <p className="mt-1 text-xs leading-relaxed text-zinc-600 sm:text-[13px] sm:leading-relaxed">
+                      <InsightNarrativeWithMentions
+                        narrative={insight.narrative}
+                        mentionNames={insight.mentionNames}
+                        onPick={(name) => openReachOut(name, insight.title, insight.narrative)}
+                        mentionButtonClassName={mentionBtnOnLightCard}
+                      />
+                    </p>
+                    <p className="mt-2 text-xs font-semibold text-emerald-700">AI confidence: {confidence}%</p>
+                    {insight.mentionNames.length > 0 ? (
+                      <div className="mt-3 flex shrink-0 items-center justify-between gap-2 border-t border-zinc-100 pt-3">
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                          AI Connects
+                        </span>
+                        <div className="flex shrink-0 items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => openReachBulk(insight)}
+                            title="AI Connects - email everyone named in this suggestion"
+                            className="rounded-lg border border-violet-200 bg-violet-50 p-1.5 text-left transition-colors hover:border-violet-300 hover:bg-violet-100"
+                            aria-label="AI Connects: open send dialog for everyone on this card"
+                          >
+                            <GmailLogoMark className="h-5 w-5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openReachBulk(insight)}
+                            title="AI Connects - WhatsApp everyone named in this suggestion"
+                            className="rounded-lg border border-emerald-200 bg-emerald-50 p-1.5 text-left transition-colors hover:border-emerald-300 hover:bg-emerald-100"
+                            aria-label="AI Connects: open send dialog for everyone on this card"
+                          >
+                            <WhatsAppLogoMark className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
+                  </motion.article>
+                );
+              })}
+            </div>
+          }
+        />
+      </motion.div>
 
       <Dialog open={reachOpen} onOpenChange={handleOpenChange}>
         <DialogContent

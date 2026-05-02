@@ -3,7 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import PageHeader from "@/components/shared/PageHeader";
-import { Clock, Loader2, CheckCircle2, AlertCircle, Plus, X, ChevronLeft, ChevronRight, Wrench } from "lucide-react";
+import {
+  Clock,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Plus,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Wrench,
+  LayoutGrid,
+  Scale,
+} from "lucide-react";
+import KarigarGoldBalances from "@/components/karigar/KarigarGoldBalances";
 import { useAppDemo } from "@/context/AppDemoContext";
 import { toast } from "@/hooks/use-toast";
 import { useSubmitLock } from "@/hooks/useSubmitLock";
@@ -46,6 +59,7 @@ const Karigar = () => {
   const { pending: karigarBusy, runExclusive } = useSubmitLock();
   const { karigarBoard, employeeList, customerList, salesOrders, moveKarigarJob, moveKarigarJobToColumn, addKarigarJob } =
     useAppDemo();
+  const [mainTab, setMainTab] = useState<"board" | "gold">("board");
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [assignStep, setAssignStep] = useState<1 | 2>(1);
   const [assignItemMode, setAssignItemMode] = useState<AssignItemMode>(null);
@@ -256,6 +270,36 @@ const Karigar = () => {
         }
       />
 
+      <div className="flex flex-wrap gap-2 mb-5">
+        <button
+          type="button"
+          onClick={() => setMainTab("board")}
+          className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+            mainTab === "board"
+              ? "gold-gradient text-primary-foreground shadow-sm"
+              : "bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80"
+          }`}
+        >
+          <LayoutGrid className="h-4 w-4 shrink-0 opacity-90" />
+          Workflow board
+        </button>
+        <button
+          type="button"
+          onClick={() => setMainTab("gold")}
+          className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+            mainTab === "gold"
+              ? "gold-gradient text-primary-foreground shadow-sm"
+              : "bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80"
+          }`}
+        >
+          <Scale className="h-4 w-4 shrink-0 opacity-90" />
+          Gold with karigars
+        </button>
+      </div>
+
+      {mainTab === "gold" ? (
+        <KarigarGoldBalances karigarBoard={karigarBoard} allKarigarJobs={allKarigarJobs} employeeList={employeeList} />
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {columns.map((col, ci) => {
           const Icon = col.icon;
@@ -408,6 +452,7 @@ const Karigar = () => {
           );
         })}
       </div>
+      )}
 
       {showAssignModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto overscroll-y-contain bg-background/80 backdrop-blur-sm">
@@ -647,7 +692,13 @@ const Karigar = () => {
                   </div>
 
                   <div>
-                    <label className="text-sm text-muted-foreground mb-1 block">Material Issued</label>
+                    <label className="text-sm text-muted-foreground mb-1 block">Material issued</label>
+                    <p className="text-[11px] text-muted-foreground mb-1.5">
+                      For fine-gold tracking, include gold as{" "}
+                      <span className="font-mono text-foreground/90">grams + karat</span> (e.g.{" "}
+                      <span className="font-mono">100g 18K</span>, <span className="font-mono">45g Gold 22K</span>). Multiple
+                      lines: separate with + .
+                    </p>
                     <input
                       value={form.material}
                       onChange={(e) => setForm((current) => ({ ...current, material: e.target.value }))}
