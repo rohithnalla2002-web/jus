@@ -111,14 +111,19 @@ function uniqueMentionOrder(narrative: string, mentionNames: string[]) {
   return ordered.sort((a, b) => b.length - a.length);
 }
 
+const mentionBtnOnPurpleCard =
+  "font-semibold text-white underline decoration-white/45 underline-offset-2 transition-colors hover:text-violet-100 hover:decoration-white/75 focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#1a0f35]";
+
 function InsightNarrativeWithMentions({
   narrative,
   mentionNames,
   onPick,
+  mentionButtonClassName,
 }: {
   narrative: string;
   mentionNames: string[];
   onPick: (name: string) => void;
+  mentionButtonClassName?: string;
 }) {
   const pieces = useMemo(() => {
     const unique = uniqueMentionOrder(narrative, mentionNames);
@@ -147,7 +152,10 @@ function InsightNarrativeWithMentions({
             key={`n-${i}-${piece.value}`}
             type="button"
             onClick={() => onPick(piece.value)}
-            className="cursor-pointer border-0 bg-transparent p-0 font-medium text-primary underline decoration-primary/35 underline-offset-2 transition-colors hover:text-primary/80 hover:decoration-primary/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className={cn(
+              "cursor-pointer border-0 bg-transparent p-0 font-medium text-primary underline decoration-primary/35 underline-offset-2 transition-colors hover:text-primary/80 hover:decoration-primary/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              mentionButtonClassName,
+            )}
           >
             {piece.value}
           </button>
@@ -491,19 +499,23 @@ export default function AiInsightsSection() {
         initial={{ opacity: 0, y: 22 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 340, damping: 30 }}
-        className="relative mb-5 overflow-hidden rounded-2xl border border-violet-200/50 bg-gradient-to-br from-white via-violet-50/35 to-violet-50/25 font-sans text-[11px] leading-normal text-foreground antialiased shadow-md shadow-violet-500/10 sm:text-xs"
+        className="relative mb-5 overflow-hidden rounded-2xl border border-violet-500/35 bg-gradient-to-br from-[#160828] via-[#2e1065] to-[#120622] font-sans text-[11px] leading-normal text-violet-100 antialiased shadow-[0_24px_56px_-14px_rgba(76,29,149,0.55)] ring-1 ring-violet-400/20 sm:text-xs"
         aria-label="GoldMind AI suggestions"
       >
         <div
-          className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-gradient-to-br from-fuchsia-400/30 to-violet-500/25 blur-3xl"
+          className="pointer-events-none absolute -right-16 -top-24 h-56 w-56 rounded-full bg-fuchsia-600/25 blur-3xl"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute -bottom-14 -left-14 h-40 w-40 rounded-full bg-gradient-to-tr from-violet-300/25 to-violet-400/20 blur-3xl"
+          className="pointer-events-none absolute -bottom-20 -left-16 h-48 w-48 rounded-full bg-violet-500/30 blur-3xl"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-300/40 to-transparent"
           aria-hidden
         />
 
-        <div className="relative h-1 w-full bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-400" />
+        <div className="relative h-1 w-full bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-500" />
 
         <motion.div
           variants={aiSectionContainer}
@@ -521,22 +533,23 @@ export default function AiInsightsSection() {
               </div>
               <div className="min-w-0 pt-0.5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="bg-gradient-to-r from-violet-800 via-fuchsia-700 to-violet-600 bg-clip-text font-sans text-sm font-semibold tracking-normal text-transparent sm:text-[15px]">
+                  <h2 className="font-sans text-sm font-semibold tracking-tight text-white sm:text-[15px]">
                     GoldMind AI
                   </h2>
-                  <span className="rounded-full border border-violet-300/80 bg-violet-500/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-violet-800 sm:text-[10px]">
+                  <span className="rounded-full border border-violet-300/45 bg-violet-500/25 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-violet-100 sm:text-[10px]">
                     Copilot
                   </span>
                 </div>
-                <p className="mt-1 max-w-xl text-[11px] leading-snug text-muted-foreground sm:text-xs">
-                  Suggestions for this screen. Click a name, or use <span className="font-semibold text-violet-900">AI Connects</span>{" "}
-                  (mail and WhatsApp icons on each card) to message everyone listed there at once.
+                <p className="mt-1 max-w-xl text-[11px] leading-snug text-violet-200/85 sm:text-xs">
+                  Suggestions for this screen. Click a name, or use{" "}
+                  <span className="font-semibold text-white">AI Connects</span> (mail and WhatsApp icons on each card) to message
+                  everyone listed there at once.
                 </p>
               </div>
             </div>
 
-            <div className="inline-flex w-fit items-center gap-2 self-start rounded-full border border-emerald-200/80 bg-emerald-50/90 px-3 py-1.5 text-[11px] font-medium text-emerald-900 sm:self-center sm:text-xs">
-              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 ring-1 ring-emerald-300" />
+            <div className="inline-flex w-fit items-center gap-2 self-start rounded-full border border-violet-300/40 bg-violet-500/25 px-3 py-1.5 text-[11px] font-medium text-violet-50 sm:self-center sm:text-xs">
+              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_1px_rgba(167,139,250,0.5)]" />
               Live
             </div>
           </motion.div>
@@ -549,35 +562,36 @@ export default function AiInsightsSection() {
                 y: -2,
                 transition: { type: "spring", stiffness: 400, damping: 28 },
               }}
-              className="group relative flex flex-col overflow-hidden rounded-xl border border-violet-200/55 bg-white/90 p-4 shadow-sm transition-shadow hover:border-fuchsia-300/60 hover:shadow-md"
+              className="group relative flex flex-col overflow-hidden rounded-xl border border-violet-400/30 bg-gradient-to-br from-violet-950/75 via-purple-950/50 to-violet-950/70 p-4 shadow-lg shadow-black/25 ring-1 ring-white/5 transition-[border-color,box-shadow] hover:border-fuchsia-400/35 hover:shadow-violet-950/40"
             >
               <div
-                className="absolute inset-y-2.5 left-0 w-0.5 rounded-full bg-gradient-to-b from-violet-500 via-fuchsia-500 to-violet-400 opacity-90"
+                className="absolute inset-y-2.5 left-0 w-0.5 rounded-full bg-gradient-to-b from-fuchsia-400 via-violet-400 to-violet-600 opacity-95"
                 aria-hidden
               />
               <BrainCircuit
-                className="pointer-events-none absolute right-2 top-2 h-10 w-10 text-violet-400/12 group-hover:text-violet-400/18"
+                className="pointer-events-none absolute right-2 top-2 h-10 w-10 text-violet-300/15 group-hover:text-fuchsia-300/22"
                 strokeWidth={1.25}
                 aria-hidden
               />
               <div className="relative flex min-h-0 flex-1 flex-col pl-3">
                 <div className="flex items-center gap-2">
                   <span
-                    className="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500"
+                    className="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-r from-fuchsia-400 to-violet-300"
                     aria-hidden
                   />
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-800 sm:text-xs">{insight.title}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-100 sm:text-xs">{insight.title}</p>
                 </div>
-                <p className="mt-2 text-[11px] leading-relaxed text-foreground/90 sm:text-[13px] sm:leading-relaxed">
+                <p className="mt-2 text-[11px] leading-relaxed text-white/90 sm:text-[13px] sm:leading-relaxed">
                   <InsightNarrativeWithMentions
                     narrative={insight.narrative}
                     mentionNames={insight.mentionNames}
                     onPick={(name) => openReachOut(name, insight.title, insight.narrative)}
+                    mentionButtonClassName={mentionBtnOnPurpleCard}
                   />
                 </p>
                 {insight.mentionNames.length > 0 ? (
-                  <div className="mt-3 flex shrink-0 items-center justify-between gap-2 border-t border-violet-100/90 pt-2">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-800/90">
+                  <div className="mt-3 flex shrink-0 items-center justify-between gap-2 border-t border-violet-400/25 pt-2">
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-violet-200/95">
                       AI Connects
                     </span>
                     <div className="flex shrink-0 items-center gap-1">
@@ -585,7 +599,7 @@ export default function AiInsightsSection() {
                         type="button"
                         onClick={() => openReachBulk(insight)}
                         title="AI Connects — email everyone named in this suggestion"
-                        className="rounded-lg border border-transparent p-1.5 text-left transition-colors hover:border-sky-200 hover:bg-sky-50/90"
+                        className="rounded-lg border border-violet-300/35 bg-violet-500/20 p-1.5 text-left transition-colors hover:border-violet-200/50 hover:bg-violet-400/30"
                         aria-label="AI Connects: open send dialog for everyone on this card"
                       >
                         <GmailLogoMark className="h-5 w-5" />
@@ -594,7 +608,7 @@ export default function AiInsightsSection() {
                         type="button"
                         onClick={() => openReachBulk(insight)}
                         title="AI Connects — WhatsApp everyone named in this suggestion"
-                        className="rounded-lg border border-transparent p-1.5 text-left transition-colors hover:border-emerald-200 hover:bg-emerald-50/90"
+                        className="rounded-lg border border-violet-300/35 bg-violet-500/20 p-1.5 text-left transition-colors hover:border-violet-200/50 hover:bg-violet-400/30"
                         aria-label="AI Connects: open send dialog for everyone on this card"
                       >
                         <WhatsAppLogoMark className="h-5 w-5" />
