@@ -476,7 +476,7 @@ export default function OldGoldExchange() {
             <div className="flex flex-1 flex-col">
               <div className="mb-6 rounded-2xl border border-primary/15 bg-background/60 p-5 backdrop-blur-sm">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Exchange value</p>
-                <p className="mt-2 font-serif text-4xl font-bold tracking-tight gold-text sm:text-5xl">{displayValue}</p>
+                <p className="mt-2 text-3xl font-semibold tabular-nums tracking-tight text-primary sm:text-4xl">{displayValue}</p>
                 <p className="mt-2 text-xs text-muted-foreground">Net fine × rate per gram (after deduction)</p>
               </div>
 
@@ -649,7 +649,7 @@ export default function OldGoldExchange() {
                       >
                         {e.kind === "bought" ? "Bought" : "Exchange"}
                       </span>
-                      <p className="mt-2 font-serif text-xl font-bold text-primary">{formatCurrency(e.exchangeValuePaise / 100)}</p>
+                      <p className="mt-2 text-xl font-semibold tabular-nums text-primary">{formatCurrency(e.exchangeValuePaise / 100)}</p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(e.createdAt).toLocaleString("en-IN", {
                           dateStyle: "medium",
