@@ -47,7 +47,7 @@ export default function ProductsPage() {
   }, [inventory, category, search, sort, priceMax]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+    <div className="mx-auto max-w-screen-2xl px-4 py-12 sm:px-6">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-center">
         <h1 className="font-serif text-4xl font-bold text-zinc-900">All Products</h1>
         <p className="mt-2 text-sm text-zinc-600">Filter by category, price, and popularity.</p>

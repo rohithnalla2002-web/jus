@@ -8,7 +8,7 @@ import {
   COMPANY_PHONE_E164,
   GOLDMIND_APP_NAME,
 } from "@/lib/company";
-import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
+import { GoldMindNavbarWordmark } from "@/components/shared/GoldMindBrandLogo";
 
 export default function ShopFooter() {
   return (
@@ -16,10 +16,13 @@ export default function ShopFooter() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           <div>
-            <div className="flex items-center gap-2 text-zinc-900">
-              <GoldMindLogoMark size="sm" />
-              <span className="font-serif text-lg font-semibold">{GOLDMIND_APP_NAME}</span>
-            </div>
+            <Link
+              to="/#home"
+              className="group inline-flex max-w-full rounded-xl outline-none ring-violet-400/30 transition-opacity hover:opacity-95 focus-visible:ring-2"
+              aria-label={GOLDMIND_APP_NAME}
+            >
+              <GoldMindNavbarWordmark className="transition-transform duration-300 group-hover:scale-[1.02]" />
+            </Link>
             <p className="mt-3 text-sm leading-relaxed text-zinc-600">
               Jewellery retail and workshop operations - inventory, karigar workflow, and billing in one place.
             </p>

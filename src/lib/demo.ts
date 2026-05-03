@@ -9,6 +9,12 @@ export const formatCurrency = (value: number) =>
 
 export const parseCurrency = (value: string) => Number(value.replace(/[^\d.]/g, "")) || 0;
 
+/** Compact lakhs label for badges (e.g. ₹4.26L). Uses ₹ (U+20B9). */
+export function formatLakhsShort(rupees: number): string {
+  if (!Number.isFinite(rupees) || rupees < 0) return "—";
+  return `₹${(rupees / 100_000).toFixed(2)}L`;
+}
+
 export const formatShortDate = (value: Date | string = new Date()) => {
   const date = typeof value === "string" ? new Date(value) : value;
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);

@@ -102,19 +102,14 @@ const faqs = [
 ];
 
 const analyticsShots = [
-  {
-    title: "Live Sales Dashboard",
-    img: "/1.jpg",
-  },
-  {
-    title: "Inventory Intelligence",
-    img: "/2.jpg",
-  },
-  {
-    title: "Mobile Business Insights",
-    img: "/3.jpg",
-  },
+  { title: "Live Sales Dashboard", img: "/1.jpg" },
+  { title: "Inventory Intelligence", img: "/2.jpg" },
+  { title: "Mobile Business Insights", img: "/3.jpg" },
 ];
+
+/** Wide hero slot — Inventory Intelligence (`2.jpg`) for maximum readable dashboard detail */
+const inventoryFeaturedShot = analyticsShots[1];
+const analyticsSecondaryShots = [analyticsShots[0], analyticsShots[2]];
 
 const heroStats = [
   { label: "Orders Processed", value: "22K+" },
@@ -122,11 +117,13 @@ const heroStats = [
   { label: "Avg. Billing Time", value: "45s" },
 ];
 
+const HERO_DASHBOARD_IMAGE_PATH = "/WhatsApp Image 2026-05-03 at 11.50.31 AM.jpeg";
+
 export default function LandingPage() {
   return (
     <>
-      <section id="home" className="relative overflow-hidden bg-white">
-        <div className="relative mx-auto grid min-h-[78vh] max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2">
+      <section id="home" className="relative overflow-hidden bg-[#F8F7FF]">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-2 lg:gap-12 lg:py-20">
           <motion.div {...fadeUp} transition={{ duration: 0.6 }} className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-violet-200/80 bg-white/90 px-4 py-1.5 text-sm font-medium text-violet-900 shadow-sm">
               <GoldMindLogoMark size="xs" />
@@ -176,29 +173,13 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.7 }}
-            className="relative mx-auto w-full max-w-xl"
+            className="relative -mx-4 flex h-[260px] w-[calc(100%+2rem)] overflow-hidden sm:-mx-6 sm:h-[300px] sm:w-[calc(100%+3rem)] lg:mx-0 lg:h-[340px] lg:w-full xl:h-[380px]"
           >
-            <div className="absolute -left-6 -top-6 h-24 w-24 rounded-2xl bg-violet-300/40 blur-2xl" />
-            <div className="absolute -bottom-8 right-0 h-28 w-28 rounded-full bg-violet-300/30 blur-2xl" />
-            <div className="relative overflow-hidden rounded-3xl border border-violet-200/70 bg-white/90 p-4 shadow-2xl backdrop-blur">
-              <img
-                src="/1.jpg"
-                alt="GoldMind analytics dashboard"
-                className="h-64 w-full rounded-2xl object-cover sm:h-72"
-              />
-              <div className="mt-4 grid grid-cols-3 gap-2">
-                {[
-                  { k: "Today Sales", v: "â‚¹4.8L" },
-                  { k: "Orders", v: "126" },
-                  { k: "AI Alerts", v: "18" },
-                ].map((m) => (
-                  <div key={m.k} className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-center">
-                    <p className="text-xs text-zinc-500">{m.k}</p>
-                    <p className="text-sm font-bold text-zinc-900">{m.v}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <img
+              src={encodeURI(HERO_DASHBOARD_IMAGE_PATH)}
+              alt="GoldMind ERP dashboard with KPIs and GoldMind Copilot"
+              className="h-full w-full object-cover object-center"
+            />
           </motion.div>
         </div>
       </section>
@@ -250,27 +231,39 @@ export default function LandingPage() {
             <motion.article
               whileHover={{ y: -4, scale: 1.005 }}
               transition={{ type: "spring", stiffness: 180, damping: 16 }}
-              className="group relative overflow-hidden rounded-3xl border border-violet-200/70 bg-white shadow-lg md:col-span-7"
+              className="group relative min-h-[17rem] overflow-hidden rounded-3xl border border-violet-200/70 bg-zinc-100 shadow-lg md:col-span-7 md:min-h-[22rem]"
             >
-              <img src={analyticsShots[0].img} alt={analyticsShots[0].title} className="h-64 w-full object-cover md:h-80" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+              <img
+                src={inventoryFeaturedShot.img}
+                alt={inventoryFeaturedShot.title}
+                className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-5">
-                <h3 className="text-xl font-semibold text-white">{analyticsShots[0].title}</h3>
-                <p className="mt-1 text-sm text-white/90">Revenue, order count, and category performance in one screen.</p>
+                <h3 className="text-xl font-semibold text-white">{inventoryFeaturedShot.title}</h3>
+                <p className="mt-1 text-sm text-white/90">
+                  Real-time stock value, smart alerts, trends, and category health in one view.
+                </p>
               </div>
             </motion.article>
 
             <div className="space-y-5 md:col-span-5">
-              {analyticsShots.slice(1).map((shot) => (
+              {analyticsSecondaryShots.map((shot) => (
                 <motion.article
                   key={shot.title}
                   whileHover={{ y: -4 }}
                   transition={{ type: "spring", stiffness: 180, damping: 16 }}
-                  className="group relative overflow-hidden rounded-3xl border border-violet-200/70 bg-white shadow-md"
+                  className="group relative min-h-[13.5rem] overflow-hidden rounded-3xl border border-violet-200/70 bg-zinc-100 shadow-md sm:min-h-[15.5rem]"
                 >
-                  <img src={shot.img} alt={shot.title} className="h-36 w-full object-cover sm:h-44" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
-                  <p className="absolute bottom-3 left-4 text-sm font-semibold text-white">{shot.title}</p>
+                  <img
+                    src={shot.img}
+                    alt={shot.title}
+                    className="absolute inset-0 h-full w-full scale-[1.08] object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.14]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
+                  <p className="absolute bottom-3 left-4 right-4 z-10 text-sm font-semibold text-white drop-shadow-md">
+                    {shot.title}
+                  </p>
                 </motion.article>
               ))}
             </div>

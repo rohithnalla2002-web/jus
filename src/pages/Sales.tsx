@@ -49,7 +49,7 @@ const Sales = () => {
       order,
       customer,
       inventory,
-      goldRatePerGram: "â‚¹7,245/g",
+      goldRatePerGram: "₹7,245/g",
       paymentMethod: labelForPaymentMode(order.paymentMode),
     });
 
