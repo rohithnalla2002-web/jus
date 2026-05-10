@@ -250,18 +250,378 @@ export function fetchAccountingMonthly(): Promise<AccountingMonthlyResponse> {
   return apiGet<AccountingMonthlyResponse>("/api/accounting/monthly");
 }
 
-export type AdminLoginResponse = { token: string; username: string };
+export type AdminLoginResponse = { token: string; username: string; name?: string };
 
 export async function adminLogin(username: string, password: string): Promise<AdminLoginResponse> {
   return apiPost<AdminLoginResponse>("/api/admin/login", { username, password });
 }
 
-export async function adminSession(token: string): Promise<{ username: string }> {
+export async function adminSession(token: string): Promise<{ username: string; name?: string }> {
   const res = await fetch(apiUrl("/api/admin/session"), {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(await parseError(res));
-  return res.json() as Promise<{ username: string }>;
+  return res.json() as Promise<{ username: string; name?: string }>;
+}
+
+const authHeaders = (token: string) => ({ ...jsonHeaders, Authorization: `Bearer ${token}` });
+
+export type SuperAdminLoginResponse = { token: string; username: string; name: string };
+
+export type AdminPermissionKey =
+  | "dashboard"
+  | "inventory"
+  | "sales"
+  | "karigar"
+  | "customers"
+  | "employees"
+  | "accounting"
+  | "reports"
+  | "goldSchemes"
+  | "oldGoldExchange";
+
+export type AdminPermissions = Record<AdminPermissionKey, boolean>;
+
+export type SuperAdminUser = {
+  id: number;
+  username: string;
+  name: string;
+  email: string;
+  phone: string;
+  roleLabel: string;
+  status: "active" | "inactive";
+  permissions: AdminPermissions;
+  lockedUntil: string | null;
+  forcePasswordReset: boolean;
+  failedLoginCount: number;
+  lastFailedLoginAt: string | null;
+  lastLoginAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
+export type SuperAdminAuditLog = {
+  id: number;
+  actor: string;
+  action: string;
+  detail: string;
+  adminId: number | null;
+  createdAt: string | null;
+};
+
+export type SuperAdminOverview = {
+  stats: {
+    totalAdmins: number;
+    activeAdmins: number;
+    inactiveAdmins: number;
+    adminsWithLogins: number;
+    lockedAdmins: number;
+    forceResetAdmins: number;
+  };
+  recentAdmins: SuperAdminUser[];
+  recentAuditLogs: SuperAdminAuditLog[];
+};
+
+export type SuperAdminDetailResponse = {
+  admin: SuperAdminUser;
+  auditLogs: SuperAdminAuditLog[];
+};
+
+export type SuperAdminCreateAdminBody = {
+  username: string;
+  password: string;
+  name: string;
+  email: string;
+  phone: string;
+  roleLabel: string;
+  permissions?: AdminPermissions;
+};
+
+export type SuperAdminUpdateAdminBody = Partial<Omit<SuperAdminCreateAdminBody, "username" | "password">> & {
+  status?: "active" | "inactive";
+  forcePasswordReset?: boolean;
+};
+
+export type SuperAdminBusinessOverview = {
+  sales: {
+    totalOrders: number;
+    pendingOrders: number;
+    deliveredOrders: number;
+    totalRevenueRupees: number;
+    revenue30dRupees: number;
+  };
+  inventory: {
+    totalItems: number;
+    lowStockItems: number;
+    inventoryValueRupees: number;
+    totalStock: number;
+  };
+  people: {
+    totalCustomers: number;
+    customerValueRupees: number;
+    totalEmployees: number;
+    activeEmployees: number;
+  };
+  schemes: {
+    totalSchemes: number;
+    activeSchemes: number;
+  };
+  recentActivities: { action: string; detail: string; createdAt: string | null }[];
+};
+
+export type SuperAdminSystemHealth = {
+  api: { status: string; checkedAt: string; responseMs: number };
+  database: { status: string; serverTime?: string | null };
+  tableCounts?: {
+    inventoryItems: number;
+    customers: number;
+    orders: number;
+    admins: number;
+    auditLogs: number;
+  };
+  latestActivityAt?: string | null;
+  error?: string;
+};
+
+export type SuperAdminTicketStatus = "open" | "in_progress" | "resolved" | "closed";
+export type SuperAdminTicketPriority = "low" | "medium" | "high" | "urgent";
+
+export type SuperAdminTicket = {
+  id: number;
+  title: string;
+  description: string;
+  requesterName: string;
+  requesterEmail: string;
+  priority: SuperAdminTicketPriority;
+  status: SuperAdminTicketStatus;
+  assignedAdminId: number | null;
+  assignedAdminName: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
+export type SuperAdminTicketBody = {
+  title: string;
+  description: string;
+  requesterName: string;
+  requesterEmail: string;
+  priority: SuperAdminTicketPriority;
+  assignedAdminId?: number | null;
+};
+
+export type SuperAdminTicketUpdateBody = Partial<SuperAdminTicketBody> & {
+  status?: SuperAdminTicketStatus;
+};
+
+export type SuperAdminFaqStatus = "draft" | "published";
+
+export type SuperAdminFaq = {
+  id: number;
+  question: string;
+  answer: string;
+  status: SuperAdminFaqStatus;
+  displayOrder: number;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
+export type SuperAdminFaqBody = {
+  question: string;
+  answer: string;
+  status: SuperAdminFaqStatus;
+  displayOrder: number;
+};
+
+export async function superAdminLogin(username: string, password: string): Promise<SuperAdminLoginResponse> {
+  return apiPost<SuperAdminLoginResponse>("/api/super-admin/login", { username, password });
+}
+
+export async function superAdminSession(token: string): Promise<{ username: string; name: string }> {
+  const res = await fetch(apiUrl("/api/super-admin/session"), {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<{ username: string; name: string }>;
+}
+
+export async function fetchSuperAdminOverview(token: string): Promise<SuperAdminOverview> {
+  const res = await fetch(apiUrl("/api/super-admin/overview"), { headers: authHeaders(token) });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminOverview>;
+}
+
+export async function fetchSuperAdminUsers(token: string): Promise<SuperAdminUser[]> {
+  const res = await fetch(apiUrl("/api/super-admin/admins"), { headers: authHeaders(token) });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminUser[]>;
+}
+
+export async function fetchSuperAdminUserDetail(token: string, id: number): Promise<SuperAdminDetailResponse> {
+  const res = await fetch(apiUrl(`/api/super-admin/admins/${id}`), { headers: authHeaders(token) });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminDetailResponse>;
+}
+
+export async function createSuperAdminUser(token: string, body: SuperAdminCreateAdminBody): Promise<SuperAdminUser> {
+  const res = await fetch(apiUrl("/api/super-admin/admins"), {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminUser>;
+}
+
+export async function updateSuperAdminUser(token: string, id: number, body: SuperAdminUpdateAdminBody): Promise<SuperAdminUser> {
+  const res = await fetch(apiUrl(`/api/super-admin/admins/${id}`), {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminUser>;
+}
+
+export async function updateSuperAdminUserPermissions(token: string, id: number, permissions: AdminPermissions): Promise<SuperAdminUser> {
+  const res = await fetch(apiUrl(`/api/super-admin/admins/${id}/permissions`), {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: JSON.stringify({ permissions }),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminUser>;
+}
+
+export async function setSuperAdminUserLock(
+  token: string,
+  id: number,
+  locked: boolean,
+  minutes = 15,
+): Promise<SuperAdminUser> {
+  const res = await fetch(apiUrl(`/api/super-admin/admins/${id}/lock`), {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: JSON.stringify({ locked, minutes }),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminUser>;
+}
+
+export async function setSuperAdminUserForceReset(
+  token: string,
+  id: number,
+  forcePasswordReset: boolean,
+): Promise<SuperAdminUser> {
+  const res = await fetch(apiUrl(`/api/super-admin/admins/${id}/force-reset`), {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: JSON.stringify({ forcePasswordReset }),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminUser>;
+}
+
+export async function resetSuperAdminUserPassword(token: string, id: number, password: string): Promise<SuperAdminUser> {
+  const res = await fetch(apiUrl(`/api/super-admin/admins/${id}/password`), {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: JSON.stringify({ password }),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminUser>;
+}
+
+export async function deactivateSuperAdminUser(token: string, id: number): Promise<SuperAdminUser> {
+  const res = await fetch(apiUrl(`/api/super-admin/admins/${id}`), {
+    method: "DELETE",
+    headers: authHeaders(token),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminUser>;
+}
+
+export async function fetchSuperAdminAuditLogs(token: string, adminId?: number): Promise<SuperAdminAuditLog[]> {
+  const suffix = adminId ? `?adminId=${encodeURIComponent(String(adminId))}` : "";
+  const res = await fetch(apiUrl(`/api/super-admin/audit-logs${suffix}`), { headers: authHeaders(token) });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminAuditLog[]>;
+}
+
+export async function fetchSuperAdminBusinessOverview(token: string): Promise<SuperAdminBusinessOverview> {
+  const res = await fetch(apiUrl("/api/super-admin/business-overview"), { headers: authHeaders(token) });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminBusinessOverview>;
+}
+
+export async function fetchSuperAdminSystemHealth(token: string): Promise<SuperAdminSystemHealth> {
+  const res = await fetch(apiUrl("/api/super-admin/system-health"), { headers: authHeaders(token) });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminSystemHealth>;
+}
+
+export async function fetchSuperAdminTickets(token: string, status?: SuperAdminTicketStatus): Promise<SuperAdminTicket[]> {
+  const suffix = status ? `?status=${encodeURIComponent(status)}` : "";
+  const res = await fetch(apiUrl(`/api/super-admin/tickets${suffix}`), { headers: authHeaders(token) });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminTicket[]>;
+}
+
+export async function createSuperAdminTicket(token: string, body: SuperAdminTicketBody): Promise<SuperAdminTicket> {
+  const res = await fetch(apiUrl("/api/super-admin/tickets"), {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminTicket>;
+}
+
+export async function updateSuperAdminTicket(
+  token: string,
+  id: number,
+  body: SuperAdminTicketUpdateBody,
+): Promise<SuperAdminTicket> {
+  const res = await fetch(apiUrl(`/api/super-admin/tickets/${id}`), {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminTicket>;
+}
+
+export async function fetchSuperAdminFaqs(token: string): Promise<SuperAdminFaq[]> {
+  const res = await fetch(apiUrl("/api/super-admin/faqs"), { headers: authHeaders(token) });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminFaq[]>;
+}
+
+export async function createSuperAdminFaq(token: string, body: SuperAdminFaqBody): Promise<SuperAdminFaq> {
+  const res = await fetch(apiUrl("/api/super-admin/faqs"), {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminFaq>;
+}
+
+export async function updateSuperAdminFaq(token: string, id: number, body: Partial<SuperAdminFaqBody>): Promise<SuperAdminFaq> {
+  const res = await fetch(apiUrl(`/api/super-admin/faqs/${id}`), {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<SuperAdminFaq>;
+}
+
+export async function deleteSuperAdminFaq(token: string, id: number): Promise<void> {
+  const res = await fetch(apiUrl(`/api/super-admin/faqs/${id}`), {
+    method: "DELETE",
+    headers: authHeaders(token),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
 }
 
 export type CashBookLineSource = "order" | "scheme_payment" | "salary";

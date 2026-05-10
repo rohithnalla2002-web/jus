@@ -1,34 +1,49 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Lock, ShieldCheck, Sparkles, User } from "lucide-react";
+import { Crown, Lock, ShieldCheck, Sparkles, User } from "lucide-react";
 import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { useSuperAdminAuth } from "@/context/SuperAdminAuthContext";
 import { COMPANY_CIN, COMPANY_LEGAL_NAME } from "@/lib/company";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const { login, isAuthenticated, authReady } = useAdminAuth();
+  const adminAuth = useAdminAuth();
+  const superAdminAuth = useSuperAdminAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (authReady && isAuthenticated) navigate("/dashboard", { replace: true });
-  }, [authReady, isAuthenticated, navigate]);
+    if (superAdminAuth.authReady && superAdminAuth.isAuthenticated) {
+      navigate("/super-admin", { replace: true });
+      return;
+    }
+    if (adminAuth.authReady && adminAuth.isAuthenticated) navigate("/dashboard", { replace: true });
+  }, [
+    adminAuth.authReady,
+    adminAuth.isAuthenticated,
+    superAdminAuth.authReady,
+    superAdminAuth.isAuthenticated,
+    navigate,
+  ]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSubmitting(true);
     try {
-      const result = await login(username, password);
+      const isSuperAdminAttempt = username.trim().toLowerCase() === "super";
+      const result = isSuperAdminAttempt
+        ? await superAdminAuth.login(username, password)
+        : await adminAuth.login(username, password);
       if (!result.ok) {
         setError(result.error ?? "Sign in failed");
         return;
       }
-      navigate("/dashboard", { replace: true });
+      navigate(isSuperAdminAttempt ? "/super-admin" : "/dashboard", { replace: true });
     } finally {
       setSubmitting(false);
     }
@@ -59,7 +74,7 @@ export default function AdminLogin() {
         <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-violet-400 via-fuchsia-300 to-violet-500" />
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-300/60 bg-violet-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-800">
           <ShieldCheck className="h-3.5 w-3.5" />
-          Secure Admin Access
+          Unified Access
         </div>
         <div className="mx-auto flex justify-center">
           <GoldMindLogoMark size="xl" />
@@ -68,7 +83,9 @@ export default function AdminLogin() {
         <p className="mt-2 text-center text-xs text-zinc-600">
           GoldMind ERP · {COMPANY_LEGAL_NAME} · CIN {COMPANY_CIN}
         </p>
-        <p className="mt-1 text-center text-[11px] text-zinc-500">Sign in to manage billing, inventory, analytics, and AI insights.</p>
+        <p className="mt-1 text-center text-[11px] text-zinc-500">
+          Sign in as Admin or Super Admin from this single secure page.
+        </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div>
@@ -112,9 +129,10 @@ export default function AdminLogin() {
             {submitting ? "Signing in…" : "Sign in"}
           </motion.button>
         </form>
-        <p className="mt-4 text-center text-[11px] text-zinc-600">
-          Credentials are set in <span className="text-zinc-700">.env</span> as{" "}
-          <span className="text-zinc-700">ADMIN_USERNAME</span> / <span className="text-zinc-700">ADMIN_PASSWORD</span>
+        <p className="mt-4 flex items-center justify-center gap-1 text-center text-[11px] text-zinc-600">
+          <Crown className="h-3.5 w-3.5 text-violet-700" />
+          Super Admin: <span className="font-semibold text-zinc-700">super</span> /{" "}
+          <span className="font-semibold text-zinc-700">super@123</span>
         </p>
         <button type="button" onClick={() => navigate("/")} className="mt-4 w-full text-center text-xs text-zinc-600 hover:text-violet-700">
           ← Back to shop

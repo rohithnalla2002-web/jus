@@ -4,9 +4,10 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AppDemoProvider } from "./context/AppDemoContext";
-import { AdminAuthProvider, useAdminAuth } from "./context/AdminAuthContext";
-import { ShopCartProvider } from "./context/ShopCartContext";
+import { AppDemoProvider } from "@/context/AppDemoContext";
+import { AdminAuthProvider, useAdminAuth } from "@/context/AdminAuthContext";
+import { SuperAdminAuthProvider, useSuperAdminAuth } from "@/context/SuperAdminAuthContext";
+import { ShopCartProvider } from "@/context/ShopCartContext";
 import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
 import Sales from "./pages/Sales";
@@ -30,6 +31,14 @@ import CartPage from "./pages/shop/CartPage";
 import AboutPage from "./pages/shop/AboutPage";
 import ContactPage from "./pages/shop/ContactPage";
 import AdminLogin from "./pages/admin/AdminLogin";
+import SuperAdminDashboard from "./pages/super-admin/SuperAdminDashboard";
+import SuperAdminAdmins from "./pages/super-admin/SuperAdminAdmins";
+import SuperAdminAdminDetails from "./pages/super-admin/SuperAdminAdminDetails";
+import SuperAdminAudit from "./pages/super-admin/SuperAdminAudit";
+import SuperAdminSettings from "./pages/super-admin/SuperAdminSettings";
+import SuperAdminMonitoring from "./pages/super-admin/SuperAdminMonitoring";
+import SuperAdminTickets from "./pages/super-admin/SuperAdminTickets";
+import SuperAdminFaqs from "./pages/super-admin/SuperAdminFaqs";
 import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
 
 const queryClient = new QueryClient();
@@ -48,9 +57,32 @@ function ProtectedAdmin({ children }: { children: ReactElement }) {
   return children;
 }
 
+function ProtectedSuperAdmin({ children }: { children: ReactElement }) {
+  const { authReady, isAuthenticated } = useSuperAdminAuth();
+  if (!authReady) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-4 text-center text-muted-foreground text-sm">
+        <GoldMindLogoMark size="lg" />
+        <span>Checking super admin session…</span>
+      </div>
+    );
+  }
+  if (!isAuthenticated) return <Navigate to="/admin/login" replace />;
+  return children;
+}
+
 const AppRoutes = () => (
   <Routes>
     <Route path="/admin/login" element={<AdminLogin />} />
+    <Route path="/super-admin/login" element={<Navigate to="/admin/login" replace />} />
+    <Route path="/super-admin" element={<ProtectedSuperAdmin><SuperAdminDashboard /></ProtectedSuperAdmin>} />
+    <Route path="/super-admin/admins" element={<ProtectedSuperAdmin><SuperAdminAdmins /></ProtectedSuperAdmin>} />
+    <Route path="/super-admin/admins/:adminId" element={<ProtectedSuperAdmin><SuperAdminAdminDetails /></ProtectedSuperAdmin>} />
+    <Route path="/super-admin/tickets" element={<ProtectedSuperAdmin><SuperAdminTickets /></ProtectedSuperAdmin>} />
+    <Route path="/super-admin/faqs" element={<ProtectedSuperAdmin><SuperAdminFaqs /></ProtectedSuperAdmin>} />
+    <Route path="/super-admin/monitoring" element={<ProtectedSuperAdmin><SuperAdminMonitoring /></ProtectedSuperAdmin>} />
+    <Route path="/super-admin/audit" element={<ProtectedSuperAdmin><SuperAdminAudit /></ProtectedSuperAdmin>} />
+    <Route path="/super-admin/settings" element={<ProtectedSuperAdmin><SuperAdminSettings /></ProtectedSuperAdmin>} />
 
     {/* Gold schemes early so this path always wins over catch-all; aliases for typos */}
     <Route path="/gold-schemes" element={<ProtectedAdmin><GoldSchemes /></ProtectedAdmin>} />
@@ -87,17 +119,19 @@ const AppRoutes = () => (
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AdminAuthProvider>
-      <AppDemoProvider>
-        <ShopCartProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
-          </TooltipProvider>
-        </ShopCartProvider>
-      </AppDemoProvider>
+      <SuperAdminAuthProvider>
+        <AppDemoProvider>
+          <ShopCartProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+            </TooltipProvider>
+          </ShopCartProvider>
+        </AppDemoProvider>
+      </SuperAdminAuthProvider>
     </AdminAuthProvider>
   </QueryClientProvider>
 );

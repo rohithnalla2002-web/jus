@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import pool from "./db.js";
 import { formatCurrency, parseCurrency } from "./format.js";
-import { createAdminAuthRouter } from "./auth.js";
+import { createAdminAuthRouter, createSuperAdminRouter, hashPassword } from "./auth.js";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -169,6 +169,85 @@ async function ensureBaseSchema() {
     await client.query(
       `CREATE INDEX IF NOT EXISTS idx_activities_created ON activities (created_at DESC)`,
     );
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS admin_users (
+        id SERIAL PRIMARY KEY,
+        username TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL DEFAULT '',
+        phone TEXT NOT NULL DEFAULT '',
+        role_label TEXT NOT NULL DEFAULT 'Branch Admin',
+        status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+        permissions JSONB NOT NULL DEFAULT '{"dashboard":true,"inventory":true,"sales":true,"karigar":true,"customers":true,"employees":true,"accounting":true,"reports":true,"goldSchemes":true,"oldGoldExchange":true}'::jsonb,
+        locked_until TIMESTAMPTZ,
+        force_password_reset BOOLEAN NOT NULL DEFAULT false,
+        failed_login_count INT NOT NULL DEFAULT 0,
+        last_failed_login_at TIMESTAMPTZ,
+        last_login_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    await client.query(`
+      ALTER TABLE admin_users
+        ADD COLUMN IF NOT EXISTS permissions JSONB NOT NULL DEFAULT '{"dashboard":true,"inventory":true,"sales":true,"karigar":true,"customers":true,"employees":true,"accounting":true,"reports":true,"goldSchemes":true,"oldGoldExchange":true}'::jsonb,
+        ADD COLUMN IF NOT EXISTS locked_until TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS force_password_reset BOOLEAN NOT NULL DEFAULT false,
+        ADD COLUMN IF NOT EXISTS failed_login_count INT NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS last_failed_login_at TIMESTAMPTZ;
+    `);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_admin_users_status ON admin_users (status);`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_admin_users_locked_until ON admin_users (locked_until);`);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS admin_audit_logs (
+        id BIGSERIAL PRIMARY KEY,
+        actor TEXT NOT NULL,
+        action TEXT NOT NULL,
+        detail TEXT NOT NULL DEFAULT '',
+        admin_id INT REFERENCES admin_users(id) ON DELETE SET NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_admin_audit_logs_created ON admin_audit_logs (created_at DESC);`);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS support_tickets (
+        id BIGSERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
+        requester_name TEXT NOT NULL DEFAULT '',
+        requester_email TEXT NOT NULL DEFAULT '',
+        priority TEXT NOT NULL DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'urgent')),
+        status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'resolved', 'closed')),
+        assigned_admin_id INT REFERENCES admin_users(id) ON DELETE SET NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_support_tickets_status ON support_tickets (status, created_at DESC);`);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS faqs (
+        id BIGSERIAL PRIMARY KEY,
+        question TEXT NOT NULL,
+        answer TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'published' CHECK (status IN ('draft', 'published')),
+        display_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_faqs_status_order ON faqs (status, display_order, id);`);
+    const seedAdminUser = String(process.env.ADMIN_USERNAME ?? "").trim();
+    const seedAdminPass = String(process.env.ADMIN_PASSWORD ?? "").trim();
+    if (seedAdminUser && seedAdminPass) {
+      const passwordHash = await hashPassword(seedAdminPass);
+      await client.query(
+        `INSERT INTO admin_users (username, password_hash, name, email, phone, role_label, status)
+         VALUES ($1, $2, $3, '', '', 'Primary Admin', 'active')
+         ON CONFLICT (username) DO NOTHING`,
+        [seedAdminUser, passwordHash, seedAdminUser],
+      );
+    }
   } finally {
     client.release();
   }
@@ -250,6 +329,7 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "4mb" }));
 
 app.use("/api/admin", createAdminAuthRouter());
+app.use("/api/super-admin", createSuperAdminRouter());
 
 const orderStatusSequence = ["ordered", "in-production", "ready", "delivered"];
 const jobColumnSequence = ["assigned", "inProgress", "completed"];
