@@ -26,12 +26,14 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  /** Wait until both sessions have finished loading; otherwise a stale admin token + slow super session (prod latency) sends users to /dashboard before super resolves. */
   useEffect(() => {
-    if (superAdminAuth.authReady && superAdminAuth.isAuthenticated) {
+    if (!adminAuth.authReady || !superAdminAuth.authReady) return;
+    if (superAdminAuth.isAuthenticated) {
       navigate("/super-admin", { replace: true });
       return;
     }
-    if (adminAuth.authReady && adminAuth.isAuthenticated) navigate("/dashboard", { replace: true });
+    if (adminAuth.isAuthenticated) navigate("/dashboard", { replace: true });
   }, [
     adminAuth.authReady,
     adminAuth.isAuthenticated,
@@ -47,9 +49,14 @@ export default function AdminLogin() {
     try {
       const isSuperAdminAttempt =
         username.trim().toLowerCase() === hintSuperUser.trim().toLowerCase();
-      const result = isSuperAdminAttempt
-        ? await superAdminAuth.login(username, password)
-        : await adminAuth.login(username, password);
+      let result: { ok: boolean; error?: string; loginAsSuperAdmin?: boolean };
+      if (isSuperAdminAttempt) {
+        adminAuth.logout();
+        result = await superAdminAuth.login(username, password);
+      } else {
+        superAdminAuth.logout();
+        result = await adminAuth.login(username, password);
+      }
       if (!result.ok) {
         setError(result.error ?? "Sign in failed");
         return;

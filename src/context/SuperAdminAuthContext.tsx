@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { superAdminLogin, superAdminSession } from "@/lib/api";
-import { SUPER_ADMIN_TOKEN_SESSION_KEY } from "@/lib/sessionKeys";
+import { ADMIN_TOKEN_SESSION_KEY, SUPER_ADMIN_TOKEN_SESSION_KEY } from "@/lib/sessionKeys";
 
 type SuperAdminAuthContextValue = {
   authReady: boolean;
@@ -49,6 +49,7 @@ export function SuperAdminAuthProvider({ children }: { children: ReactNode }) {
 
     try {
       const result = await superAdminLogin(u, password);
+      sessionStorage.removeItem(ADMIN_TOKEN_SESSION_KEY);
       sessionStorage.setItem(SUPER_ADMIN_TOKEN_SESSION_KEY, result.token);
       setUsername(result.username);
       setName(result.name);

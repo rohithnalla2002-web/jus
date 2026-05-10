@@ -43,9 +43,11 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     try {
       const data = await adminLogin(u, password);
       if (data.loginAs === "super_admin") {
+        sessionStorage.removeItem(ADMIN_TOKEN_SESSION_KEY);
         sessionStorage.setItem(SUPER_ADMIN_TOKEN_SESSION_KEY, data.token);
         return { ok: true, loginAsSuperAdmin: true };
       }
+      sessionStorage.removeItem(SUPER_ADMIN_TOKEN_SESSION_KEY);
       sessionStorage.setItem(ADMIN_TOKEN_SESSION_KEY, data.token);
       setUsername(data.username);
       return { ok: true };
