@@ -31,6 +31,7 @@ In Render: your **Web Service** → **Environment** → add:
 | `JWT_SECRET` | Yes | Long random string (e.g. `openssl rand -hex 32`). |
 | `ADMIN_USERNAME` | Yes | Branch admin user for `/admin/login` (seeded into `admin_users`). |
 | `ADMIN_PASSWORD` | Yes | Strong password (pairs with `ADMIN_USERNAME`). |
+| `ADMIN_SYNC_PASSWORD_FROM_ENV` | Optional | Set to `true` **once** after rotating `ADMIN_PASSWORD` if login still returns 401 — existing rows use `ON CONFLICT DO NOTHING` unless this sync is enabled. Remove or set `false` after login works if admins manage passwords in the app. |
 | `SUPER_ADMIN_USERNAME` | Recommended | Super Admin login username (default `super`). Must match `VITE_LOGIN_HINT_SUPER_USERNAME` if you set that on the frontend for routing/hints. |
 | `SUPER_ADMIN_PASSWORD` | Recommended | Super Admin password (change default before production). |
 | `NODE_ENV` | Recommended | `production` |
@@ -145,3 +146,17 @@ The API uses permissive CORS for browser calls from your Netlify domain. If you 
 | **Render env** | Render API at runtime | Dashboard |
 
 Keep **secrets** (DB password, `JWT_SECRET`, `ADMIN_PASSWORD`) only in Render / local `.env`, never in the repo.
+
+---
+
+## 7. Troubleshooting: `401` on `/api/admin/login`
+
+The API returns **401** when the username/password do **not** match a row in Postgres table `admin_users` (wrong password, wrong username, or no row).
+
+**Why env vars alone might not fix it**
+
+- Variables must be on the **Web Service** that runs the Node API, not only on the Postgres add-on.
+- After the first boot, the server runs `INSERT ... ON CONFLICT (username) DO NOTHING`. So if `admin` already exists with an **old** hash, changing `ADMIN_PASSWORD` in the dashboard does **not** update the database until you either:
+  - set **`ADMIN_SYNC_PASSWORD_FROM_ENV=true`**, redeploy once (see env table above), then turn it off if you use in-app password changes, or
+  - delete/update the row in `admin_users`, or reset the password via **Super Admin**.
+- Log in with **exact** `ADMIN_USERNAME` (case-insensitive) and that user’s password — not the Super Admin password unless you are using the Super Admin flow (`SUPER_ADMIN_*` and username matching your configured super admin).
