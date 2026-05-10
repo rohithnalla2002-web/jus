@@ -7,11 +7,15 @@ import { useAdminAuth } from "@/context/AdminAuthContext";
 import { useSuperAdminAuth } from "@/context/SuperAdminAuthContext";
 import { COMPANY_CIN, COMPANY_LEGAL_NAME } from "@/lib/company";
 
-/** Optional VITE_LOGIN_HINT_* in .env — mirror server ADMIN_* / SUPER_ADMIN_* for local dev only. */
-const hintAdminUser = import.meta.env.VITE_LOGIN_HINT_ADMIN_USERNAME ?? "admin";
+/**
+ * Optional VITE_LOGIN_HINT_* — mirror server ADMIN_* / SUPER_ADMIN_* for dev/prod hints.
+ * Use `||` fallbacks: an empty string from the host env (e.g. Netlify key with no value) must not
+ * wipe defaults — otherwise "super" would wrongly POST to /api/admin/login instead of /api/super-admin/login.
+ */
+const hintAdminUser = import.meta.env.VITE_LOGIN_HINT_ADMIN_USERNAME?.trim() || "admin";
 const hintAdminPass = import.meta.env.VITE_LOGIN_HINT_ADMIN_PASSWORD ?? "";
-const hintSuperUser = import.meta.env.VITE_LOGIN_HINT_SUPER_USERNAME ?? "super";
-const hintSuperPass = import.meta.env.VITE_LOGIN_HINT_SUPER_PASSWORD ?? "super@123";
+const hintSuperUser = import.meta.env.VITE_LOGIN_HINT_SUPER_USERNAME?.trim() || "super";
+const hintSuperPass = import.meta.env.VITE_LOGIN_HINT_SUPER_PASSWORD?.trim() || "super@123";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
