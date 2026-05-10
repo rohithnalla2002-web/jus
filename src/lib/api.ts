@@ -3,7 +3,16 @@ import { formatCurrency } from "@/lib/demo";
 const jsonHeaders = { "Content-Type": "application/json" };
 
 /** Use VITE_API_URL when the UI is served without a dev proxy (e.g. static hosting + separate API). */
-const apiUrl = (path: string) => `${import.meta.env.VITE_API_URL ?? ""}${path}`;
+function normalizeApiOrigin(): string {
+  const raw = String(import.meta.env.VITE_API_URL ?? "").trim();
+  return raw.replace(/\/+$/, "");
+}
+
+const apiUrl = (path: string) => {
+  const base = normalizeApiOrigin();
+  const p = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${p}`;
+};
 
 async function parseError(res: Response): Promise<string> {
   try {

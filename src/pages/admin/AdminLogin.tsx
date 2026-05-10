@@ -6,6 +6,7 @@ import { GoldMindLogoMark } from "@/components/shared/GoldMindBrandLogo";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { useSuperAdminAuth } from "@/context/SuperAdminAuthContext";
 import { COMPANY_CIN, COMPANY_LEGAL_NAME } from "@/lib/company";
+import { appOriginPath } from "@/lib/appOriginPath";
 
 /**
  * Optional VITE_LOGIN_HINT_* — mirror server ADMIN_* / SUPER_ADMIN_* for dev/prod hints.
@@ -26,20 +27,22 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  /** Wait until both sessions have finished loading; otherwise a stale admin token + slow super session (prod latency) sends users to /dashboard before super resolves. */
+  /**
+   * Auto-leave login when already signed in. Use full navigation so providers remount with sessionStorage
+   * (avoids SPA races in production where client routing sent users to /dashboard before super-admin resolved).
+   */
   useEffect(() => {
     if (!adminAuth.authReady || !superAdminAuth.authReady) return;
     if (superAdminAuth.isAuthenticated) {
-      navigate("/super-admin", { replace: true });
+      window.location.assign(appOriginPath("/super-admin"));
       return;
     }
-    if (adminAuth.isAuthenticated) navigate("/dashboard", { replace: true });
+    if (adminAuth.isAuthenticated) window.location.assign(appOriginPath("/dashboard"));
   }, [
     adminAuth.authReady,
     adminAuth.isAuthenticated,
     superAdminAuth.authReady,
     superAdminAuth.isAuthenticated,
-    navigate,
   ]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,10 +66,10 @@ export default function AdminLogin() {
       }
       /** Server accepted Super Admin on /api/admin/login; session key lives outside Router — hard-navigate so SuperAdminAuthProvider reloads. */
       if ("loginAsSuperAdmin" in result && result.loginAsSuperAdmin) {
-        window.location.assign(`${window.location.origin}/super-admin`);
+        window.location.assign(appOriginPath("/super-admin"));
         return;
       }
-      navigate(isSuperAdminAttempt ? "/super-admin" : "/dashboard", { replace: true });
+      window.location.assign(appOriginPath(isSuperAdminAttempt ? "/super-admin" : "/dashboard"));
     } finally {
       setSubmitting(false);
     }
