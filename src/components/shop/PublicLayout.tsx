@@ -23,7 +23,7 @@ export default function PublicLayout() {
   }, [location.hash, location.pathname, dataLoading]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#faf8ff] via-[#f4f0ff] to-[#ebe4f9] text-zinc-900">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-[#faf8ff] via-[#f4f0ff] to-[#ebe4f9] text-zinc-900">
       <ShopNav />
       {dataError && !isLandingPage && (
         <div className="mx-auto max-w-4xl px-4 pt-3 text-sm text-violet-900 bg-violet-100/90 border border-violet-200 rounded-lg py-2">
@@ -33,7 +33,7 @@ export default function PublicLayout() {
       {dataLoading && !dataError && !isLandingPage && (
         <div className="mx-auto max-w-4xl px-4 pt-3 text-sm text-zinc-600">Loading catalogue…</div>
       )}
-      <main>
+      <main className="min-w-0 overflow-x-hidden">
         <Outlet />
       </main>
       <ShopFooter />

@@ -28,7 +28,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       />
 
       <div
-        className={`flex min-h-screen min-w-0 flex-col bg-background transition-all duration-300 md:min-h-0 md:h-[100dvh] md:max-h-[100dvh] md:overflow-hidden ${collapsed ? "md:pl-[72px]" : "md:pl-[260px]"}`}
+        className={`flex min-h-screen min-w-0 max-w-full flex-col overflow-x-hidden bg-background transition-all duration-300 md:min-h-0 md:h-[100dvh] md:max-h-[100dvh] md:overflow-hidden ${collapsed ? "md:pl-[72px]" : "md:pl-[260px]"}`}
       >
         <TopNavbar onOpenMobileNav={() => setMobileNavOpen(true)} />
         {dataError && (
@@ -36,7 +36,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             Data API error: {dataError}. Run <code className="text-xs">npm run dev --prefix server</code> and ensure PostgreSQL is up, then refresh.
           </div>
         )}
-        <main className="relative min-h-0 flex-1 basis-0 overflow-y-auto overscroll-y-contain px-3 py-4 sm:px-5 sm:py-6">
+        <main className="relative min-w-0 flex-1 overflow-x-hidden px-3 py-4 sm:px-5 sm:py-6 md:min-h-0 md:basis-0 md:overflow-y-auto md:overscroll-y-contain">
           {dataLoading && !dataError && (
             <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/70 backdrop-blur-sm">
               <p className="text-sm text-muted-foreground">Loading data…</p>

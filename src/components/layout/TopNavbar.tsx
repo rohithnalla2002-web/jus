@@ -21,7 +21,7 @@ export default function TopNavbar({ onOpenMobileNav }: { onOpenMobileNav: () => 
   const [showProfile, setShowProfile] = useState(false);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-border glass px-4 sm:px-6">
+    <header className="z-30 flex h-16 shrink-0 items-center justify-between border-b border-border glass px-4 sm:px-6 md:sticky md:top-0">
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <button
           type="button"
@@ -82,7 +82,7 @@ export default function TopNavbar({ onOpenMobileNav }: { onOpenMobileNav: () => 
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 12 }}
-                className="absolute right-0 mt-3 w-[calc(100vw-2rem)] sm:w-80 glass rounded-2xl p-4 gold-glow max-h-[80vh] overflow-hidden"
+                className="fixed left-4 right-4 top-16 z-50 mt-2 max-h-[calc(100dvh-5rem)] w-auto overflow-hidden rounded-2xl p-4 glass gold-glow sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-80 sm:max-h-[80vh]"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div>
@@ -98,7 +98,7 @@ export default function TopNavbar({ onOpenMobileNav }: { onOpenMobileNav: () => 
                   </button>
                 </div>
 
-                <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
+                <div className="max-h-[calc(100dvh-10rem)] space-y-2 overflow-y-auto pr-1 sm:max-h-[70vh]">
                   {notifications.map((notification) => (
                     <button
                       key={notification.id}
@@ -111,11 +111,11 @@ export default function TopNavbar({ onOpenMobileNav }: { onOpenMobileNav: () => 
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-medium text-foreground">{notification.title}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{notification.detail}</p>
+                        <div className="min-w-0">
+                          <p className="break-words text-sm font-medium text-foreground">{notification.title}</p>
+                          <p className="mt-1 break-words text-xs text-muted-foreground">{notification.detail}</p>
                         </div>
-                        <span className="text-[11px] text-muted-foreground whitespace-nowrap">{notification.time}</span>
+                        <span className="shrink-0 whitespace-nowrap text-[11px] text-muted-foreground">{notification.time}</span>
                       </div>
                     </button>
                   ))}

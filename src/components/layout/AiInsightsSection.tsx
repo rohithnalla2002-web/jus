@@ -807,7 +807,7 @@ export default function AiInsightsSection() {
       <Dialog open={reachOpen} onOpenChange={handleOpenChange}>
         <DialogContent
           className={cn(
-            "max-w-[min(100vw-1.25rem,42rem)] gap-0 overflow-hidden border-0 bg-transparent p-0 shadow-none sm:max-w-2xl",
+            "max-h-[calc(100dvh-1rem)] max-w-[min(100vw-1.25rem,42rem)] gap-0 overflow-y-auto border-0 bg-transparent p-0 shadow-none sm:max-w-2xl",
             "[&>button]:right-3 [&>button]:top-3 [&>button]:rounded-full [&>button]:bg-black/25 [&>button]:text-white [&>button]:opacity-90 [&>button]:ring-1 [&>button]:ring-white/30 [&>button]:hover:bg-black/40 [&>button]:hover:opacity-100",
           )}
         >
@@ -924,8 +924,8 @@ export default function AiInsightsSection() {
                         id="ai-reach-message"
                         value={messageDraft}
                         onChange={(e) => setMessageDraft(e.target.value)}
-                        rows={11}
-                        className="min-h-[240px] resize-y border-violet-200/70 bg-white/90 text-sm leading-relaxed shadow-sm transition-shadow focus-visible:border-violet-400 focus-visible:shadow-md focus-visible:ring-violet-400/30"
+                        rows={7}
+                        className="min-h-[150px] resize-y border-violet-200/70 bg-white/90 text-sm leading-relaxed shadow-sm transition-shadow focus-visible:border-violet-400 focus-visible:shadow-md focus-visible:ring-violet-400/30 sm:min-h-[240px]"
                       />
                     </motion.div>
 
