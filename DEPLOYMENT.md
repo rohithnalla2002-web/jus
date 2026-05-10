@@ -29,8 +29,10 @@ In Render: your **Web Service** → **Environment** → add:
 |----------|----------|--------|
 | `DATABASE_URL` | Yes | Use Render’s **Internal Database URL** for the Postgres instance (same region as the web service). |
 | `JWT_SECRET` | Yes | Long random string (e.g. `openssl rand -hex 32`). |
-| `ADMIN_USERNAME` | Yes | Admin login user for `/admin/login`. |
-| `ADMIN_PASSWORD` | Yes | Strong password. |
+| `ADMIN_USERNAME` | Yes | Branch admin user for `/admin/login` (seeded into `admin_users`). |
+| `ADMIN_PASSWORD` | Yes | Strong password (pairs with `ADMIN_USERNAME`). |
+| `SUPER_ADMIN_USERNAME` | Recommended | Super Admin login username (default `super`). Must match `VITE_LOGIN_HINT_SUPER_USERNAME` if you set that on the frontend for routing/hints. |
+| `SUPER_ADMIN_PASSWORD` | Recommended | Super Admin password (change default before production). |
 | `NODE_ENV` | Recommended | `production` |
 | `PORT` | No | Render sets this automatically; the app already uses `process.env.PORT`. |
 

@@ -7,6 +7,12 @@ import { useAdminAuth } from "@/context/AdminAuthContext";
 import { useSuperAdminAuth } from "@/context/SuperAdminAuthContext";
 import { COMPANY_CIN, COMPANY_LEGAL_NAME } from "@/lib/company";
 
+/** Optional VITE_LOGIN_HINT_* in .env — mirror server ADMIN_* / SUPER_ADMIN_* for local dev only. */
+const hintAdminUser = import.meta.env.VITE_LOGIN_HINT_ADMIN_USERNAME ?? "admin";
+const hintAdminPass = import.meta.env.VITE_LOGIN_HINT_ADMIN_PASSWORD ?? "";
+const hintSuperUser = import.meta.env.VITE_LOGIN_HINT_SUPER_USERNAME ?? "super";
+const hintSuperPass = import.meta.env.VITE_LOGIN_HINT_SUPER_PASSWORD ?? "super@123";
+
 export default function AdminLogin() {
   const navigate = useNavigate();
   const adminAuth = useAdminAuth();
@@ -35,7 +41,8 @@ export default function AdminLogin() {
     setError("");
     setSubmitting(true);
     try {
-      const isSuperAdminAttempt = username.trim().toLowerCase() === "super";
+      const isSuperAdminAttempt =
+        username.trim().toLowerCase() === hintSuperUser.trim().toLowerCase();
       const result = isSuperAdminAttempt
         ? await superAdminAuth.login(username, password)
         : await adminAuth.login(username, password);
@@ -129,11 +136,25 @@ export default function AdminLogin() {
             {submitting ? "Signing in…" : "Sign in"}
           </motion.button>
         </form>
-        <p className="mt-4 flex items-center justify-center gap-1 text-center text-[11px] text-zinc-600">
-          <Crown className="h-3.5 w-3.5 text-violet-700" />
-          Super Admin: <span className="font-semibold text-zinc-700">super</span> /{" "}
-          <span className="font-semibold text-zinc-700">super@123</span>
-        </p>
+        <div className="mt-4 space-y-1 text-center text-[11px] text-zinc-600">
+          <p className="flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5">
+            <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-violet-700" aria-hidden />
+            Branch admin: <span className="font-semibold text-zinc-700">{hintAdminUser}</span>
+            {hintAdminPass ? (
+              <>
+                {" "}
+                / <span className="font-semibold text-zinc-700">{hintAdminPass}</span>
+              </>
+            ) : (
+              <span className="text-zinc-500"> · password = ADMIN_PASSWORD in API .env</span>
+            )}
+          </p>
+          <p className="flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5">
+            <Crown className="h-3.5 w-3.5 shrink-0 text-violet-700" aria-hidden />
+            Super Admin: <span className="font-semibold text-zinc-700">{hintSuperUser}</span> /{" "}
+            <span className="font-semibold text-zinc-700">{hintSuperPass}</span>
+          </p>
+        </div>
         <button type="button" onClick={() => navigate("/")} className="mt-4 w-full text-center text-xs text-zinc-600 hover:text-violet-700">
           ← Back to shop
         </button>
