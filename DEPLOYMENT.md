@@ -30,8 +30,8 @@ In Render: your **Web Service** → **Environment** → add:
 | `DATABASE_URL` | Yes | Use Render’s **Internal Database URL** for the Postgres instance (same region as the web service). |
 | `JWT_SECRET` | Yes | Long random string (e.g. `openssl rand -hex 32`). |
 | `ADMIN_USERNAME` | Yes | Branch admin user for `/admin/login` (seeded into `admin_users`). |
-| `ADMIN_PASSWORD` | Yes | Strong password (pairs with `ADMIN_USERNAME`). |
-| `ADMIN_SYNC_PASSWORD_FROM_ENV` | Optional | Set to `true` **once** after rotating `ADMIN_PASSWORD` if login still returns 401 — existing rows use `ON CONFLICT DO NOTHING` unless this sync is enabled. Remove or set `false` after login works if admins manage passwords in the app. |
+| `ADMIN_PASSWORD` | Yes | Strong password (pairs with `ADMIN_USERNAME`). On each API boot, the hash for `ADMIN_USERNAME` is updated from this value unless `ADMIN_SKIP_ENV_PASSWORD_OVERWRITE=true`. |
+| `ADMIN_SKIP_ENV_PASSWORD_OVERWRITE` | Optional | Set to `true` only if you must keep the DB password for `ADMIN_USERNAME` and not overwrite it from `ADMIN_PASSWORD` on startup (default is overwrite). |
 | `SUPER_ADMIN_USERNAME` | Recommended | Super Admin login username (default `super`). Must match `VITE_LOGIN_HINT_SUPER_USERNAME` if you set that on the frontend for routing/hints. |
 | `SUPER_ADMIN_PASSWORD` | Recommended | Super Admin password (change default before production). |
 | `NODE_ENV` | Recommended | `production` |
@@ -153,10 +153,8 @@ Keep **secrets** (DB password, `JWT_SECRET`, `ADMIN_PASSWORD`) only in Render / 
 
 The API returns **401** when the username/password do **not** match a row in Postgres table `admin_users` (wrong password, wrong username, or no row).
 
-**Why env vars alone might not fix it**
+**Checklist**
 
 - Variables must be on the **Web Service** that runs the Node API, not only on the Postgres add-on.
-- After the first boot, the server runs `INSERT ... ON CONFLICT (username) DO NOTHING`. So if `admin` already exists with an **old** hash, changing `ADMIN_PASSWORD` in the dashboard does **not** update the database until you either:
-  - set **`ADMIN_SYNC_PASSWORD_FROM_ENV=true`**, redeploy once (see env table above), then turn it off if you use in-app password changes, or
-  - delete/update the row in `admin_users`, or reset the password via **Super Admin**.
-- Log in with **exact** `ADMIN_USERNAME` (case-insensitive) and that user’s password — not the Super Admin password unless you are using the Super Admin flow (`SUPER_ADMIN_*` and username matching your configured super admin).
+- After changing `ADMIN_USERNAME` / `ADMIN_PASSWORD`, **redeploy** (or restart) so startup runs the seed upsert; the API **updates** the stored hash from `ADMIN_PASSWORD` each boot unless **`ADMIN_SKIP_ENV_PASSWORD_OVERWRITE=true`**.
+- Log in with **exact** `ADMIN_USERNAME` (case-insensitive) and **`ADMIN_PASSWORD`** — not the Super Admin password (that uses `/api/super-admin/login` when the username matches `SUPER_ADMIN_USERNAME`).

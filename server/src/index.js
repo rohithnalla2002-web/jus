@@ -239,13 +239,21 @@ async function ensureBaseSchema() {
     await client.query(`CREATE INDEX IF NOT EXISTS idx_faqs_status_order ON faqs (status, display_order, id);`);
     const seedAdminUser = String(process.env.ADMIN_USERNAME ?? "").trim();
     const seedAdminPass = String(process.env.ADMIN_PASSWORD ?? "").trim();
-    const syncAdminPasswordFromEnv = process.env.ADMIN_SYNC_PASSWORD_FROM_ENV === "true";
+    /** When false (default), startup overwrites password_hash for ADMIN_USERNAME from ADMIN_PASSWORD so Render env stays authoritative. */
+    const preserveSeededPassword = process.env.ADMIN_SKIP_ENV_PASSWORD_OVERWRITE === "true";
     if (seedAdminUser && !seedAdminPass) {
       console.warn("[api] ADMIN_USERNAME is set but ADMIN_PASSWORD is empty — branch admin will not be seeded or updated.");
     }
     if (seedAdminUser && seedAdminPass) {
       const passwordHash = await hashPassword(seedAdminPass);
-      if (syncAdminPasswordFromEnv) {
+      if (preserveSeededPassword) {
+        await client.query(
+          `INSERT INTO admin_users (username, password_hash, name, email, phone, role_label, status)
+           VALUES ($1, $2, $3, '', '', 'Primary Admin', 'active')
+           ON CONFLICT (username) DO NOTHING`,
+          [seedAdminUser, passwordHash, seedAdminUser],
+        );
+      } else {
         await client.query(
           `INSERT INTO admin_users (username, password_hash, name, email, phone, role_label, status)
            VALUES ($1, $2, $3, '', '', 'Primary Admin', 'active')
@@ -253,14 +261,6 @@ async function ensureBaseSchema() {
              password_hash = EXCLUDED.password_hash,
              name = EXCLUDED.name,
              updated_at = NOW()`,
-          [seedAdminUser, passwordHash, seedAdminUser],
-        );
-        console.info("[api] Branch admin user/password synced from ADMIN_USERNAME / ADMIN_PASSWORD (ADMIN_SYNC_PASSWORD_FROM_ENV=true).");
-      } else {
-        await client.query(
-          `INSERT INTO admin_users (username, password_hash, name, email, phone, role_label, status)
-           VALUES ($1, $2, $3, '', '', 'Primary Admin', 'active')
-           ON CONFLICT (username) DO NOTHING`,
           [seedAdminUser, passwordHash, seedAdminUser],
         );
       }
