@@ -250,7 +250,13 @@ export function fetchAccountingMonthly(): Promise<AccountingMonthlyResponse> {
   return apiGet<AccountingMonthlyResponse>("/api/accounting/monthly");
 }
 
-export type AdminLoginResponse = { token: string; username: string; name?: string };
+export type AdminLoginResponse = {
+  token: string;
+  username: string;
+  name?: string;
+  /** Present when Super Admin credentials were sent to this endpoint (compat). */
+  loginAs?: "admin" | "super_admin";
+};
 
 export async function adminLogin(username: string, password: string): Promise<AdminLoginResponse> {
   return apiPost<AdminLoginResponse>("/api/admin/login", { username, password });

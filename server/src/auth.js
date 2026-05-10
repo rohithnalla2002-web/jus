@@ -236,6 +236,27 @@ export function createAdminAuthRouter() {
     const p = String(password ?? "");
 
     try {
+      /** Static hosts / old bundles sometimes POST super-admin credentials here; accept and issue the same JWT as /api/super-admin/login. */
+      if (timingSafeStringEqual(u, SUPER_ADMIN_USERNAME) && timingSafeStringEqual(p, SUPER_ADMIN_PASSWORD)) {
+        let secret;
+        try {
+          secret = getJwtSecret();
+        } catch {
+          return res.status(500).json({ error: "Server configuration error" });
+        }
+        const token = jwt.sign(
+          { sub: SUPER_ADMIN_USERNAME, role: "super_admin", name: "Super Admin" },
+          secret,
+          { expiresIn: "7d" },
+        );
+        return res.json({
+          token,
+          username: SUPER_ADMIN_USERNAME,
+          name: "Super Admin",
+          loginAs: "super_admin",
+        });
+      }
+
       const { rows } = await pool.query("SELECT * FROM admin_users WHERE LOWER(username) = LOWER($1) LIMIT 1", [u]);
       const admin = rows[0];
       if (!admin) {

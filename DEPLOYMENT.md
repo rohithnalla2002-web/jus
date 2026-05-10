@@ -158,3 +158,4 @@ The API returns **401** when the username/password do **not** match a row in Pos
 - Variables must be on the **Web Service** that runs the Node API, not only on the Postgres add-on.
 - After changing `ADMIN_USERNAME` / `ADMIN_PASSWORD`, **redeploy** (or restart) so startup runs the seed upsert; the API **updates** the stored hash from `ADMIN_PASSWORD` each boot unless **`ADMIN_SKIP_ENV_PASSWORD_OVERWRITE=true`**.
 - Log in with **exact** `ADMIN_USERNAME` (case-insensitive) and **`ADMIN_PASSWORD`** — not the Super Admin password (that uses `/api/super-admin/login` when the username matches `SUPER_ADMIN_USERNAME`).
+- **Super Admin env vars (`SUPER_ADMIN_*`) exist only on the API** — the Netlify build cannot read them. If you send Super Admin credentials to `/api/admin/login` by mistake, the API now recognizes them (same JWT as `/api/super-admin/login`); redeploy **both** API and frontend so the UI stores the token correctly.

@@ -1,7 +1,6 @@
 import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { superAdminLogin, superAdminSession } from "@/lib/api";
-
-const SUPER_ADMIN_TOKEN_KEY = "goldmind-erp-super-admin-token";
+import { SUPER_ADMIN_TOKEN_SESSION_KEY } from "@/lib/sessionKeys";
 
 type SuperAdminAuthContextValue = {
   authReady: boolean;
@@ -22,7 +21,7 @@ export function SuperAdminAuthProvider({ children }: { children: ReactNode }) {
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
-    const saved = sessionStorage.getItem(SUPER_ADMIN_TOKEN_KEY);
+    const saved = sessionStorage.getItem(SUPER_ADMIN_TOKEN_SESSION_KEY);
     if (!saved) {
       setAuthReady(true);
       return;
@@ -35,7 +34,7 @@ export function SuperAdminAuthProvider({ children }: { children: ReactNode }) {
         setToken(saved);
       })
       .catch(() => {
-        sessionStorage.removeItem(SUPER_ADMIN_TOKEN_KEY);
+        sessionStorage.removeItem(SUPER_ADMIN_TOKEN_SESSION_KEY);
         setUsername(null);
         setName(null);
         setToken(null);
@@ -50,7 +49,7 @@ export function SuperAdminAuthProvider({ children }: { children: ReactNode }) {
 
     try {
       const result = await superAdminLogin(u, password);
-      sessionStorage.setItem(SUPER_ADMIN_TOKEN_KEY, result.token);
+      sessionStorage.setItem(SUPER_ADMIN_TOKEN_SESSION_KEY, result.token);
       setUsername(result.username);
       setName(result.name);
       setToken(result.token);
@@ -62,7 +61,7 @@ export function SuperAdminAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
-    sessionStorage.removeItem(SUPER_ADMIN_TOKEN_KEY);
+    sessionStorage.removeItem(SUPER_ADMIN_TOKEN_SESSION_KEY);
     setUsername(null);
     setName(null);
     setToken(null);
@@ -91,5 +90,5 @@ export function useSuperAdminAuth() {
 }
 
 export function getSuperAdminToken(): string | null {
-  return sessionStorage.getItem(SUPER_ADMIN_TOKEN_KEY);
+  return sessionStorage.getItem(SUPER_ADMIN_TOKEN_SESSION_KEY);
 }

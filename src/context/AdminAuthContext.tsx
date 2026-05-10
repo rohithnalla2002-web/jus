@@ -1,14 +1,16 @@
 import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { adminLogin, adminSession } from "@/lib/api";
-
-const TOKEN_KEY = "goldmind-erp-admin-token";
+import { ADMIN_TOKEN_SESSION_KEY, SUPER_ADMIN_TOKEN_SESSION_KEY } from "@/lib/sessionKeys";
 
 type AdminAuthContextValue = {
   /** True after initial session check (or no token). */
   authReady: boolean;
   isAuthenticated: boolean;
   username: string | null;
-  login: (username: string, password: string) => Promise<{ ok: boolean; error?: string }>;
+  login: (
+    username: string,
+    password: string,
+  ) => Promise<{ ok: boolean; error?: string; loginAsSuperAdmin?: boolean }>;
   logout: () => void;
 };
 
@@ -19,7 +21,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
-    const token = sessionStorage.getItem(TOKEN_KEY);
+    const token = sessionStorage.getItem(ADMIN_TOKEN_SESSION_KEY);
     if (!token) {
       setAuthReady(true);
       return;
@@ -27,7 +29,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     adminSession(token)
       .then((r) => setUsername(r.username))
       .catch(() => {
-        sessionStorage.removeItem(TOKEN_KEY);
+        sessionStorage.removeItem(ADMIN_TOKEN_SESSION_KEY);
         setUsername(null);
       })
       .finally(() => setAuthReady(true));
@@ -39,9 +41,13 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     if (!password?.trim()) return { ok: false, error: "Enter your password." };
 
     try {
-      const { token, username: name } = await adminLogin(u, password);
-      sessionStorage.setItem(TOKEN_KEY, token);
-      setUsername(name);
+      const data = await adminLogin(u, password);
+      if (data.loginAs === "super_admin") {
+        sessionStorage.setItem(SUPER_ADMIN_TOKEN_SESSION_KEY, data.token);
+        return { ok: true, loginAsSuperAdmin: true };
+      }
+      sessionStorage.setItem(ADMIN_TOKEN_SESSION_KEY, data.token);
+      setUsername(data.username);
       return { ok: true };
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Login failed";
@@ -50,7 +56,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
-    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(ADMIN_TOKEN_SESSION_KEY);
     setUsername(null);
   }, []);
 
@@ -76,5 +82,5 @@ export function useAdminAuth() {
 
 /** Bearer token for authenticated API calls (admin UI). */
 export function getAdminToken(): string | null {
-  return sessionStorage.getItem(TOKEN_KEY);
+  return sessionStorage.getItem(ADMIN_TOKEN_SESSION_KEY);
 }

@@ -54,6 +54,11 @@ export default function AdminLogin() {
         setError(result.error ?? "Sign in failed");
         return;
       }
+      /** Server accepted Super Admin on /api/admin/login; session key lives outside Router — hard-navigate so SuperAdminAuthProvider reloads. */
+      if ("loginAsSuperAdmin" in result && result.loginAsSuperAdmin) {
+        window.location.assign(`${window.location.origin}/super-admin`);
+        return;
+      }
       navigate(isSuperAdminAttempt ? "/super-admin" : "/dashboard", { replace: true });
     } finally {
       setSubmitting(false);
